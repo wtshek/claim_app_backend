@@ -1,0 +1,48 @@
+<form id="edit_form" method="POST" accept-charset="UTF-8" action="?op=index">
+  <div class="box box-color box-bordered">
+    <div class="box-title">
+      <h3><i class="icon-edit"></i>{$dict.SET_operations.edit|escape}</h3>
+
+      <ul class="actions">
+        <li>
+          <button type="button" class="btn btn-mini content-slideUp">
+            <i class="icon-angle-down"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="box-content">
+      <div class="row">
+        <div class="col-12 col-lg-6">
+          {field_select name="salutation" title=$dict.LABEL_salutation options=$dict.SET_salutations id="salutation" selected=$user->getSalutation() error=$errors.salutation has_empty=true}
+          {field_text class="" name="first_name" title=$dict.LABEL_first_name id="first_name" maxlength="255" value=$user->getFirstName() error=$errors.first_name view_only=false}
+          {field_text class="" name="last_name" title=$dict.LABEL_last_name id="last_name" maxlength="255" value=$user->getLastName() error=$errors.last_name view_only=false}
+        </div>
+
+        <div class="col-12 col-lg-6">
+          {field_text class="" type="text" name="username" title=$dict.LABEL_username id="username" maxlength="255" value=$user->getUsername() error=$errors.username view_only=false}
+          {field_text class="" type="email" name="email" title=$dict.LABEL_email id="email" maxlength="255" value=$user->getEmail() error=$errors.email view_only=false}
+          {field_text class="" type="password" name="password" title=$dict.LABEL_password_new id="password" value="" error=$errors.password view_only=false}
+          {field_text class="" type="password" name="password_confirm" title=$dict.LABEL_password_confirm id="password_confirm" value="" error=$errors.password_confirm view_only=false}
+        </div>
+      </div>
+    </div>
+
+    <div class="actions_container">
+      <ul class="actions">
+        <li>
+          <button type="submit" name="submit" class="btn btn-primary">
+            <i class="icon-save"></i> {$dict.ACTION_save|escape}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</form>
+
+<script>
+(function() {
+    new form_submit_panel( $("#edit_form") );
+} )();
+</script>

@@ -1,0 +1,1197 @@
+<form action="?{$query_str}" method="POST" id="edit_webpage_form">
+  <div class="container-fluid nopadding role-content-wrapper">
+    <div class="row">
+      {if $action_title}
+      <div class="col-12 col-lg-6">
+        <h3 class="mt-3">{$action_title|escape}</h3>
+      </div>
+      {/if}
+
+      <div class="col-12 col-lg-{if $action_title}6{else}12{/if}">
+        <div class="form_actions">
+          <ul>
+            {if $data.webpage.id>0}
+            <li>
+              <button type="button" name="save_preview" class="btn btn-primary" disabled="disabled">
+                <i class="icon-eye-open"></i>
+                {$dict.ACTION_preview_save_draft|escape}</button>
+            </li>
+            {/if}
+
+            <li>
+              <button type="submit" name="save_draft" class="btn btn-primary" disabled="disabled">
+                <i class="icon-pencil"></i>
+                {$dict.ACTION_save_draft|escape}</button>
+            </li>
+
+            {if $data.webpage.id>0}
+            {if $user->hasRights('webpage_admin', Right::APPROVE) && in_array(Right::APPROVE, $current_webpage_rights)}
+            <li>
+              <button type="submit" name="save_publish" class="btn btn-primary" disabled="disabled">
+                <i class="icon-save"></i>
+                {$dict.ACTION_publish|escape}</button>
+            </li>
+            {else}
+            <li>
+              <button type="submit" name="save_approval" class="btn btn-primary" disabled="disabled">
+                <i class="icon-envelope"></i>
+                {$dict.ACTION_send_approve|escape}</button>
+            </li>
+            {/if}
+            {/if}
+
+            <li>
+              <button type="reset" name="save_cancel" class="btn btn-primary" disabled="disabled">
+                <i class="icon-remove-circle"></i>
+                {$dict.ACTION_cancel|escape}</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 col-lg-9">
+        <nav>
+          <div class="nav nav-tabs" id="edit-webpage-tab" role="tablist">
+            {foreach from=$dict.SET_content_types key=content_type item=contents}
+            <a class="nav-item nav-link {if $contents@first}active{/if}" id="setting-{$content_type|escape}-tab"
+              data-toggle="tab" href="#setting-{$content_type|escape}" role="tab"
+              aria-controls="setting-{$content_type|escape}" aria-selected="{if $contents@first}true{else}false{/if}"
+              data-tab-type="{$content_type|escape}">{$dict["LABEL_setting_`$content_type`"]|escape}</a>
+            {/foreach}
+
+            {if $data.webpage.id>0}
+            {foreach from=$dict.SET_content_types key=content_type item=contents}
+            <a class="nav-item nav-link" id="content-{$content_type|escape}-tab"
+              data-toggle="tab" href="#content-{$content_type|escape}" role="tab"
+              aria-controls="content-{$content_type|escape}" aria-selected="false"
+              data-tab-type="{$content_type|escape}">{$dict.LABEL_desktop_content|escape}</a>
+            {/foreach}
+
+            {if $page_type == "static" || $page_type == "structured_page"}
+            <a class="nav-item nav-link" id="offers-desktop-tab"
+              data-toggle="tab" href="#offers-desktop" role="tab"
+              aria-controls="offers-desktop" aria-selected="false"
+              data-tab-type="desktop">{$dict.LABEL_offers|escape}</a>
+            {/if}
+            {/if}
+          </div>
+        </nav>
+
+        <div class="tab-content tab-content-inline tab-content-bottom" id="edit-webpage-tabContent">
+          {$page_specific_content}
+          <input type="hidden" name="id" id="id" value="{$data.webpage.id|escape}" />
+        </div>
+      </div>
+
+      <aside class="col-12 col-lg-3 aside-right">
+        <div class="public-tree box box-color box-bordered">
+          <div class="box-title">
+            <h3>{$dict.LABEL_page_attributes|escape}</h3>
+          </div>
+
+          <div class="box-content">
+            <h4>{$dict.LABEL_page_type|escape}</h4>
+
+            <div class="field">
+              <div>
+                {*field_select ratio="0:12" wrap=false name="webpage_type_select" id="webpage_type_select" options=$dict.SET_webpage_types selected=$page_type view_only=(!$user->isGlobalUser() || $has_previous)*}
+                {field_select ratio="0:12" wrap=false name="webpage_type_select" id="webpage_type_select" options=$dict.SET_webpage_types selected=$page_type view_only=(!in_array(Right::CREATE, $current_webpage_rights) || $has_previous || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+                {if !in_array(Right::CREATE, $current_webpage_rights) || $has_previous || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+                <div class="d-none">
+                  {field_select ratio="0:12" wrap=false name="webpage_type_select" id="webpage_type_select" options=$dict.SET_webpage_types selected=$page_type view_only=false}
+                </div>
+                {/if}
+              </div>
+            </div>
+
+            {if $page_type == 'structured_page'}
+            <h4>{$dict.LABEL_page_template|escape}</h4>
+
+            <div class="field">
+              <div>
+                {field_select ratio="0:12" wrap=false name="structured_page_template" id="structured_page_template" options=$dict.SET_structured_page_type selected=$structured_page_template view_only=(!in_array(Right::CREATE, $current_webpage_rights) || $has_previous || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+                {if !in_array(Right::CREATE, $current_webpage_rights) || $has_previous || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+                <div class="d-none">
+                  {field_select ratio="0:12" wrap=false name="structured_page_template" id="structured_page_template" options=$dict.SET_structured_page_type selected=$structured_page_template view_only=false}
+                </div>
+                {/if}
+              </div>
+            </div>
+            {/if}
+
+            {if !$root_page}
+            <h4>{$dict.LABEL_default_alias|escape}</h4>
+
+            <div class="field">
+              <div>
+                {field_text ratio="0:12" wrap=false name="default_alias" id="default_alias" value=$data.webpage['desktop']['alias'] view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+                </div>
+                {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+                <div class="d-none">
+                  {field_text ratio="0:12" wrap=false name="default_alias" id="default_alias" view_only=false}
+                </div>
+              {/if}
+            </div>
+            {/if}
+
+            <h4>{$dict.LABEL_access|escape}</h4>
+
+            <div>
+              {field_select ratio="0:12" name="accessible_public_roles[]" id="public_access_right_select" options=$public_role_options multiple=true selected=$data.webpage.accessible_public_roles view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+              {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+              <div class="d-none">
+                {field_select ratio="0:12" name="accessible_public_roles[]" id="public_access_right_select" options=$public_role_options multiple=true selected=$data.webpage.accessible_public_roles view_only=false}
+              </div>
+              {/if}
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <input type="hidden" name="submitForm" id="submitForm" value="1" />
+    <input type="hidden" name="duplicate_content" id="duplicate_content" value="0" />
+    <input type="hidden" name="webpage_type" id="webpage_type" value="{$page_type|escape}" />
+    <input type="hidden" name="platforms[]" value="{$data.webpage.platforms|reset|escape}">
+    <input type="hidden" name="status" id="status" value="draft" />
+    <input type="hidden" name="preview" id="preview" value="0" />
+    <input type="hidden" name="preview_platform" id="preview_platform" value="" />
+    {if $roll_back_locale == ''}
+    <input type="hidden" name="expected_locale" id="expected_locale" value="locale-{$default_public_locale|escape}" />
+    {else if $data['webpage']['expected_locale'] != ''}
+    <input type="hidden" name="expected_locale" id="expected_locale" value="locale-{$data['webpage']['expected_locale']|escape}" />
+    {else}
+    <input type="hidden" name="expected_locale" id="expected_locale" value="locale-{$roll_back_locale|escape}" />
+    {/if}
+    <input type="hidden" name="save_locale_str" id="save_locale_str" value="" />
+
+    <div class="row">
+      {if $data.webpage.id}
+      <div class="col-12 col-lg-6">
+        <ul class="info-list">
+          <li class="create_date">{$info.created_date_message}</li>
+        </ul>
+      </div>
+      {/if}
+
+      <div class="col-12 col-lg-{if $data.webpage.id}6{else}12{/if}">
+        <div class="form_actions">
+          <ul>
+            {if $data.webpage.id>0}
+            <li>
+              <button type="button" name="save_preview" class="btn btn-primary" disabled="disabled">
+                <i class="icon-eye-open"></i>
+                {$dict.ACTION_preview_save_draft|escape}</button>
+            </li>
+            {/if}
+
+            <li>
+              <button type="submit" name="save_draft" class="btn btn-primary" disabled="disabled">
+                <i class="icon-pencil"></i>
+                {$dict.ACTION_save_draft|escape}</button>
+            </li>
+
+            {if $data.webpage.id>0}
+            {if $user->hasRights('webpage_admin', Right::APPROVE) && in_array(Right::APPROVE, $current_webpage_rights)}
+            <li>
+              <button type="submit" name="save_publish" class="btn btn-primary" disabled="disabled">
+                <i class="icon-save"></i>
+                {$dict.ACTION_publish|escape}</button>
+            </li>
+            {else}
+            <li>
+              <button type="submit" name="save_approval" class="btn btn-primary" disabled="disabled">
+                <i class="icon-envelope"></i>
+                {$dict.ACTION_send_approve|escape}</button>
+            </li>
+            {/if}
+            {/if}
+
+            <li>
+              <button type="reset" name="save_cancel" class="btn btn-primary" disabled="disabled">
+                <i class="icon-remove-circle"></i>
+                {$dict.ACTION_cancel|escape}</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {* Modal *}
+  <div class="modal hide fade chose_locales_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{$dict.LABEL_select_language_to_continue|escape}</h5>
+
+          <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <table style="width:100%">
+            <tbody>
+              <tr>
+                <td>
+                  <input type="checkbox" id="select_all_locales" name="save_locales[]" value="" checked style="margin-top: 0px;">
+                  <!--label for="select_all_locales" style="display:inline-block;"--><span>{$dict.ACTION_check_all|escape}</span><!--/label-->
+                </td>
+              </tr>
+
+              {foreach from=$dict.SET_accessible_locales key=alias item=name}
+              {if $default_locale_read_only && $alias==$default_locale}
+              {else}
+              <tr>
+                <td>
+                  <input type="checkbox" id="select-{$alias|replace:'/':'-'}" name="save_locales[]" value="{$alias}" checked style="margin-top: 0px;">
+                  <!--label for="select-{$alias|replace:'/':'-'}" style="display:inline-block;"--><span>{$name|escape}</span><!--/label-->
+                </td>
+              </tr>
+              {/if}
+              {/foreach}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{$dict.ACTION_cancel|escape}</button>
+          <button type="button" class="btn btn-primary" name="continue_btn">{$dict.ACTION_continue|escape}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+/**
+ * Author: Patrick Yeung
+ * Email: <patrick[at]avalade[dot]com>
+ * Date: 2013-09-24
+ * Time: 02:09
+ *
+ */
+
+var form = null;
+
+var triggerException = function(json) {
+    json = jQuery.parseJSON(json);
+    if(json.result == "error") {
+        form.processErrors(json.errors);
+    }
+}
+
+var setupPath = function(wrapper) {
+    var prefix = wrapper.find('input[name^="webpage_parent_path"]').val();
+    var alias = wrapper.find('input[name^="alias"]').val();
+    var path_field = wrapper.find('*[id$="path_field"]');
+
+    if(alias == "") {
+        alias = "[alias]";
+    }
+
+    path_field.text(prefix + alias + "/");
+}
+
+$(document).ready(function() {
+    form = new form_submit_panel($("form"));
+
+    $('.alias_fields input[name^="webpage_parent_text"]').bind('change', function(){
+        setupPath($(this).parentsUntil('.alias_fields').parent());
+    });
+
+    $('.alias_fields input[name^="alias"]').bind('change', function(){
+        setupPath($(this).parentsUntil('.alias_fields').parent());
+
+        $(this).val($.trim($(this).val()));
+
+        if($.trim($(this).val()) != $('#default_alias').val()) {
+            $('#default_alias').val('');
+        }
+    });
+
+    $('.alias_fields button').bind('click', function(e){
+        e.preventDefault();
+
+        var root = $(this).parentsUntil('.tab-pane');
+        root = root[root.length-1];
+        var target = $(root).find('.parent_page_modal');
+        target.modal();
+    });
+
+    $('.alias_fields .modal').on('show.bs.modal', function(e){
+        var t = $(this);
+        var to_load = t.data('loaded') == undefined || !$(this).data('loaded');
+        var p = t.attr('data-platform');
+        var w = t.parent();
+        var tn;
+
+        if(to_load) {
+            t.data('loaded', true);
+            tn = t.find('.webpage-tree').fancytree({
+                source: $.ajax({
+                    url: "./",
+                    data: {
+                        'op': 'get_webpage_nodes',
+                        'ajax': 1,
+                        'platform': p
+                        {if $smarty.get.id}, 'target': {$smarty.get.id|escape:'javascript'}{/if}
+                    }
+                }),
+                activate: function(event, data) {
+                    // get the alias wrapper
+                    var key_field = w.find('input[name^="webpage_parent_id"]');
+                    var text_field = w.find('input[name^="webpage_parent_text"]');
+                    var path_field = w.find('input[name^="webpage_parent_path"]');
+
+                    key_field.val(data.node.key);
+                    text_field.val(data.node.title);
+                    path_field.val(data.node.tooltip);
+
+                    key_field.trigger('change');
+                    text_field.trigger('change');
+                    path_field.trigger('change');
+                    t.modal('hide');
+
+                    var qps = w.find('.qPgInput');
+                    for(var i = 0; i < qps.length; i++) {
+                        $(qps[i]).data('qPgInput').update();
+                    }
+                    //pgInput.update();
+                },
+                lazyLoad: function(event, data) {
+                    data.result = $.getJSON("./", {
+                        "op": "get_webpage_nodes",
+                        "ajax": 1,
+                        "disable_root": true,
+                        "platform": p,
+                        "parent": data.node.key
+                    });
+                },
+                init: function(event, data) {
+                    t.data('loaded', false);
+                }
+            });
+        }
+    });
+
+    var refreshPlatformTabs = function() {
+        var selector = '.tabs *[data-tab-type]';
+        var tabs = $(selector);
+        var l = tabs.length;
+
+        var checked_platforms = [];
+        var checked_els = $('input[name="platforms[]"]:checked');
+        for(var i = 0; i < checked_els.length; i++) {
+            checked_platforms.push($(checked_els[i]).val());
+        }
+
+        for( var i = 0; i < l; i++ ) {
+            var t = $(tabs[i]);
+            var id = t.find('a').attr('href');
+
+            var type = t.attr('data-tab-type');
+            if($.inArray(type, checked_platforms) > -1) {
+                var classtoRemove = 'hidden';
+                var classtoAdd = '';
+
+                var t2 = $(id).find('input[name^="alias"]');
+                if(t2.val() == "" && $('#default_alias').val() != "") {
+                    t2.val($('#default_alias').val());
+                }
+            } else {
+                var classtoRemove = 'active';
+                var classtoAdd = 'hidden';
+            }
+
+            $(id).removeClass(classtoRemove).addClass(classtoAdd);
+            $(t).removeClass(classtoRemove).addClass(classtoAdd);
+        }
+
+        var locale_contents = $('.tabs-container');
+        for(var i = 0; i < locale_contents.length; i++) {
+            var locale_content = $(locale_contents[i]);
+
+            if(locale_content.find('.tabs li').filter('.active').length == 0)
+                locale_content.find('.tabs li').filter(':not(.hidden)').first().find('a').tab('show');
+        }
+    }
+
+    $('form').delegate('input[name="platforms[]"]', 'click', function(){
+        var val = $(this).val();
+        refreshPlatformTabs();
+
+    });
+
+    /*var platforms = $('form input[name="platforms[]"]');
+     for(var i = 0; i < platforms.length; i++) {
+     var val = $(platforms[i]).val();
+     refreshPlatformTabs(val, $(platforms[i]).prop('checked'));
+     }*/
+    
+    $('button[name="continue_btn"]').bind('click', function(e){
+        e.preventDefault();
+
+        var form = $('form');
+        $('.chose_locales_modal').modal("hide");
+        
+        var locales_to_save = new Array();
+        $('input[name^="save_locales"]').each(function(index){
+            if($(this).prop('checked') && $(this).val() !='')
+                locales_to_save.push($(this).val());
+        });
+        $('#save_locale_str').val(locales_to_save.join());
+        
+        $('#duplicate_content').val(0);
+        $('#submitForm').val(1);
+        form.trigger('submit');
+    }); 
+
+    $('form').delegate('button[name="save_draft"]', 'click', function(e){
+        e.preventDefault();
+
+        var form = $('form');
+
+        form.attr('target', '_top');
+        form.find('input[name="status"]').val("draft");
+        form.find('input[name="preview"]').val("0");
+        $('.chose_locales_modal').modal();
+        //form.trigger('submit');
+    });
+
+    $('form').delegate('button[name="save_preview"]', 'click', function(e){
+        e.preventDefault();
+
+        window.form.clearErrors();
+
+        var form = $('form');
+
+        form.attr('target', '_blank');
+        form.find('input[name="preview"]').val("1");
+
+        var locales_to_save = new Array();
+        $('input[name^="save_locales"]').each(function(index){
+            if($(this).val() !='')
+                locales_to_save.push($(this).val());
+        });
+        $('#save_locale_str').val(locales_to_save.join());
+
+        // ensure the hasErrors class are removed
+        form.find('.hasErrors').removeClass('hasErrors');
+        form.find('.hasError').removeClass('hasError');
+
+        //var locale = $('#expected_locale').val();
+        //var desire_platform = $('#' + locale).find('.platform-locale-contents .tabs li.active');
+        //if(desire_platform.length > 0) {
+            //form.find('#preview_platform').val(desire_platform.attr('data-tab-type'));
+        //}
+
+        /*form.find('input[name="selected_offers[]"]').remove();
+
+        var offer_source = form.find('input[name="offer_source"]:checked').val();
+        if(offer_source =="specific" && offers_panel != undefined && offers_panel != null) {
+            var objs = offers_panel.selected_offers;
+
+            for(var i = 0; i < objs.length; i++) {
+                form.append('<input type="hidden" name="selected_offers[]" value="' + objs[i].id + '" />')
+            }
+        }*/
+
+        form[0].submit();
+    });
+
+    $('form').delegate('button[name="save_publish"]', 'click', function(e){
+        e.preventDefault();
+      
+        var form = $('form');
+        form.attr('target', '_top');
+        form.find('input[name="status"]').val("approved");
+        form.find('input[name="preview"]').val("0");
+        $('.chose_locales_modal').modal();
+        //form.trigger('submit');
+    });
+
+    $('form').delegate('button[name="save_approval"]', 'click', function(e){
+        e.preventDefault();
+
+        var form = $('form');
+        form.attr('target', '_top');
+        form.find('input[name="status"]').val("pending");
+        form.find('input[name="preview"]').val("0");
+        $('.chose_locales_modal').modal();
+        //form.trigger('submit');
+    });
+
+    $('form').delegate('button[name="save_cancel"]', 'click', function(e){
+        e.preventDefault();
+
+        window.location.href = "{$sets.paths['mod_from_doc']|escape:'javascript'}?id={$data.webpage.id|escape:"javascript"}";
+    });
+
+    $('button.duplicate_default_content').bind('click', function(e){
+        e.preventDefault();
+        var dup_confirm = confirm("{$dict.CONFIRM_duplicate_global_content}");
+        if(dup_confirm == true)
+        {
+            // Submit form without saving
+            $('#duplicate_content').val(1);
+            $('#submitForm').val(0);
+            var form = $('form');
+            form[0].submit();
+        }
+        else
+        {
+            return false;
+        }
+        
+    });
+
+    $('#webpage_type_select, #structured_page_template').bind('change', function(e){
+        e.preventDefault();
+
+        $('#webpage_type').val($('#webpage_type_select').val());
+        $('#submitForm').val(0);
+        $(window).off('unload', unloadEvt);
+
+        //
+        var form = $('form');
+        form.attr('target', '_top');
+        form[0].submit();
+    });
+
+    (function(){
+        var aliases = $('input[name^="alias"]');
+        var val;
+
+        var isSameAlias = function() {
+            var a;
+            val = undefined;
+
+            for(var i = 0; i < aliases.length; i++) {
+                var input = $(aliases[i]);
+                var platform = input.prop('name').replace(/^.*?\[([^\]]*?)\]$/, function(a, b) {
+                    return b;
+                });
+
+                var el = $('#platforms_' + platform + ':checked');
+                if(!el.length) {
+                    continue;
+                } else {
+                    if(val == undefined || $.trim(input.val()) == "" || $.trim(input.val()) == val) {
+                        val = $.trim(input.val());
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            return i == aliases.length;
+        }
+
+        if(isSameAlias()) {
+            $('#default_alias').val(val);
+        }
+
+        $('#default_alias').bind('change', function(){
+            if(isSameAlias()) {
+                $('input[name^="alias"]').data('value', $(this).val()).val($(this).val()).trigger('change');
+            }
+        });
+    })();
+
+
+    $('.alias_fields input[name^="webpage_parent_text"]').trigger('change');
+    
+    var switchLocaleContentBlock = function(content_locale){
+        if(content_locale == '')
+        {
+            content_locale = $('#locale-content-block-switch').val();
+        }
+        
+        if(content_locale != '')
+        {
+            $('.webpage-content-block').hide();
+            $('#'+content_locale+'-webpage-content-block').show();
+            {if $hasPageFolderRight}
+              avaMediaSelectorSettings.url2 = "{$sets.paths.app_from_doc|escape:'javascript'}/module/file_admin/dialog.php?lang=en_EN&type=-1&root=webpage%2F{$control.editor_media_subfolder|escape:url}%2F"+content_locale+"%2F{if $data.webpage.id != ''}{$data.webpage.id|escape:'javascript'}%2F{/if}";
+          {/if}
+          
+          var expected_locale = $('#'+content_locale+'-webpage-content-block').find('input[name^=block_lan]').val();
+          $('#expected_locale').val(expected_locale);
+        }
+    }
+
+    switchLocaleContentBlock(''); 
+    $('#locale-content-block-switch').bind('change', function(e){
+        switchLocaleContentBlock($(this).val());
+    });
+
+    $( "#content-desktop-tab" ).click( function() {
+        switchLocaleContentBlock( "" );
+    } );
+
+    // page timer
+    {if $data.webpage.id > 0}
+        var pageTookAction = false;
+        var pageTookActionInRange = false;
+        var pagePingTimer = ({$conf.page_session_timer|escape:'javascript'}) / 5 * 1000;
+    var page_status_update_timer = {$conf.page_session_timer|escape:'javascript'} * 1000; //millisecond
+
+    var pageTakeAction = function(){
+        pageTookAction = true;
+        pageTookActionInRange = true;
+    }
+
+    var pgPTimer = function() {
+        if(pageTookActionInRange)   {
+            pgRequest('update');
+            pageTookActionInRange = false;
+        }
+    }
+
+    var pgTimer = function(){
+        // send request to log out
+        clearInterval(pageActionTimer);
+        clearInterval(pageActionTimer2);
+        pageActionTimer = null;
+        pageActionTimer2 = null;
+        pgRequest('expired');
+
+        $(window).unbind('userAction');
+        pageTookAction = false;
+    };
+
+    var pgRequest = function(action) {
+        var data = {
+            'op': (action == 'expired' ? 'check_p_unlock' : 'update_p_ses'),
+            'webpage_id': {$data.webpage.id|escape:"javascript"}
+        };
+
+        if(action == 'expired') {
+            data.temp_folder = '{$data.temp_folder|escape:"javascript"}';
+        }
+
+        $.ajax({
+            url: "./",
+            type: 'get',
+            data: data,
+            'success': function(json, status, ajax) {
+                if(json.result != undefined && json.result == "error" && json.errors != undefined) {
+                    var msg = "";
+                    for(var i = 0; i < json.errors.errorStack.length; i++) {
+                        msg = "<li class='error'>" + json.errors.errorStack[i] + "</li>";
+                    }
+                    $('form').find('.errorStack').empty().append(msg);
+                }
+
+                if(action != 'expired')
+                {
+                    clearInterval(pageActionTimer);
+                    pageActionTimer = setInterval(pgTimer, page_status_update_timer);
+                } else {
+                    if(json.result == undefined || json.result != "error" || json.errors == undefined) {
+                        try {
+                            clearInterval(pageActionTimer);
+                            clearInterval(pageActionTimer2);
+                        } catch(e) {
+
+                        };
+
+                        pageActionTimer = setInterval(pgTimer, page_status_update_timer);
+                        pageActionTimer2 = setInterval(pgPTimer, pagePingTimer);
+                        $(window).bind('userAction', function(){
+                            pageTakeAction();
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    var pageActionTimer = setInterval(pgTimer, page_status_update_timer);
+    var pageActionTimer2 = setInterval(pgPTimer, pagePingTimer);
+    $(window).bind('userAction', function(){
+        pageTakeAction();
+    });
+
+    {/if}
+
+    {if $hasShareFolderRight}
+        avaMediaSelectorSettings.url1 = "{$sets.paths.app_from_doc|escape:'javascript'}/module/file_admin/dialog.php?lang=en_EN&type=-1&root=webpage%2Fshared%2F";
+    {/if}
+
+    var unloadEvt = function() {
+        $(window).trigger('leaveWpEdit');
+    };
+
+    window.onbeforeunload = function(){
+        unloadEvt();
+    };
+
+    $(window).bind('leaveWpEdit', function(){
+        $.ajax({
+            'url': "./",
+            'async': false,
+            'data': {
+                'op': 'unlock',
+                'id': "{$data.webpage.id|escape:'javascript'}",
+                'temp_folder': "{if $data.temp_folder !=''}{$data.temp_folder|escape:'javascript'}{/if}"
+            }
+        });
+    });
+
+    var webpage_inputs = $('.webpage_parent_input');
+    for(var i = 0; i < webpage_inputs.length; i++) {
+        var w = $(webpage_inputs[i]);
+        new qPgInput(w, w.find('input[name*="parent_text"]')
+            , w.find('input[name*="parent_id"]'), w.find('input[name*="parent_path"]')
+            , [$('#id').val()]);
+    }
+
+    var webpage_inputs = $('.linked_page_input');
+    for(var i = 0; i < webpage_inputs.length; i++) {
+        var w = $(webpage_inputs[i]);
+        new qPgInput(w, w.find('input[name*="linked_page_text"]')
+            , w.find('input[name*="linked_page_id"]'), w.find('input[name*="linked_page_path"]')
+            , [$('#id').val()]);
+    }
+
+    $('#edit_webpage_tabs > .tabs-container > .tabs a[data-toggle="tab"]').on('shown', function (e) {
+        var h = $(e.target).attr('href');
+        h = h.replace(/^#/, '');
+        var v = '';
+
+        if(h.match(/^locale\-/)) {
+            v = h;
+        }
+
+        //$('#expected_locale').val(v);
+
+        var qPgInputs = $('#' + h).find('.qPgInput');
+
+        for(var i = 0; i < qPgInputs.length; i++) {
+            var o = $(qPgInputs[i]).data('qPgInput');
+
+            if(o != undefined && o != null) {
+                o.calListWidth();
+            }
+        }
+    });
+
+    $('#edit_webpage_tabs > .tabs-container > .tabs .active a[data-toggle="tab"]').trigger('shown');
+
+    refreshPlatformTabs();
+
+    $("#public_access_right_select").chosen({
+
+    });
+
+//    $(window).bind('load', function(){
+        $('.form_actions').find('button[disabled]').filter(':not(.disabled)').prop('disabled', false);
+//    });
+
+    $('#select_all_locales').bind('click', function(e){
+        if($(this).is(':checked'))
+        {
+            $('input[name^="save_locales"]').prop('checked', true);
+        }
+        else
+        {
+            $('input[name^="save_locales"]').prop('checked', false);
+        }
+    });
+});
+
+var qPgInput = function(root, vField, idField, pField, ignore) {
+    this.root = null;
+    this.vField = null;
+    this.idField = null;
+    this.pField = null;
+    this.lastVals = {
+        'vText': '',
+        'id': '',
+        'path': ''
+    };
+    this.resultContainer = null;
+    this.valForSearch = "";
+    this.ignore_ids = [];
+    this.resultList = null;
+    this.init(root, vField, idField, pField, ignore);
+};
+
+(function($){
+    var resultList = function() {
+        this.results = [];
+        this.list = null;
+        this.cSelected = null;
+        this.init();
+    };
+
+    var resultBlk = function(data) {
+        this.title = null;
+        this.path = null;
+        this.id = null;
+        this.description = null;
+        this.html = '';
+        this.element = null;
+        this.init(data);
+    };
+
+    resultList.prototype = {
+        'init': function() {
+            this.list = $('<div class="qResult-list"></div>');
+
+        },
+        'add': function(item) {
+            var me = this;
+            this.results.push(item);
+            this.list.append(item.element);
+
+            item.element.bind('mouseenter', function(e){
+                e.stopPropagation();
+                me.clearFocused();
+            });
+        },
+        'clearFocused': function() {
+            this.cSelected = null;
+            for( var x = 0; x < this.results.length; x++) {
+                this.results[x].element.removeClass('focused-element');
+            }
+        },
+        'clearList': function() {
+            for(var i = 0; i < this.results.length; i++) {
+                this.results[i].destroy();
+                this.results[i] = null;
+            }
+
+            this.list.empty();
+            this.results = [];
+
+            this.cSelected = null;
+        },
+        'selectNext': function() {
+            var t = this.cSelected;
+            if(t != null && this.results.length > t + 1) {
+                t++;
+            } else {
+                t = 0;
+            }
+
+            if(t != this.cSelected) {
+                this.select(t);
+            }
+        },
+        'selectPrev': function() {
+            var t = this.cSelected;
+            if(t != null) {
+                if(t > 0) {
+                    t--;
+                } else {
+                    t = this.results.length - 1;
+                }
+            } else {
+                t = 0;
+            }
+
+            if(t != this.cSelected) {
+                this.select(t);
+            }
+        },
+        'select': function(i) {
+            for( var x = 0; x < this.results.length; x++) {
+                this.results[x].element.removeClass('focused-element');
+            }
+
+            if(i >= 0 && i < this.results.length) {
+                this.cSelected = i;
+                this.results[i].element.addClass('focused-element');
+                var p = this.results[i].element.position();
+                var p2 = this.results[0].element.position();
+                this.list.parent().scrollTop(p.top - p2.top);
+            } else {
+                this.clearFocused();
+            }
+        },
+        'getSelected': function() {
+            if(this.cSelected != null && this.results[this.cSelected] != undefined) {
+                return this.results[this.cSelected];
+            }
+
+            return false;
+        }
+    };
+
+    resultBlk.prototype = {
+        'init': function(data) {
+            this.html = data.html;
+            this.path = data.path;
+            this.id = data.webpage_id;
+            this.title = data.webpage_title;
+            this.description = data.description;
+            this.element = $(this.html);
+            this.element.addClass('result-item');
+
+            var me = this;
+
+            this.element.bind('mousedown', function(e){
+                e.stopPropagation();
+                e.preventDefault();
+
+                $(this).trigger('selected', [me]);
+            });
+        },
+        'destroy': function() {
+            this.element.remove();
+        }
+    };
+
+    qPgInput.prototype = {
+        'init': function(root, vField, idField, pField, ignore) {
+
+            this.root = root;
+            this.vField = vField;
+            this.idField = idField;
+            this.pField = pField;
+            this.lastFieldVal = {
+                'v': '',
+                'id': '',
+                'p': ''
+            };
+
+            var me = this;
+            this.t1 = null;
+            this.overlay = $('<div class="qPgInput-overlay"></div>');
+            this.t1Interval = 500;
+            this.minHeight = 300;
+            this.lastAjax = null;
+            this.lastAjaxVal = "";
+            this.resultContainer = $('<div class="qPgInput-container"></div>');
+            this.isFocus = false;
+            if(ignore != undefined) {
+                this.ignore_ids = ignore;
+            }
+
+            // start only if every field is found
+            if(this.root.length && this.vField.length && this.idField.length && this.pField.length) {
+                this.resultList = new resultList();
+                this.vWrapper = this.vField.wrap($('<div class="qPgInput"></div>')).parent();
+                this.vWrapper.append(this.overlay);
+                this.vWrapper.append(this.resultContainer);
+                this.vWrapper.data('qPgInput', this);
+                this.resultContainer.append(this.resultList.list);
+                this.valForSearch = this.getVal();
+                this.vField.addClass('qPgInput-input').attr('autocomplete', 'off');
+
+                this.lastFieldVal = {
+                    'v': this.vField.val(),
+                    'id': this.idField.val(),
+                    'p': this.pField.val()
+                };
+
+                this.vField.bind('keydown', function(e) {
+                    try {
+                        clearTimeout(me.t1);
+                    } catch(e) {
+
+                    }
+
+                    e.stopPropagation();
+                    if(e.keyCode == 40) {
+                        me.resultList.selectNext();
+                    } else if(e.keyCode == 38) {
+                        me.resultList.selectPrev();
+                    } else if(e.keyCode == 13) {
+                        e.preventDefault();
+                        var s = me.resultList.getSelected();
+                        if(s) {
+                            me.setVal(s);
+                        }
+                    } else {
+                        me.t1 = setTimeout(function() {
+                            me.vField.trigger('change');
+                        }, me.t1Interval);
+                    }
+                });
+
+                this.vField.bind('focus', function() {
+                    me.isFocus = true;
+                });
+
+                this.vField.bind('click', function() {
+                    $(this).select();
+                });
+
+                this.vField.bind('change', function(e) {
+                    var v = me.getVal();
+                    if(v != me.lastAjaxVal && v != '') {
+                        try {
+                            if(me.lastAjax != null)
+                                me.lastAjax.abort();
+                        } catch(e) {
+
+                        }
+
+                        if(me.isFocus) {
+                            me.lastAjaxVal = v;
+                            me.lastAjax = $.ajax({
+                                'url': './',
+                                'data': {
+                                    'op': 'quick_edit_page_search',
+                                    'ajax': 1,
+                                    'kw': me.lastAjaxVal,
+                                    'ignore': me.ignore_ids
+                                },
+                                'beforeSend': function() {
+                                    me.vWrapper.addClass('ajax-loading');
+                                    me.resultList.clearList();
+                                    me.hideResult();
+                                },
+                                'complete': function() {
+                                    me.vWrapper.removeClass('ajax-loading');
+                                    me.lastAjax = null;
+                                },
+                                'success': function(json) {
+                                    if(json.result == "success") {
+                                        if(json.data != undefined) {
+                                            for(var i = 0; i < json.data.length; i++) {
+                                                var b = new resultBlk(json.data[i]);
+                                                me.resultList.add(b);
+                                            }
+                                            me.resultList.list.parent().scrollTop(0);
+                                        } else {
+                                            me.resultList.list.append('<div>{$dict.LABEL_no_records|escape:"javascript"}</div>');
+                                        }
+                                        me.showResult();
+
+                                    }
+                                },
+                                'error': function() {
+
+                                }
+                            });
+                        }
+                    }
+                });
+
+                this.hideResult();
+                this.calListWidth();
+
+                $(window).bind('load', function(){
+                    setTimeout(function() {
+                        me.calListWidth();
+                    }, 100);
+                });
+
+                $(window).bind('resize', function(e){
+                    me.calListWidth();
+                });
+
+                var inAppMouseClick = false;
+
+                this.resultContainer.bind('mousedown', function(e){
+                    e.stopPropagation();
+                    inAppMouseClick = true;
+                });
+                this.resultContainer.bind('mouseup', function(e){
+                    e.stopPropagation();
+                    inAppMouseClick = false;
+                });
+
+                this.overlay.bind('click', function(e) {
+                    e.preventDefault();
+                    inAppMouseClick = false;
+                    me.vField.triggerHandler('blur');
+                });
+
+                var blur = function(){
+                    me.isFocus = false;
+                    me.hideResult();
+                    me.vField.val(me.lastFieldVal.v);
+                    me.lastAjaxVal = '';
+                    if(me.lastAjax != null)
+                        me.lastAjax.abort();
+                };
+
+                this.vField.bind('blur', function(e){
+                    if(!inAppMouseClick) {
+                        setTimeout(function(){
+                            blur();
+                        }, 0);
+                    }
+                });
+
+                this.resultList.list.delegate('.result-item', 'selected', function(e, a){
+                    me.setVal(a);
+                });
+            }
+        },
+        'update': function() {
+            this.lastFieldVal = {
+                'v': this.vField.val(),
+                'id': this.idField.val(),
+                'p': this.pField.val()
+            };
+        },
+        'getVal': function() {
+            var val = $.trim(this.vField.val());
+            this.vField.val(val);
+            return val;
+        },
+        'restore': function() {
+            this.vField.val('');
+        },
+        'calListWidth': function() {
+            this.resultContainer.css({
+                'width': this.vField.outerWidth()
+            });
+        },
+        'hideResult': function() {
+            this.overlay.hide();
+            this.resultContainer.removeClass('d-block').addClass('d-none');
+        },
+        'showResult': function() {
+            this.overlay.show();
+
+            this.resultContainer.removeClass('d-none').addClass('d-block').css({
+                'top': 'auto',
+                'bottom': 'auto'
+            });
+            var p = this.resultContainer.offset();
+            var h1 = $(window).height() - p.top + $(document).scrollTop();
+            if(h1 < this.minHeight) {
+                this.resultContainer.css({
+                    'max-height': this.vField.offset().top - this.vField.outerHeight() - 20,
+                    'top': 'auto',
+                    'bottom': this.vField.outerHeight()
+                });
+            } else {
+                this.resultContainer.css({
+                    'max-height': h1 - 50,
+                    'top': this.vField.outerHeight(),
+                    'bottom': 'auto'
+                });
+            }
+        },
+        'setVal': function(rb) {
+            this.vField.val(rb.title + ' - [#' + rb.id + ']');
+            this.idField.val(rb.id);
+            this.pField.val(rb.path);
+
+            this.lastFieldVal = {
+                'v': this.vField.val(),
+                'id': this.idField.val(),
+                'p': this.pField.val()
+            };
+
+            this.lastAjaxVal = '';
+
+            this.hideResult();
+            setupPath($(this.vField).parentsUntil('.alias_fields').parent());
+        }
+    }
+})(jQuery);
+</script>

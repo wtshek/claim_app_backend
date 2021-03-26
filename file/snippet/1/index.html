@@ -1,0 +1,93 @@
+<div class="container gallery">
+  {if count($snippet_data.tags) > 2}
+  <div class="row">
+    <div class="col-12">
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="gallery-toggle-{$snippet_data.snippet_id|escape}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {$snippet_data.tags[$snippet_data.default_tag]|escape}
+        </button>
+
+        <div class="dropdown-menu" aria-labelledby="gallery-toggle-{$snippet_data.snippet_id|escape}">
+          <a class="dropdown-item active" href="#"{if $snippet_data.default_tag} data-filter=".{$snippet_data.default_tag|escape}"{/if}>
+            {$snippet_data.tags[$snippet_data.default_tag]|escape}
+          </a>
+
+          {foreach $snippet_data.tags as $tag => $tag_name}
+          {if $tag != $snippet_data.default_tag || (!$tag && $snippet_data.default_tag)}
+          <a class="dropdown-item" href="#"{if $tag} data-filter=".{$tag|escape}"{/if}>
+            {$tag_name|escape}
+          </a>
+          {/if}
+          {/foreach}
+        </div>
+      </div>
+    </div>
+  </div>
+  {/if}
+
+  <div class="row">
+    <div class="col-12">
+      <div id="gallery-container-{$snippet_data.snippet_id|escape}">
+        {foreach $snippet_data.images as $image}
+        {capture "src"}{strip}
+        {if $conf.aws_enabled && strpos($image.image, 'gallery/gallery_image/') === 0}
+        https://{$conf.cloudfront_domain}/
+        {elseif strpos($image.image, ':') === FALSE}
+        file/
+        {/if}
+        {$image.image}
+        {/strip}{/capture}
+        <a href="{$smarty.capture.src|escape}" target="_blank" class="{$image.tags|implode:' '|escape}" title="{$image.caption|escape}" data-title="{$image.caption|escape}">
+          <img src="{$smarty.capture.src|escape}" alt="{$image.alternative_text|escape}" width="{$image.width|escape}" height="{$image.height|escape}" class="img-responsive" loading="lazy">
+        </a>
+        {/foreach}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready( function() {
+    var container = $( "#gallery-container-{$snippet_data.snippet_id|escape:'javascript'}" ).justifiedGallery( {
+        "rowHeight": 200,
+        "margins": 6,
+        "border": 0,
+        "waitThumbnailsLoad": false,
+        {if !$snippet_data.default_tag}
+        "filter": false
+        {else}
+        "filter": ".{$snippet_data.default_tag|escape:'javascript'}"
+        {/if}
+    } ).on( "jg.complete", function() {
+        container.children().removeAttr( "data-gallery" ).filter( ":visible" ).attr( "data-gallery", "{$snippet_data.snippet_id|escape:'javascript'}" );
+    } );
+
+    {* Open lighbox on image click *}
+    container.children().click( function() {
+        $(this).ekkoLightbox();
+        return false;
+    } );
+
+    {* Filter images on dropdown item click *}
+    {if count($snippet_data.tags) > 2}
+    var toggle = $( "#gallery-toggle-{$snippet_data.snippet_id|escape:'javascript'}" );
+    toggle.next().find( "a.dropdown-item" ).click( function() {
+        var item = $( this );
+
+        {* Update toggle and items *}
+        toggle.text( item.text() );
+        toggle.dropdown( "toggle" );
+        item.siblings().removeClass( "active" );
+        item.addClass( "active" );
+
+        {* Update images *}
+        var filter = item.data( "filter" );
+        container.justifiedGallery( {
+            "filter": filter == undefined ? false : filter
+        } );
+
+        return false;
+    } );
+    {/if}
+} );
+</script>

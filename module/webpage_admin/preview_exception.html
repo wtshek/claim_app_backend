@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript">
+      try {
+        window.opener.triggerException('{$response.content}');
+      } catch(e) {
+
+      }
+
+      window.close();
+  </script>
+</head>
+<body>
+    {$dict.MESSAGE_preview_unable|escape:'html'}
+</body>
+</html>

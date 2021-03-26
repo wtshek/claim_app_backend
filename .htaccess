@@ -1,0 +1,23 @@
+RewriteEngine On
+
+# The following rule tells Apache that if the requested filename exists, simply serve it.
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+
+# 404 Error
+ErrorDocument 400 /
+
+# The following rewrites sitemap.xml to sitemap.php
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+# The following rewrites all other queries to bootstrap.php.
+# The condition ensures that if you are using Apache aliases to do mass virtual hosting,
+# the base path will be prepended to allow proper resolution of the bootstrap.php file;
+# it will work in non-aliased environments as well, providing a safe, one-size fits all solution.
+RewriteCond %{REQUEST_URI}::$1 ^(/.+)(.+)::\2$
+RewriteRule ^(.*) - [E=BASE:%1]
+RewriteRule api/v1/(.*)$ api/v1/api.php?request=$1 [QSA,NC,L]
+RewriteRule ^(.*)$ %{ENV:BASE}index.php [NC,L]
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

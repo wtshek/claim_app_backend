@@ -1,0 +1,266 @@
+
+{*<div class="row-fluid">*}
+{*<div class="span12">*}
+{*<div class="box box-color box-bordered blue">*}
+
+{*<div class="box-title">*}
+    {*<h3>*}
+        {*<i class="icon-table"></i>*}
+        {*Hide/show columns*}
+    {*</h3>*}
+{*</div>*}
+{*<div class="box-content nopadding">*}
+
+{if count($list_actions) > 0}
+<ul class="record-actions">
+  {foreach key=list_url item=list_action from=$list_actions}
+  <li><a href="{$list_url|escape:'html'}" class="button">{$list_action|escape:'html'}</a></li>
+  {/foreach}
+</ul>
+{/if}
+
+<table id="{$summary.id|escape:'html'}" class="table-condensed dataTable-nosort dataTable-noheader dataTable-nofooter table table-hover table-nomargin table-striped dataTable dataTable-colvis"
+  cellspacing="0" cellpadding="0" border="0" width="100%">
+  <thead>
+    <tr>
+      {if $summary.record_count > 0}
+      {if $summary.record_input.type != ''}
+      <th><a id="{$summary.id|escape:'html'}_batch_cell">&nbsp;</a></th>
+      {/if}
+      {foreach key=key item=value from=$keys}
+      {if $key != $summary.primary_key && !in_array($key, $hidden_fields)}
+      <th class="sorting{if $key == $summary.order_by}{if $summary.order_dir == 'ASC'} sorting_asc{elseif $summary.order_dir == 'DESC'} sorting_desc{/if}{/if}">
+        {if $conf.page_sortable}
+        <a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_order_by={$key|escape:'html'}{if $key != $summary.order_by || $summary.order_dir == 'DESC'}&amp;{$summary.id|escape:'html'}_order_dir=ASC{elseif $summary.order_dir == 'ASC'}&amp;{$summary.id|escape:'html'}_order_dir=DESC{/if}{if $hash}#{$hash|escape:'url'}{/if}">
+        {else}
+        <a>
+        {/if}
+          {$value|escape:'html'}
+
+        </a>
+      </th>
+      {/if}
+      {/foreach}
+      {if count($record_actions) > 0}
+      <th><a>{$dict.LABEL_action|escape:'html'}</a></th>
+      {/if}
+      {else}
+      <th><a>&nbsp;</a></th>
+      {/if}
+    </tr>
+  </thead>
+
+  <tbody>
+    {foreach item=record from=$records name=record}
+    <tr class="{if $smarty.foreach.record.iteration % 2 == 1}odd{else}even{/if}" data-row-id="{$record[$summary.primary_key]|escape:'html'}">
+      {if $summary.record_input.type != ''}
+      <td style="width: 1em">
+        <input type="{$summary.record_input.type|escape:'html'}"
+          id="{$summary.id|escape:'html'}_input_{$record[$summary.primary_key]|escape:'html'}"
+          name="{$summary.id|escape:'html'}{if $summary.record_input.type != 'radio'}[]{/if}"
+          value="{$record[$summary.primary_key]|escape:'html'}"
+          class="{$summary.record_input.type|escape:'html'}"
+          {if in_array($record[$summary.primary_key], $summary.record_input.values)}checked{/if}>
+      </td>
+      {/if}
+      {foreach key=key item=value from=$record}
+      {if $key != $summary.primary_key && !in_array($key, $hidden_fields)}
+      <td>
+        {if in_array($key, $html_fields)}
+            {$value|nl2br}
+        {else}
+            {if isset($field_actions[$key])}
+            <a href="{if $field_actions[$key]['prefix_url']}{$field_actions[$key]['prefix_url']|escape:'html'}{/if}{if $field_actions[$key]['postfix_url']}{if isset($record[$field_actions[$key]['postfix_url']])}{$record[$field_actions[$key]['postfix_url']]|escape:'html'}{else}{$field_actions[$key]['postfix_url']|escape:'html'}{/if}{/if}"
+                title="{$value|escape:'html'}"
+                target="{if $field_actions[$key]['target']}{$field_actions[$key]['target']|escape:'html'}{else}_top{/if}">
+            {/if}
+            {$value|escape:'html'|nl2br}
+            {if isset($field_actions[$key])}
+            </a>
+            {/if}
+        {/if}
+      </td>
+      {/if}
+      {/foreach}
+      {if count($record_actions) > 0}
+      <td class="buttonset">
+        {foreach key=record_url item=record_action from=$record_actions}
+            {if (!isset($actions_ref[$record_url]) || $record[$actions_ref[$record_url]]) && (!isset($record['__d_actions'][$record_action]) || $record['__d_actions'][$record_action])}
+            	{if ($record_action==$dict.ACTION_delete && $record['num']==0) || $record_action!=$dict.ACTION_delete}
+                <a href="{$record_url|escape:'html'}{if $record[$actions_ref[$record_url]]}{$record[$actions_ref[$record_url]]}{else}{$record[$summary.primary_key]|escape:'html'}{/if}{if isset($action_hashes[$record_action])}#{$action_hashes[$record_action]|escape:'html'}{/if}">{$record_action|escape:'html'}</a>
+                {/if}
+            {/if}
+        {/foreach}
+      </td>
+      {/if}
+    </tr>
+    {/foreach}
+    {if count($records) == 0}
+    <tr>
+      <td>{$dict.LABEL_no_records|escape:'html'}</td>
+    </tr>
+    {/if}
+  </tbody>
+</table>
+
+<div class="datatable-summary row-fluid">
+    {if count($records)}
+    <div class="record-summary span4">
+        <span>{$summary.formatted_record_count}</span>
+    </div>
+    {/if}
+    <div class="datatable-pagination span8">
+        <ul>
+        {assign var=page_count value=$pages|@count}
+        {if $summary.page_count > 1}
+            {*{$dict.LABEL_page}*}
+            {if $summary.page_index > 0}
+                <li><a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page=0{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#/{$summary.id|escape:'url'}"
+                   title="1">|&lt;</a></li>
+            {/if}
+            {if $summary.page_index > 1}
+                <li><a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page={$summary.page_index-1}{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#/{$summary.id|escape:'url'}"
+                   title="{$summary.page_index}">&lt;</a></li>
+            {/if}
+            {foreach item=page_index from=$pages}
+                <li><a class="{if $summary.page_index == $page_index}current{/if}" href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page={$page_index}{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#/{$summary.id|escape:'url'}"
+                   title="{$page_index+1}">{$page_index+1}</a></li>
+            {/foreach}
+            {if $summary.page_index < $summary.page_count-2}
+                <li><a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page={$summary.page_index+1}{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#/{$summary.id|escape:'url'}"
+                   title="{$summary.page_index+2}">&gt;</a></li>
+            {/if}
+            {if $summary.page_index < $summary.page_count-1}
+                <li><a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page={$summary.page_count-1}{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#/{$summary.id|escape:'url'}"
+                   title="{$summary.page_count}">&gt;|</a></li>
+            {/if}
+        {/if}
+        </ul>
+    </div>
+</div>
+
+
+{*</div>*}
+{*</div>*}
+{*</div>*}
+{*</div>*}
+
+{if $summary.record_input.type != '' && $summary.record_input.type != 'hidden'}
+<script type="text/javascript">
+<!--
+var list = document.getElementById( "{$summary.id|escape:'javascript'}" );
+var inputs = list.getElementsByTagName( "input" );
+var values = readCookie( "{$summary.id}" );
+values = values ? decodeURIComponent( values ).split( "," ) : [];
+
+{if $summary.record_input.type == 'checkbox'}
+var batch_cell = document.getElementById( "{$summary.id|escape:'javascript'}_batch_cell" );
+if ( batch_cell )
+{ldelim}
+    // Add batch checkbox to the table header
+    var batch = document.createElement( "input" );
+    batch.id = "{$summary.id|escape:'javascript'}_batch";
+    batch.type = "checkbox";
+    batch.className = "checkbox";
+    while ( batch_cell.firstChild )
+    {ldelim}
+        batch_cell.removeChild( batch_cell.firstChild );
+    {rdelim}
+    batch_cell.appendChild( batch );
+
+    // Batch check/uncheck
+    batch.onclick = function()
+    {ldelim}
+        var inputs = document.getElementById( "{$summary.id|escape:'javascript'}" ).getElementsByTagName( "input" );
+        for ( var i = 0; i < inputs.length; i++ )
+        {ldelim}
+            var input = inputs.item(i);
+            if ( input.name == "{$summary.id|escape:'javascript'}[]"
+                && this.checked != input.checked )
+            {ldelim}
+                input.checked = this.checked;
+                input.onclick();
+            {rdelim}
+        {rdelim}
+    {rdelim}
+
+    var all_checked = true;
+    for ( var i = 0; i < inputs.length; i++ )
+    {ldelim}
+        var input = inputs.item(i);
+        if ( input.name == "{$summary.id|escape:'javascript'}{if $summary.record_input.type == 'checkbox'}[]{/if}" )
+        {ldelim}
+            // Reuse the selection using cookies
+            input.onclick = function( e )
+            {ldelim}
+                var values = readCookie( "{$summary.id|escape:'javascript'}" );
+                values = values ? decodeURIComponent( values ).split( "," ) : [];
+                {literal}
+                if ( this.type.toLowerCase() == "checkbox" )
+                {
+                    var index = values.indexOf( this.value );
+                    if ( this.checked )
+                    {
+                        if ( index < 0 )
+                        {
+                            values.push( this.value );
+                        }
+                    }
+                    else
+                    {
+                        if ( index >= 0 )
+                        {
+                            values.splice( index, 1 );
+                        }
+                    }
+                }
+                else if ( this.type.toLowerCase() == "radio" )
+                {
+                    values = [this.value];
+                }
+                {/literal}
+                createCookie( "{$summary.id|escape:'javascript'}", encodeURIComponent(values.join(",")), -1, "{$sets.paths.app_from_doc|escape:'javascript'}/" );
+
+                {if $summary.record_input.type == 'checkbox'}
+                // Check/uncheck batch checkbox
+                if ( (window.event && window.event.srcElement == this) || e )
+                {ldelim}
+                    var inputs = document.getElementById( "{$summary.id|escape:'javascript'}" ).getElementsByTagName( "input" );
+                    var all_checked = true;
+                    for ( var i = 0; i < inputs.length && all_checked; i++ )
+                    {ldelim}
+                        var input = inputs.item(i);
+                        if ( input.name == "{$summary.id|escape:'javascript'}[]" && !input.checked )
+                        {ldelim}
+                            all_checked = false;
+                        {rdelim}
+                    {rdelim}
+                    document.getElementById( "{$summary.id|escape:'javascript'}_batch" ).checked = all_checked;
+                {rdelim}
+                {/if}
+            {rdelim}
+
+            // Restore previous selection, if any
+            {literal}
+            if ( values.length > 0 )
+            {
+                if ( values.indexOf(input.value) >= 0 )
+                {
+                    input.checked = true;
+                }
+            }
+            {/literal}
+
+            // Check to see if all checkboxes are checked
+            if ( !input.checked )
+            {ldelim}
+                all_checked = false;
+            {rdelim}
+        {rdelim}
+    {rdelim}
+    batch.checked = all_checked;
+{rdelim}
+{/if}
+-->
+</script>
+{/if}

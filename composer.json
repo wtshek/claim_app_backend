@@ -1,0 +1,19 @@
+{
+    "require": {
+        "phpmailer/phpmailer": "^6.0",
+        "mrclay/minify": "^3.0",
+        "smarty/smarty": "^3.1",
+        "phpoffice/phpspreadsheet": "^1.6",
+        "aws/aws-sdk-php": "^3.94",
+        "vlucas/phpdotenv": "^5.3",
+        "firebase/php-jwt": "^5.2",
+        "giggsey/libphonenumber-for-php": "^8.12"
+    },
+    "require-dev": {
+        "codeception/codeception": "^4.1",
+        "codeception/module-phpbrowser": "^1.0.0",
+        "codeception/module-asserts": "^1.0.0",
+        "codeception/module-rest": "^1.2",
+        "codeception/module-datafactory": "^1.1"
+    }
+}

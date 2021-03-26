@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js"> <!--<![endif]--><head>
+    {* Metadata *}
+    <meta charset="{$response.charset}">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>{$response.title|escape}</title>
+
+    <link type="image/x-icon" rel="icon" href="{$sets.paths.app_from_doc|escape}/favicon.ico?v=1">
+
+    {* minify (CSS) *}
+    <link type="text/css" charset="utf-8" rel="stylesheet" href="{$sets.paths.app_from_doc|escape}/vendor/mrclay/minify/?{capture "href"}
+      {if $sets.paths.app_from_doc}
+      b={$sets.paths.app_from_doc|substr:1|escape}&amp;f=
+      {else}
+      f=
+      {/if}
+
+      {* jQuery UI *}
+      node_modules/jquery-ui-dist/jquery-ui.css,
+
+      {* Bootstrap *}
+      node_modules/bootstrap/dist/css/bootstrap.css,
+
+      {* Chosen *}
+      node_modules/chosen-js/chosen.css,
+
+      {* Bootstrap4C *}
+      node_modules/bootstrap4c-chosen/dist/css/component-chosen.css,
+
+      {* CodeMirror *}
+      node_modules/codemirror/lib/codemirror.css,
+
+      {* Fancytree *}
+      node_modules/jquery.fancytree/dist/skin-win8/ui.fancytree.css,
+
+      {* FLAT Theme *}
+      module/admin/lib/flat/css/style.css,
+      module/admin/lib/flat/css/themes.css,
+
+      {* Font Awesome *}
+      node_modules/font-awesome/css/font-awesome.css,
+
+      {* Tempus Dominus *}
+      node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.css,
+
+      {* Misc *}
+      module/admin/css/template.css
+      {/capture}{$smarty.capture.href|strip:''}">
+
+    {* minify (JS) *}
+    <script type="text/javascript" src="{$sets.paths.app_from_doc|escape}/vendor/mrclay/minify/?{capture "src"}
+      {if $sets.paths.app_from_doc}
+      b={$sets.paths.app_from_doc|substr:1|escape}&amp;f=
+      {else}
+      f=
+      {/if}
+
+      {* jQuery *}
+      node_modules/jquery/dist/jquery.js,
+
+      {* jQuery UI *}
+      node_modules/jquery-ui-dist/jquery-ui.js,
+
+      {* Bootstrap *}
+      node_modules/bootstrap/dist/js/bootstrap.bundle.js,
+
+      {* Chosen *}
+      node_modules/chosen-js/chosen.jquery.js,
+
+      {* CodeMirror *}
+      node_modules/codemirror/lib/codemirror.js,
+      node_modules/codemirror/mode/css/css.js,
+      node_modules/codemirror/mode/htmlmixed/htmlmixed.js,
+      node_modules/codemirror/mode/javascript/javascript.js,
+      node_modules/codemirror/mode/xml/xml.js,
+
+      {* Fancytree *}
+      node_modules/jquery.fancytree/dist/jquery.fancytree-all.js,
+
+      {* FLAT Theme *}
+      module/admin/lib/flat/js/eakroko.js,
+      module/admin/lib/flat/js/application.js,
+
+      {* JavaScript Cookie *}
+      node_modules/js-cookie/src/js.cookie.js,
+
+      {* Moment *}
+      node_modules/moment/moment.js,
+
+      {* Tempus Dominus *}
+      node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js,
+
+      {* Hasher *}
+      node_modules/signals/dist/signals.js,
+      node_modules/hasher/dist/js/hasher.js,
+
+      {* Misc *}
+      module/admin/lib/jquery.formSubmitPanel.js,
+      include/commons.js,
+      module/admin/template.js
+
+      {/capture}{$smarty.capture.src|strip:''}"></script>
+
+    {* TinyMCE *}
+    <script src="{$sets.paths.app_from_doc|escape}/node_modules/tinymce/tinymce.min.js"></script>
+    <script src="{$sets.paths.app_from_doc|escape}/module/admin/lib/tinymce/avaContentBlock/plugin.js"></script>
+    <script src="{$sets.paths.app_from_doc|escape}/module/admin/lib/tinymce/avaMediaSelector/plugin.js"></script>
+
+    <script>
+    {if $user->getId()}
+    $(document).ready(function() {
+        var dd = new Date().getTime();
+
+        {* HTML elements reference *}
+        {* https://developer.mozilla.org/en-US/docs/Web/HTML/Element *}
+        var avacontentblock = "avacontentblock[id]";
+        var button = "button[autofocus|class|disabled|form|formaction|formenctype|formmethod|formnovalidate|formtarget|id|name|type|value]";
+        var iframe = "iframe[allow|allowfullscreen|allowpaymentrequest|class|height|id|name|referrerpolicy|sandbox|src|srcdoc|width]";
+        var style = "style[media|nonce|title|type]";
+        var script = "script[async|crossorigin|defer|integrity|nomodule|nonce|referrerpolicy|src|type]";
+
+        {* Fix TinyMCE height *}
+        tinymce.on( "addeditor", function(event) {
+            tinymce.get( event.editor.id ).on( "init", function(event) {
+                var content = $( document.getElementById(this.id) );
+                content.next().height( content.height() );
+            } );
+        }, true );
+
+        tinymce.init({
+            selector: "textarea.visualEditor",
+            document_base_url: "{$sets.paths.server_url|escape:'javascript'}{$sets.paths.app_from_doc|escape:'javascript'}/",
+            //custom_elements: 'avasnippet,ava:snippet',
+            custom_elements: "~avacontentblock",
+            extended_valid_elements: [avacontentblock, button, iframe, style, script].join(","),
+            style_formats: [
+                {
+                    title: 'Header 1', block: 'h1'
+                },
+                {
+                    title: 'Header 2', block: 'h2'
+                },
+                {
+                    title: 'Header 3', block: 'h3'
+                },
+                {
+                    title: 'Responsive image', selector: 'img', 'classes': 'img-fluid'
+                },
+                {
+                    title: 'Button', selector: 'a', 'classes': 'btn btn-primary'
+                }
+            ],
+            fix_list_elements: true,
+            fix_table_elements: true,
+            verify_html: false,
+            verify_css_classes: false,
+            valid_children: "+body[style]",
+            visual: true,
+            body_class: 'inner_content',
+            content_css: "{$sets['paths']['app_from_doc']|escape:'javascript'}/node_modules/bootstrap/dist/css/bootstrap.css,{$sets['paths']['app_from_doc']|escape:'javascript'}/node_modules/@fortawesome/fontawesome-free/css/all.css,{$sets['paths']['app_from_doc']|escape:'javascript'}/file/template/1/css/content.css,{$sets.paths.app_from_doc|escape}/module/admin/lib/tinymce/avaContentBlock/css/avaContentBlock.css",
+
+            {* UI elements *}
+            plugins: ["advlist avaMediaSelector avaContentBlock anchor autolink charmap code hr fullscreen image legacyoutput link lists media nonbreaking paste searchreplace table visualchars visualblocks wordcount"],
+            image_advtab: true,
+            toolbar1: 'undo redo | cut copy paste | styleselect forecolor backcolor removeformat | bullist numlist outdent indent | searchreplace fullscreen visualchars visualblocks code',
+            toolbar2: 'bold italic underline strikethrough subscript superscript | alignleft aligncenter alignright alignjustify | table | image media {if $user->hasRights('snippet_generator_admin', Right::EDIT)}avaContentBlock{/if} | link unlink anchor | hr charmap',
+            fontsize_formats: "8px 10px 12px 14px 18px 24px 36px",
+            block_formats: "Paragraph=p;Header 1=h1;Header 2=h2;Header 3=h3;Header 4=h4;Header 5=h5;Header 6=h6",
+            setup: function(editor) {
+                editor.on('change', function(e) {
+                    $(window).trigger('userAction');
+                });
+                editor.on('click', function(e) {
+                    $(window).trigger('userAction');
+                });
+                editor.on('keydown', function(e) {
+                    $(window).trigger('userAction');
+                });
+                if($('#'+editor.id).hasClass('readonly_editor'))
+                {
+                        editor.settings.readonly = true;
+                }
+            },
+            codemirror: {
+                indentOnInit: false, // Whether or not to indent code on init.
+                path: 'codemirror', // Path to CodeMirror distribution
+                config: {             // CodeMirror config object
+                    lineNumbers: true,
+                    smartIndent: false
+                },
+                jsFiles: [
+                    //'mode/htmlembedded/htmlembedded.js',
+                    'addon/hint/show-hint.js',
+                    'addon/hint/html-hint.js',
+                    'addon/hint/css-hint.js'
+                ],
+                cssFiles: [
+                    'addon/hint/show-hint.css'
+                ]
+            }
+
+            //height: 500
+        });
+
+        tinymce.init({
+            selector: "textarea.visualEditorSimple",
+            document_base_url: "{$sets.paths.server_url|escape:'javascript'}{$sets.paths.app_from_doc|escape:'javascript'}/",
+            extended_valid_elements: [iframe, style, script].join(","),
+            fix_list_elements: true,
+            fix_table_elements: true,
+            verify_html : false,
+            verify_css_classes: false,
+            valid_children : "+body[style]",
+            force_p_newlines: false,
+            visual: true,
+            menubar: false,
+
+            {* UI elements *}
+            plugins: ["anchor autolink code fullscreen hr lists link"],
+            toolbar1: 'bold italic underline | bullist numlist | fullscreen code',
+            setup: function(editor) {
+                editor.on('change', function(e) {
+                    $(window).trigger('userAction');
+                });
+                editor.on('click', function(e) {
+                    $(window).trigger('userAction');
+                });
+                editor.on('keydown', function(e) {
+                    $(window).trigger('userAction');
+                });
+            }
+        });
+
+        tinymce.init({
+            selector: 'textarea.visualSnippetEditor',
+            document_base_url: "{$sets.paths.server_url|escape:'javascript'}{$sets.paths.app_from_doc|escape:'javascript'}/",
+            extended_valid_elements: [button, iframe, style, script].join(","),
+            style_formats: [
+                {
+                    title: 'Paragraph list', selector: 'ol,ul', 'classes':'para-list'
+                },
+                {
+                    title: 'No border table', selector: 'table', 'classes':'noborder'
+                },
+                {
+                    title: 'Border table', selector: 'table', 'classes':'withborder'
+                },
+                //{
+                //    title: 'h1', block: 'h1'
+                //},
+                  {
+                      title: 'h2', block: 'h2'
+                  },
+                  {
+                      title: 'h3', block: 'h3'
+                  }
+            ],
+            fix_list_elements: true,
+            fix_table_elements: true,
+            verify_html: false,
+            verify_css_classes: false,
+            valid_children: "+body[style]",
+            visual: true,
+            body_class: 'inner_content',
+            content_css: "{$sets['paths']['app_from_doc']|escape:'javascript'}/node_modules/bootstrap/dist/css/bootstrap.css,{$sets['paths']['app_from_doc']|escape:'javascript'}/node_modules/@fortawesome/fontawesome-free/css/all.css,{$sets['paths']['app_from_doc']|escape:'javascript'}/file/template/1/css/content.css",
+
+            {* UI elements *}
+            plugins: ["advlist anchor autolink avaMediaSelector charmap code fullscreen hr image legacyoutput link lists searchreplace media nonbreaking paste table visualchars visualblocks wordcount"],
+            image_advtab: true,
+            toolbar1: 'undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | subscript superscript | searchreplace',
+            toolbar2: 'styleselect | table | hr link anchor | cut copy paste | image media | charmap | visualblocks visualchars | fullscreen code',
+            fontsize_formats: "8px 10px 12px 14px 18px 24px 36px",
+            block_formats: "Paragraph=p;Header 1=h1;Header 2=h2;Header 3=h3;Header 4=h4;Header 5=h5;Header 6=h6",
+            setup: function(editor) {
+              editor.on('change', function(e) {
+                $(window).trigger('userAction');
+              });
+              editor.on('click', function(e) {
+                $(window).trigger('userAction');
+              });
+              editor.on('keydown', function(e) {
+                $(window).trigger('userAction');
+              });
+            },
+            codemirror: {
+              indentOnInit: false, // Whether or not to indent code on init.
+              path: 'codemirror', // Path to CodeMirror distribution
+              config: {       // CodeMirror config object
+                lineNumbers: true,
+                smartIndent: false
+              },
+              jsFiles: [
+                //'mode/htmlembedded/htmlembedded.js',
+                'addon/hint/show-hint.js',
+                'addon/hint/html-hint.js',
+                'addon/hint/css-hint.js'
+              ],
+              cssFiles: [
+                'addon/hint/show-hint.css'
+              ]
+            }
+        });
+
+        /*
+        Shadowbox.init({
+          skipSetup: true
+        });
+        */
+
+        // time ticker
+        var ts = new timeTicker({$sts|escape:'javascript'});
+        $(ts).bind('update', function(e, d, ts) {
+            var weekdays = [
+                {foreach from=$dict.SET_weekdays item=weekday name=weekdays}
+                "{$weekday|escape:'javascript'}"{if !$smarty.foreach.weekdays.last},{/if}
+                {/foreach}
+            ];
+            var months = [
+                {foreach from=$dict.SET_months item=month name=months}
+                "{$month|escape:'javascript'}"{if !$smarty.foreach.months.last},{/if}
+                {/foreach}
+            ];
+
+            var el = $('#current-time');
+            var day = d.getDay() - 1 < 0 ? 6 : d.getDay() - 1;
+
+            el.find('.date').html(d.getDate() + ' ' + months[d.getMonth()] + ', ' + d.getFullYear());
+            el.find('.time').html(weekdays[day] + ', '
+                + ((d.getHours() < 10 ? '0' : '') + d.getHours()) + ':'
+                + ((d.getMinutes() < 10 ? '0' : '') + d.getMinutes()) + ':'
+                + ((d.getSeconds() < 10 ? '0' : '') + d.getSeconds())
+            );
+        });
+        ts.tsUpdate();
+
+        $('#current-time').show();
+    });
+    {/if}
+    </script>
+  </head>
+  <body class="module_{$response.module} locale_{$request.locale} {implode(' ', $response.bodyCls)}">
+    {if $response.bodyCls[0] == 'login'}
+    {$response.content}
+
+    {elseif $response.bodyCls[0] == 'bare'}
+    <div id="content">{$response.content}</div>
+
+    {else}
+    <div id="navigation" class="navbar-fixed-top">
+      <div class="container-fluid">
+        <a href="{$sets.paths.app_from_doc|escape}/admin/{$request.locale}/" id="brand">{$dict.APP_title|escape}</a>
+        <a href="#" class="toggle-nav" rel="tooltip" data-placement="bottom" title="Toggle navigation"><i class="icon-reorder"></i></a>
+
+        <ul class="main-nav">
+        </ul>
+
+        {if $user->getId()}
+        <div class="user">
+          <ul class="icon-nav">
+            <li>
+              <a href="{$sets.paths.app_from_doc|escape}/user-guide/cms-user-guide.pdf" target="_blank"><i class="icon-book"></i></a>
+            </li>
+            <li class="dropdown sett">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i></a>
+
+              <ul class="dropdown-menu pull-right">
+                {if $user->hasRights('configuration_admin', Right::ACCESS)}
+                <li>
+                  <a href="{$sets.paths.app_from_doc|escape}/admin/{$request.locale}/configuration/">{$dict.SET_modules.configuration_admin|escape}</a>
+                </li>
+                {/if}
+
+                {if $user->hasRights('log_admin', Right::ACCESS)}
+                <li>
+                  <a href="{$sets.paths.app_from_doc|escape}/admin/{$request.locale}/log/">{$dict.SET_modules.log_admin|escape}</a>
+                </li>
+                {/if}
+              </ul>
+            </li>
+
+            <li class="dropdown locale">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="icon-globe"></i>
+                {$dict.SET_accessible_locales[$user->getPreferredLocale()]|escape}
+              </a>
+
+              <ul class="dropdown-menu pull-right">
+                {foreach $dict.SET_accessible_locales as $locale => $locale_name}
+                <li>
+                  <a href="{$sets.paths.app_from_doc|escape}/admin/{$request.locale}/?op=set_preferred_locale&amp;locale={$locale|escape:'url'}&amp;redirect_url={$sets.paths.mod_from_doc|escape:'url'}%2F%3F{$smarty.get|http_build_query|escape:'url'}"
+                    {if $locale == $user->getPreferredLocale()}class="active"{/if}>{$locale_name|escape}</a>
+                </li>
+                {/foreach}
+              </ul>
+            </li>
+          </ul>
+
+          <div class="dropdown">
+            <a href="#" class='dropdown-toggle' data-toggle="dropdown">{$user->getFirstName()|escape}</a>
+
+            <ul class="dropdown-menu pull-right">
+              <li>
+                <a href="{$sets.paths.app_from_doc|escape}/admin/{$request.locale}/my_profile/">{$dict.SET_modules.my_profile_admin|escape}</a>
+              </li>
+
+              <li>
+                <a href="{$sets.paths.app_from_doc|escape}/admin/{$request.locale}/?op=logout">{$dict.ACTION_logout|escape}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        {/if}
+      </div>
+    </div>
+
+    <div class="container-fluid nav-fixed" id="content">
+      {if $user->getId()}
+      <div id="left">
+        {foreach $side_menu as $group => $items}
+        <div class="subnav{if !$items.active} subnav-hidden{/if}">
+          <div class="subnav-title">
+            <a href="#" class="toggle-subnav">
+              <i class="icon-angle-{if $items.active}down{else}right{/if}"></i>
+              <span>{$dict.SET_side_menu_groups[$group]|escape}</span>
+            </a>
+          </div>
+
+          <ul class="subnav-menu"{if !$items.active} style="display: none"{/if}>
+            {foreach $items.children as $child_type => $child}
+            <li class="{if $child.active}active{/if} {if $child.children}dropdown{/if} dropright">
+              <a href="{$child.url|escape}" target="{$child.target|escape}"{if $child.children} data-toggle="dropdown"{/if}>
+                <i class="{$child.icon|escape}"></i>
+                {$child.title|escape}
+              </a>
+
+              {if $child.children}
+              <ul class="dropdown-menu">
+                {foreach $child.children as $grandchild}
+                <li{if $grandchild.active} class="active"{/if}>
+                  <a href="{$grandchild.url|escape}" target="{$grandchild.target|escape}">
+                    <i class="{$grandchild.icon|escape}"></i>
+                    {$grandchild.title|escape}
+                  </a>
+                </li>
+                {/foreach}
+              </ul>
+              {/if}
+            </li>
+            {/foreach}
+          </ul>
+        </div>
+        {/foreach}
+      </div>
+      {/if}
+
+      <div id="main">
+        <div class="container-fluid">
+          {if $user->getId()}
+          <div class="page-header">
+            <div class="pull-left">
+              <h1>{$module_title|escape}</h1>
+            </div>
+
+            <div class="pull-right">
+              <ul class="stats">
+                <li class='lightred' id="current-time" style="display: none;">
+                  <i class="icon-calendar"></i>
+
+                  <div class="details">
+                    <span class="big date">--</span>
+                    <span class="time">--</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {if $breadcrumb->count()}
+          <div class="breadcrumbs">
+            {$breadcrumb->toHtml('<i class="icon-angle-right"></i>')}
+
+            <div class="close-bread">
+              <a href="#"><i class="icon-remove"></i></a>
+            </div>
+          </div>
+          {/if}
+          {/if}
+
+          <div class="row">
+            <div class="col-12">
+              <div class="box">
+                <div class="box-content nopadding inner-content">
+                  {$response.content}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer">
+      <p>{$dict.APP_admin_copyright|escape}</p>
+      <a href="#" class="gototop"><i class="icon-arrow-up"></i></a>
+    </div>
+    {/if}
+
+    <div class="loading">
+      <div><span>{$dict.LABEL_processing|escape}</span></div>
+      <img src="{$sets.paths.app_from_doc|escape}/module/admin/css/redeem_load.gif">
+    </div>
+  </body>
+</html>

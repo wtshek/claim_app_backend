@@ -1,0 +1,133 @@
+{if count($list_actions) > 0}
+<ul class="record-actions">
+  {foreach $list_actions as $list_url => $list_action}
+  <li><a href="{$list_url|escape}" class="button">{$list_action|escape}</a></li>
+  {/foreach}
+</ul>
+{/if}
+
+<table id="{$summary.id|escape}" class="table-condensed dataTable-nosort dataTable-noheader dataTable-nofooter table table-hover table-nomargin table-striped dataTable dataTable-colvis"
+  cellspacing="0" cellpadding="0" border="0" width="100%">
+  <thead>
+    <tr>
+      {if $summary.record_count > 0}
+      {foreach $keys as $key => $value}
+      {if $key != $summary.primary_key && $key != 'preview_token' && $key != 'preview_expiry_time'}
+      <th class="sorting{if $key == $summary.order_by}{if $summary.order_dir == 'ASC'} sorting_asc{elseif $summary.order_dir == 'DESC'} sorting_desc{/if}{/if}">
+        {if $conf.page_sortable}
+        <a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_order_by={$key|escape}{if $key != $summary.order_by || $summary.order_dir == 'DESC'}&amp;{$summary.id|escape}_order_dir=ASC{elseif $summary.order_dir == 'ASC'}&amp;{$summary.id|escape}_order_dir=DESC{/if}{if $hash}#{$hash|escape:'url'}{/if}">
+        {else}
+        <a>
+        {/if}
+          {$value|escape}
+        </a>
+      </th>
+      {/if}
+      {/foreach}
+      {if count($record_actions) > 0}
+      <th><a>{$dict.LABEL_action|escape}</a></th>
+      {/if}
+      {else}
+      <th><a>&nbsp;</a></th>
+      {/if}
+    </tr>
+  </thead>
+
+  <tbody>
+    {foreach $records as $record}
+    <tr class="{if $record@iteration % 2 == 1}odd{else}even{/if}" data-row-id="{$record[$summary.primary_key]|escape}">
+      {foreach key=key item=value from=$record}
+      {if $key != $summary.primary_key && $key != 'preview_token' && $key != 'preview_expiry_time'}
+      <td>
+        {* File field *}
+        {if $key == 'file' && $value}
+        <span title="{$value|escape}">{$value|basename|escape}</span>
+
+        {* Image field *}
+        {elseif $key == 'image'}
+        {if $value}
+        <figure class="figure" title="{$value|escape}">
+          <img src="{strip}
+            {if $conf.aws_enabled}
+            https://{$conf.s3_domain|escape}/
+            {elseif strpos($value, ':') === FALSE}
+            {$sets.paths.app_from_doc|escape}/file/
+            {/if}
+            {$value|escape}
+            {/strip}" alt="" class="figure-img img-fluid">
+          <figcaption class="figure-caption">{$value|basename|escape}</figcaption>
+        </figure>
+        {/if}
+
+        {* Other fields *}
+        {else}
+        {$value|escape|nl2br}
+        {/if}
+      </td>
+      {/if}
+      {/foreach}
+
+      {if count($record_actions) > 0}
+      <td class="buttonset">
+        <p>
+          {foreach $record_actions as $record_url => $record_action}
+          <a href="{$record_url|escape}{$record[$summary.primary_key]}">
+            {$record_action|escape}
+          </a>
+          {/foreach}
+        </p>
+
+        {if in_array($smarty.get.entity, array('announcement', 'press_release'))}
+        <div><b>{$dict.LABEL_anonymous_url|escape}</b></div>
+        <div>- <a href="?entity={$smarty.get.entity|escape:'url'}&amp;op=generate_token&amp;referer_url=%3F{$smarty.get|http_build_query|escape:'url'}&amp;id={$record[$summary.primary_key]}">{$dict.ACTION_generate|escape}</a></div>
+        {if $record.preview_token}
+        <div>- <a href="{$sets.paths['app_from_doc']|escape}/{$user->getPreferredLocale()|escape}/preview/?pvtk={$m->encodePvToken($record.preview_token, $smarty.get.entity)|escape:'url'}" target="_blank">{$dict.ACTION_preview|escape}</a> ({$dict.LABEL_expiry_time|escape}: {$record.preview_expiry_time|escape})</div>
+        <div>- <a href="?entity={$smarty.get.entity|escape:'url'}&amp;op=remove_token&amp;referer_url=%3F{$smarty.get|http_build_query|escape:'url'}&amp;id={$record[$summary.primary_key]}">{$dict.ACTION_remove|escape}</a></div>
+        {/if}
+        {/if}
+      </td>
+      {/if}
+    </tr>
+    {foreachelse}
+    <tr>
+      <td>{$dict.LABEL_no_records|escape}</td>
+    </tr>
+    {/foreach}
+  </tbody>
+</table>
+
+<div class="datatable-summary row-fluid">
+  {if count($records)}
+  <div class="record-summary span4">
+    <span>{$summary.formatted_record_count}</span>
+  </div>
+  {/if}
+
+  <div class="datatable-pagination span8">
+    <ul>
+      {assign var=page_count value=$pages|@count}
+      {if $summary.page_count > 1}
+      {if $summary.page_index > 0}
+      <li><a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page=0{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#{$hash|escape:'url'}{/if}"
+         title="1">|&lt;</a></li>
+      {/if}
+      {if $summary.page_index > 1}
+      <li><a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page={$summary.page_index-1}{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#{$hash|escape:'url'}{/if}"
+         title="{$summary.page_index}">&lt;</a></li>
+      {/if}
+      {foreach item=page_index from=$pages}
+      <li><a class="{if $summary.page_index == $page_index}current{/if}" href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page={$page_index}{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#{$hash|escape:'url'}{/if}"
+         title="{$page_index+1}">{$page_index+1}</a></li>
+      {/foreach}
+      {if $summary.page_index < $summary.page_count-2}
+      <li><a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page={$summary.page_index+1}{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#{$hash|escape:'url'}{/if}"
+         title="{$summary.page_index+2}">&gt;</a></li>
+      {/if}
+      {if $summary.page_index < $summary.page_count-1}
+      <li><a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page={$summary.page_count-1}{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#{$hash|escape:'url'}{/if}"
+         title="{$summary.page_count}">&gt;|</a></li>
+      {/if}
+      {/if}
+    </ul>
+  </div>
+</div>

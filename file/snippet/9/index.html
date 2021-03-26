@@ -1,0 +1,49 @@
+<div class="pgwSlideshowLight wide" style="display: block;">
+	<ul class="pgwSlideshow">
+		{foreach from=$snippet_data.images key=k item=image}
+		{capture "src"}{strip}
+		{if $conf.aws_enabled && strpos($image, 'webpage/') === 0}
+		https://{$conf.cloudfront_domain}/
+		{elseif strpos($image, ':') === FALSE}
+		file/
+		{/if}
+		{$image}
+		{/strip}{/capture}
+		<li><img src="{$smarty.capture.src|escape}" alt="{$snippet_data.captions[$k]}"></li>
+		{/foreach}
+	</ul>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('.pgwSlideshow').pgwSlideshow({
+			transitionEffect: 'fading',
+			displayControls: true,
+			autoSlide: true,
+			transitionDuration: 800,
+			intervalDuration: 40000,
+			adaptiveDuration: 0,
+			imageWidth: 610,
+			imageHeight: 400
+		});
+
+		if($('html').width()<480)
+			$(".main").css('min-height', '575px');
+
+		var pgwTimer = setInterval(
+			function(){
+				var ulWidth = 0;
+				if($('.ps-list ul').width() == 0){
+					$('.ps-list ul').children('li').each(function(index){
+						ulWidth += parseInt($(this).width());
+					});
+					$('.ps-list ul').width(ulWidth);
+				}
+				else
+				{
+					//clearInterval(pgwTimer);
+				}
+
+			}, 50);
+	});
+</script>

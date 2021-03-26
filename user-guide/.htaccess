@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteRule ^(.*)$ %{ENV:BASE}auth.php [NC,L]
+
+# Allow access to html|txt files
+<FilesMatch "\.(html|txt)$">
+   Allow from all
+</FilesMatch>

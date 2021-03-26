@@ -1,0 +1,15 @@
+{$response.content}
+
+<script>
+(function() {
+    var announcement_webpages = $( "#edit_announcement_webpages" ).closest( "dl" );
+    var shown_in_webpages = $( "#edit_form input[name='base_table[shown_in_webpages]']" );
+    {if !$data.base_table.shown_in_webpages}
+    shown_in_webpages.filter( "[value=all]" ).prop( "checked", true );
+    {/if}
+    shown_in_webpages.on( "click", function() {
+        announcement_webpages.toggle( this.value == "specific" );
+    } );
+    shown_in_webpages.filter( ":checked" ).trigger( "click" );
+} )();
+</script>

@@ -1,0 +1,26 @@
+<div class="offer_preview">
+    <div class="offer_block">
+        <ul class="offers">
+            <li>
+                <img title="{$data.title|escape:'html'}" src="{$data.img_url|escape:'html'}" style="width:100%;" />
+                <div class="info">
+                    <a href="/en/" class="actionBtn">{$data.action_text|escape:'html'}</a>
+                    <p class="descrption">{$data.title|escape:'html'}</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="data_block">
+        <ul class="data-list">
+        {if $data.start_date}
+            <li><b>{$dict.LABEL_start_date|escape:'html'}</b>: {$data.start_date|escape:'html'}</li>
+        {/if}
+        {if $data.end_date}
+            <li><b>{$dict.LABEL_end_date|escape:'html'}</b>: {$data.end_date|escape:'html'}</li>
+        {/if}
+        </ul>
+        <ul class="actions">
+            <li><a href="?op=edit&id={$data.id|escape:'html'}" title="{$dict.ACTION_edit|escape:'html'}" class="btn btn-primary">{$dict.ACTION_edit|escape:'html'}</a></li>
+        </ul>
+    </div>
+</div>

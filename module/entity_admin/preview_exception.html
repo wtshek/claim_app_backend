@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="{$request.locale}">
+  <head>
+    <meta charset="utf-8">
+    <title>{$response.titles|@end|escape}</title>
+    <script>
+    try
+    {
+        window.opener.triggerException( {$response.content} );
+    }
+    catch( e )
+    {
+    }
+  
+    window.close();
+    </script>
+  </head>
+
+  <body>{$dict.DESCRIPTION_preview_exception|escape:'html'}</body>
+</html>

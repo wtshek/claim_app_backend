@@ -1,0 +1,260 @@
+
+{*<div class="row">*}
+{*<div class="col-12">*}
+{*<div class="box box-color box-bordered blue">*}
+
+{*<div class="box-title">*}
+    {*<h3>*}
+        {*<i class="icon-table"></i>*}
+        {*Hide/show columns*}
+    {*</h3>*}
+{*</div>*}
+{*<div class="box-content nopadding">*}
+
+{if count($list_actions) > 0}
+<ul class="record-actions">
+  {foreach key=list_url item=list_action from=$list_actions}
+  <li><a href="{$list_url|escape}" class="button">{$list_action|escape}</a></li>
+  {/foreach}
+</ul>
+{/if}
+
+<table id="{$summary.id|escape}" class="table-condensed dataTable-nosort dataTable-noheader dataTable-nofooter table table-hover table-nomargin table-striped dataTable dataTable-colvis"
+  cellspacing="0" cellpadding="0" border="0" width="100%">
+  <thead>
+    <tr>
+      {if $summary.record_count > 0}
+      {if $summary.record_input.type != ''}
+      <th><a id="{$summary.id|escape}_batch_cell">&nbsp;</a></th>
+      {/if}
+      {foreach key=key item=value from=$keys}
+      {if $key != $summary.primary_key && !in_array($key, $hidden_fields)}
+      <th class="sorting{if $key == $summary.order_by}{if $summary.order_dir == 'ASC'} sorting_asc{elseif $summary.order_dir == 'DESC'} sorting_desc{/if}{/if}">
+        {if $conf.page_sortable}
+        <a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_order_by={$key|escape}{if $key != $summary.order_by || $summary.order_dir == 'DESC'}&amp;{$summary.id|escape}_order_dir=ASC{elseif $summary.order_dir == 'ASC'}&amp;{$summary.id|escape}_order_dir=DESC{/if}{if $hash}#/{$hash|escape:'url'}{/if}">
+        {else}
+        <a>
+        {/if}
+          {$value|escape}
+
+        </a>
+      </th>
+      {/if}
+      {/foreach}
+      {if count($record_actions) > 0}
+      <th><a>{$dict.LABEL_action|escape}</a></th>
+      {/if}
+      {else}
+      <th><a>&nbsp;</a></th>
+      {/if}
+    </tr>
+  </thead>
+
+  <tbody>
+    {foreach item=record from=$records name=record}
+    <tr class="{if $smarty.foreach.record.iteration % 2 == 1}odd{else}even{/if}" data-row-id="{$record[$summary.primary_key]|escape}">
+      {if $summary.record_input.type != ''}
+      <td style="width: 1em">
+        <input type="{$summary.record_input.type|escape}"
+          id="{$summary.id|escape}_input_{$record[$summary.primary_key]|escape}"
+          name="{$summary.id|escape}{if $summary.record_input.type != 'radio'}[]{/if}"
+          value="{$record[$summary.primary_key]|escape}"
+          class="{$summary.record_input.type|escape}"
+          {if in_array($record[$summary.primary_key], $summary.record_input.values)}checked{/if}>
+      </td>
+      {/if}
+      {foreach key=key item=value from=$record}
+      {if $key != $summary.primary_key && !in_array($key, $hidden_fields)}
+      <td>
+        {if in_array($key, $html_fields)}
+            {$value|nl2br}
+        {else}
+            {if isset($field_actions[$key])}
+            <a href="{if $field_actions[$key]['prefix_url']}{$field_actions[$key]['prefix_url']|escape}{/if}{if $field_actions[$key]['postfix_url']}{if isset($record[$field_actions[$key]['postfix_url']])}{$record[$field_actions[$key]['postfix_url']]|escape}{else}{$field_actions[$key]['postfix_url']|escape}{/if}{/if}"
+                title="{$value|escape}"
+                target="{if $field_actions[$key]['target']}{$field_actions[$key]['target']|escape}{else}_top{/if}">
+            {/if}
+            {$value|escape|nl2br}
+            {if isset($field_actions[$key])}
+            </a>
+            {/if}
+        {/if}
+      </td>
+      {/if}
+      {/foreach}
+      {if count($record_actions) > 0}
+      <td class="buttonset">
+        {foreach key=record_url item=record_action from=$record_actions}
+            {if (!isset($actions_ref[$record_url]) || $record[$actions_ref[$record_url]]) && (!isset($record['__d_actions'][$record_action]) || $record['__d_actions'][$record_action])}
+                <a href="{$record_url|escape}{if $record[$actions_ref[$record_url]]}{$record[$actions_ref[$record_url]]}{else}{$record[$summary.primary_key]|escape}{/if}{if isset($action_hashes[$record_action])}#{$action_hashes[$record_action]|escape}{/if}">{$record_action|escape}</a>
+            {/if}
+        {/foreach}
+      </td>
+      {/if}
+    </tr>
+    {/foreach}
+    {if count($records) == 0}
+    <tr>
+      <td>{$dict.LABEL_no_records|escape}</td>
+    </tr>
+    {/if}
+  </tbody>
+</table>
+
+<div class="datatable-summary container">
+  <div class="row">
+    {if count($records)}
+    <div class="record-summary col-4">
+      <span>{$summary.formatted_record_count}</span>
+    </div>
+    {/if}
+    <div class="datatable-pagination col-8">
+      <ul>
+      {assign var=page_count value=$pages|@count}
+      {if $summary.page_count > 1}
+          {*{$dict.LABEL_page}*}
+          {if $summary.page_index > 0}
+              <li><a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page=0{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#/{$hash|escape:'url'}{/if}"
+                 title="1">|&lt;</a></li>
+          {/if}
+          {if $summary.page_index > 1}
+              <li><a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page={$summary.page_index-1}{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#/{$hash|escape:'url'}{/if}"
+                 title="{$summary.page_index}">&lt;</a></li>
+          {/if}
+          {foreach item=page_index from=$pages}
+              <li><a class="{if $summary.page_index == $page_index}current{/if}" href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page={$page_index}{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#/{$hash|escape:'url'}{/if}"
+                 title="{$page_index+1}">{$page_index+1}</a></li>
+          {/foreach}
+          {if $summary.page_index < $summary.page_count-2}
+              <li><a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page={$summary.page_index+1}{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#/{$hash|escape:'url'}{/if}"
+                 title="{$summary.page_index+2}">&gt;</a></li>
+          {/if}
+          {if $summary.page_index < $summary.page_count-1}
+              <li><a href="?{$summary.query_string|escape}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape}_page={$summary.page_count-1}{if $summary.order_by != ''}&amp;{$summary.id|escape}_order_by={$summary.order_by}&amp;{$summary.id|escape}_order_dir={$summary.order_dir}{/if}{if $hash}#/{$hash|escape:'url'}{/if}"
+                 title="{$summary.page_count}">&gt;|</a></li>
+          {/if}
+      {/if}
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+{*</div>*}
+{*</div>*}
+{*</div>*}
+{*</div>*}
+
+{if $summary.record_input.type != '' && $summary.record_input.type != 'hidden'}
+<script type="text/javascript">
+<!--
+var list = document.getElementById( "{$summary.id|escape:'javascript'}" );
+var inputs = list.getElementsByTagName( "input" );
+var values = Cookies.get( "{$summary.id}" );
+values = values ? values.split( "," ) : [];
+
+{if $summary.record_input.type == 'checkbox'}
+var batch_cell = document.getElementById( "{$summary.id|escape:'javascript'}_batch_cell" );
+if ( batch_cell )
+{
+    // Add batch checkbox to the table header
+    var batch = document.createElement( "input" );
+    batch.id = "{$summary.id|escape:'javascript'}_batch";
+    batch.type = "checkbox";
+    batch.className = "checkbox";
+    while ( batch_cell.firstChild )
+    {
+        batch_cell.removeChild( batch_cell.firstChild );
+    }
+    batch_cell.appendChild( batch );
+
+    // Batch check/uncheck
+    batch.onclick = function()
+    {
+        var inputs = document.getElementById( "{$summary.id|escape:'javascript'}" ).getElementsByTagName( "input" );
+        for ( var i = 0; i < inputs.length; i++ )
+        {
+            var input = inputs.item(i);
+            if ( input.name == "{$summary.id|escape:'javascript'}[]"
+                && this.checked != input.checked )
+            {
+                input.checked = this.checked;
+                input.onclick();
+            }
+        }
+    }
+
+    var all_checked = true;
+    for ( var i = 0; i < inputs.length; i++ )
+    {
+        var input = inputs.item(i);
+        if ( input.name == "{$summary.id|escape:'javascript'}{if $summary.record_input.type == 'checkbox'}[]{/if}" )
+        {
+            // Reuse the selection using cookies
+            input.onclick = function( e )
+            {
+                var values = Cookies.get( "{$summary.id|escape:'javascript'}" );
+                values = values ? values.split( "," ) : [];
+                if ( this.type.toLowerCase() == "checkbox" )
+                {
+                    var index = values.indexOf( this.value );
+                    if ( this.checked )
+                    {
+                        if ( index < 0 )
+                        {
+                            values.push( this.value );
+                        }
+                    }
+                    else
+                    {
+                        if ( index >= 0 )
+                        {
+                            values.splice( index, 1 );
+                        }
+                    }
+                }
+                else if ( this.type.toLowerCase() == "radio" )
+                {
+                    values = [this.value];
+                }
+                Cookies.set( "{$summary.id|escape:'javascript'}", values.join(","), { path: "{$sets.paths.app_from_doc|escape:'javascript'}/" } );
+
+                // Check/uncheck batch checkbox
+                if ( (window.event && window.event.srcElement == this) || e )
+                {
+                    var inputs = document.getElementById( "{$summary.id|escape:'javascript'}" ).getElementsByTagName( "input" );
+                    var all_checked = true;
+                    for ( var i = 0; i < inputs.length && all_checked; i++ )
+                    {
+                        var input = inputs.item(i);
+                        if ( input.name == "{$summary.id|escape:'javascript'}[]" && !input.checked )
+                        {
+                            all_checked = false;
+                        }
+                    }
+                    document.getElementById( "{$summary.id|escape:'javascript'}_batch" ).checked = all_checked;
+                }
+            }
+
+            // Restore previous selection, if any
+            if ( values.length > 0 )
+            {
+                if ( values.indexOf(input.value) >= 0 )
+                {
+                    input.checked = true;
+                }
+            }
+
+            // Check to see if all checkboxes are checked
+            if ( !input.checked )
+            {
+                all_checked = false;
+            }
+        }
+    }
+    batch.checked = all_checked;
+}
+{/if}
+-->
+</script>
+{/if}

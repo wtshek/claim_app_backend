@@ -1,0 +1,55 @@
+<table class="layout record_list" cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tbody>
+    {foreach item=record from=$records name=record}
+
+    <tr class="{if $smarty.foreach.record.iteration % 2 == 1}odd{else}even{/if}">
+      <td>
+        <h4 class="title">
+          {$record.creator_user_name|escape:'html'}
+          &lt;{$record.creator_email|escape:'html'}&gt;:
+        </h4>
+
+        <p lang="{$record.locale}">{$record.content|escape:'html'|nl2br}</p>
+
+        <p>{$record.created_date|escape:'html'}</p>
+      </td>
+    </tr>
+
+    {foreachelse}
+
+    <tr class="odd">
+      <td><p>{$dict.LABEL_no_records|escape:'html'}</p></td>
+    </tr>
+
+    {/foreach}
+  </tbody>
+</table>
+
+{if $summary.page_count > 1}
+<div class="spacer">&nbsp;</div>
+
+<p>
+  {assign var=page_count value=$pages|@count}
+  {$dict.LABEL_page}
+  {if $summary.page_index > 0}
+  <a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page=0{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#comments"
+    title="1">|&lt;</a>
+  {/if}
+  {if $summary.page_index > 1}
+  <a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page={$summary.page_index-1}{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#comments"
+    title="{$summary.page_index}">&lt;</a>
+  {/if}
+  {foreach item=page_index from=$pages}
+  <a class="{if $summary.page_index == $page_index}current{/if}" href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page={$page_index}{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#comments"
+    title="{$page_index+1}">{$page_index+1}</a>
+  {/foreach}
+  {if $summary.page_index < $summary.page_count-2}
+  <a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page={$summary.page_index+1}{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#comments"
+    title="{$summary.page_index+2}">&gt;</a>
+  {/if}
+  {if $summary.page_index < $summary.page_count-1}
+  <a href="?{$summary.query_string|escape:'html'}{if $summary.query_string != ''}&amp;{/if}{$summary.id|escape:'html'}_page={$summary.page_count-1}{if $summary.order_by != ''}&amp;{$summary.id|escape:'html'}_order_by={$summary.order_by}&amp;{$summary.id|escape:'html'}_order_dir={$summary.order_dir}{/if}#comments"
+    title="{$summary.page_count}">&gt;|</a>
+  {/if}
+</p>
+{/if}

@@ -1,0 +1,55 @@
+<div class="span{$pb_item->getSize()|escape:'html'}">
+  <div class="box box-color box-bordered {$pb_item->getColorTheme()}">
+    <div class="box-title">
+      <h3>
+        <i class="{$pb_item->getIconName()|escape:'html'}"></i>
+        {$pb_item->getTitle()|escape:'html'}
+      </h3>
+
+      <ul class="actions">
+        <li>
+          <button class="btn btn-mini content-slideUp">
+            <i class="icon-angle-down"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="box-content nopadding">
+      <div class="row-fluid">
+        <dl class="box-list">
+          {while $pb_item->getItemList()->valid()}
+          <dd>
+            {assign var=pb_current value=$pb_item->getItemList()->current()}
+            {$pb_item->getItemList()->next()}
+            <dl class="box-list-item{if !$pb_item->getItemList()->valid()} last{/if} {if $pb_item->getItemList()->key() % 2}odd{else}even{/if}" rel="{$pb_current->getUrl()|escape:'html'}">
+              {if $pb_current->getIconName()}
+              <dd class="icon {$pb_current->getIconName()|escape:'html'}">
+                <i class="icon-{$pb_current->getIconName()|escape:'html'}"></i>
+              </dd>
+              {/if}
+
+              <dt>
+                {$pb_current->getTitle()|escape:'html'}
+              </dt>
+
+              <dd class="action">
+                {foreach from=$pb_current->getActions() item=action_text}
+                <span>
+                  <a href="{$pb_current->getUrl()|escape:'html'}">{$action_text|escape:'html'}</a>
+                  <i class="icon-chevron-right"></i>
+                </span>
+                {/foreach}
+              </dd>
+
+              <dd>
+                {$pb_current->getDescription()|escape:'html'}
+              </dd>
+            </dl>
+          </dd>
+          {/while}
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>

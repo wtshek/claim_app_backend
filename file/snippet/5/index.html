@@ -1,0 +1,116 @@
+{* Offer list *}
+{capture name="offer_row"}
+<div class="row promotions align-items-stretch">
+  {foreach $offer_list as $offer}
+  <div class="col-12 col-md-6 col-lg-4 card-item">
+    <div class="card">
+      <div>
+        <a href="{$offer.url|escape}" {if $offer.target}target="{$offer.target|escape}"{/if} {if $offer.video_url}data-video-url="{$offer.video_url|escape}"{/if}>
+          {capture "src"}{strip}
+          {if $conf.aws_enabled && strpos($offer.img_url, 'offer/') === 0}
+          https://{$conf.cloudfront_domain}/
+          {elseif strpos($offer.img_url, ':') === FALSE}
+          file/
+          {/if}
+          {$offer.img_url}
+          {/strip}{/capture}
+          <img class="card-img-top" src="{$smarty.capture.src|escape}" alt="" loading="lazy">
+        </a>
+      </div>
+
+      <div class="card-body">
+        <h3 class="card-title"><a href="{$offer.url|escape}" {if $offer.target}target="{$offer.target|escape}"{/if}>{$offer.title|escape}</a></h3>
+
+        {if $offer.period_from && $offer.period_to}
+        <p class="small mb-2 text-secondary">{$offer.period_from|date_format:'%Y.%m.%d'|escape} &#x2013; {$offer.period_to|date_format:'%Y.%m.%d'|escape}</p>
+        {/if}
+
+        <div class="card-text">{$offer.description}</div>
+
+        {if $offer.action_text && $offer.action_url}
+        <div class="promo-btn">
+          <a href="{$offer.action_url|escape}" class="btn btn-primary ctc" target="_blank" data-report-group="{$offer.report_group|escape}" data-report-label="Offers">{$offer.action_text|escape}</a>
+        </div>
+        {/if}
+      </div>
+    </div>
+  </div>
+  {/foreach}
+</div>
+{/capture}
+
+{* Offer page *}
+{if $is_index}
+<section id="offers" class="pt-0">
+  <div class="container text-center">
+    <div class="row justify-content-center">
+      <ul class="nav">
+        {foreach $category as $alias => $name}
+        <li class="nav-item">
+          <a href="{$offer_url|escape}{if $alias}?category={$alias|escape:'url'}{/if}" class="nav-link{if $alias == $smarty.get.category} active{/if}">{$name|escape}</a>
+        </li>
+        {/foreach}
+      </ul>
+    </div>
+    {$smarty.capture.offer_row}
+  </div>
+</section>
+
+{* Other pages *}
+{else}
+<section id="featured-offers">
+  <div class="container text-center">
+    <div class="row d-block">
+      <h2>{$dict.LABEL_featured_offers|escape}</h2>
+
+      <p>{$dict.LABEL_featured_offers_intro_text|escape}</p>
+    </div>
+
+    {$smarty.capture.offer_row}
+
+	<p>
+        <a href="{$dict.URL_offer_url|escape}">{$dict.LABEL_more_offers|escape} <i class="fas fa-chevron-right"></i> </a>
+    </p>
+  </div>
+</section>
+{/if}
+
+{* Video modal *}
+<div id="video_modal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.LABEL_close|escape}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe frameborder="0" height="720" src="about:blank" width="1280"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready( function() {
+    {* Video modal *}
+    var video_modal = $( "#video_modal" ).on( "hide.bs.modal", function() {
+        video_iframe.attr( "src", "about:blank" );
+    } );
+    var video_iframe = video_modal.find( "iframe" );
+    var video_title = video_modal.find( ".modal-title" );
+
+    $( "a[data-video-url]" ).click( function() {
+        var link = $( this );
+        video_iframe.attr( "src", link.data("video-url") );
+        video_title.text( link.closest(".card").find("h3").text() );
+        video_modal.modal();
+        return false;
+    } );
+} );
+</script>

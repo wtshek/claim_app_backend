@@ -1,0 +1,116 @@
+<form id="edit_form" method="POST" accept-charset="UTF-8" action="?op=edit&amp;id={$data.id}&amp;referer_url={$_get.referer_url|escape:'url'}">
+  <div class="box box-color box-bordered">
+    <div class="box-title">
+      <h3>
+        <i class="icon-edit"></i>
+
+        {if $data.id > 0}
+        {$dict.SET_operations.edit|escape}
+        {else}
+        {$dict.SET_operations.new|escape}
+        {/if}
+      </h3>
+
+      <ul class="actions">
+        <li>
+          <button type="button" class="btn btn-mini content-slideUp">
+            <i class="icon-angle-down"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="box-content">
+      <div class="row">
+        <div class="col-12 col-lg-6">
+          {field_select name="role_id" title=$dict.LABEL_role options=$role_options id="role_id" selected=$data.role_id error=$errors.role_id disabled_items=$disabled_roles view_only=false}
+          {field_select name="salutation" title=$dict.LABEL_salutation options=$dict.SET_salutations id="salutation" selected=$data.salutation error=$errors.salutation has_empty=true}
+          {field_text class="" name="first_name" title=$dict.LABEL_first_name id="first_name" maxlength="255" value=$data.first_name error=$errors.first_name view_only=false}
+          {field_text class="" name="last_name" title=$dict.LABEL_last_name id="last_name" maxlength="255" value=$data.last_name error=$errors.last_name view_only=false}
+          {field_radio name="enabled" title=$dict.LABEL_enabled options=$dict.SET_bool id="enabled" selected=$data.enabled error=$errors.enabled view_only=false}
+        </div>
+
+        <div class="col-12 col-lg-6">
+          {field_text class="" name="username" title=$dict.LABEL_username id="username" maxlength="255" value=$data.username error=$errors.username view_only=false}
+          {field_text class="" type="email" name="email" title=$dict.LABEL_email id="email" maxlength="255" value=$data.email error=$errors.email view_only=false}
+          {if $data.id > 0}
+          {field_text class="" type="password" name="password" title=$dict.LABEL_password_new id="password" value="" error=$errors.password view_only=false}
+          {else}
+          {field_text class="" type="password" name="password" title=$dict.LABEL_password id="password" value="" error=$errors.password view_only=false}
+          {/if}
+          {field_text class="" type="password" name="password_confirm" title=$dict.LABEL_password_confirm id="password_confirm"  value="" error=$errors.password_confirm view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_checkbox name="locale_check_all" id="locale_check_all" style="display:block" error=$errors.locale_check_all options=$dict.LABEL_check_all selected=false view_only=false}
+          {field_checkbox name="user_locales" options=$sets.public_locales selected=$data.user_locales view_only=false}
+        </div>
+      </div>
+
+      {if $data.id > 0}
+      <div class="bottom-info">
+        <ul class="info-list">
+          {if $info.last_update_message}<li class="update_date">{$info.last_update_message}</li>{/if}
+          <li class="create_date">{$info.created_date_message}</li>
+        </ul>
+      </div>
+      {/if}
+    </div>
+
+    <div class="actions_container">
+      <ul class="actions">
+        <li>
+          <button name="submit" class="btn btn-primary">
+            <i class="icon-save"></i>
+            {$dict.ACTION_save|escape}</button>
+        </li>
+
+        <li>
+          <button type="button" name="action-cancel" class="btn btn-primary">
+            <i class="icon-remove-circle"></i>
+            {$dict.ACTION_cancel|escape}</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <input type="hidden" name="t" value="{$type|escape}" />
+</form>
+
+<script>
+(function() {
+    new form_submit_panel( $("#edit_form") );
+
+    $( '*[name="action-cancel"]' ).bind( 'click', function(e){
+        e.preventDefault();
+        window.location.href = "{$smarty.get.referer_url|escape:'javascript'}#/{$data.role_type}_user_list_{$data.role_id}";
+    } );
+    
+    // Initial the status of check_all_languages
+    if($('input[name^="user_locales"]:checked').length == $('input[name^="user_locales"]').length)
+    {
+      $("#locale_check_all_0").prop('checked', true);
+    }
+    else
+    {
+      $("#locale_check_all_0").prop('checked', false);
+    }
+    
+    $("#locale_check_all_0").bind('click', function(e){
+      $('input[name^="user_locales"]').prop('checked', $(this).prop('checked'));
+    });
+    
+    $('input[name^="user_locales"]').bind('click', function(e){
+      if($('input[name^="user_locales"]:checked').length == $('input[name^="user_locales"]').length)
+      {
+        $("#locale_check_all_0").prop('checked', true);
+      }
+      else
+      {
+        $("#locale_check_all_0").prop('checked', false);
+      }
+    });
+} )();
+</script>

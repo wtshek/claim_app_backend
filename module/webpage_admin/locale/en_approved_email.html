@@ -1,0 +1,41 @@
+Webpage(s) approved for {$dict.APP_title|escape:'html'}
+
+<p>Hi,</p>
+
+<p>
+    Following webpage(s) has been approved by {$user.first_name|escape:'html'} &lt;<a href="mailto:{$user.email|escape:'html'}">{$user.email|escape:'html'}</a>&gt;. You may review the page with following links:
+</p>
+
+
+{foreach from=$pages item=page}
+    {foreach from=$page key=platform item=p name=page}
+        {if $smarty.foreach.page.first}
+            <h3>{$p->getTitle()|escape:'html'}</h3>
+            <ul>
+        {/if}
+        <li><b>({$dict.SET_webpage_page_types[$platform]})</b>:&nbsp;
+            <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}{$p->getRelativeUrl($platform)|escape:'html'}?m={if $platform == 'mobile'}1{else}0{/if}">
+                {$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}{$p->getRelativeUrl($platform)|escape:'html'}
+            </a>
+        </li>
+        {if $smarty.foreach.page.last}
+            </ul>
+        {/if}
+    {/foreach}
+{/foreach}
+
+{*  {if is_array($data.path)}
+  {foreach from=$data.path key=k item=path name=paths}
+  <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/{$request.locale}/admin/webpage/?{if $k == 'mobile'}mobile_{/if}path={$path|escape:'url'}">
+    {$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/{$request.locale}/admin/webpage/?{if $k == 'mobile'}mobile_{/if}pathpath={$path|escape:'url'}
+  </a> ({$dict.SET_webpage_page_types[$k]|ucfirst}){if !$smarty.foreach.paths.last} / {/if}
+  {/foreach}
+  {else}
+  <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/{$request.locale}/admin/webpage/?path={$data.path|escape:'url'}">
+    {$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/{$request.locale}/admin/webpage/?path={$data.path|escape:'url'}
+  </a>
+  {/if}*}
+
+<p>Regards,</p>
+
+<p>{$conf.mailer_name|escape:'html'}</p>

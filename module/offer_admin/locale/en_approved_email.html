@@ -1,0 +1,21 @@
+Offer(s) approved for {$dict.APP_title|escape:'html'}
+
+<p>Hi,</p>
+
+<p>
+    Following offer(s) has been approved by {$user->getFirstname()|escape:'html'} &lt;<a href="mailto:{$user->getEmail()|escape:'html'}">{$user->getEmail()|escape:'html'}</a>&gt;. You may review the page with following links:
+</p>
+{foreach from=$data.offers item=offer}
+    <h3>{$offer.title|escape:'html'}</h3>
+    <ul>
+        <li>
+            <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/admin/{$request.locale}/offer/?op=edit&id={$offer.id|escape:'url'}">
+                {$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/admin/{$request.locale}/offer/?op=edit&id={$offer.id|escape:'url'}
+            </a>
+        </li>
+    </ul>
+{/foreach}
+
+<p>Regards,</p>
+
+<p>{$conf.mailer_name|escape:'html'}</p>

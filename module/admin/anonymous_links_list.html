@@ -1,0 +1,58 @@
+<div class="span{$pb_item->getSize()|escape:'html'}">
+    <div class="box box-color box-bordered {$pb_item->getColorTheme()}">
+        <div class="box-title">
+            <h3><i class="{$pb_item->getIconName()|escape:'html'}"></i>
+                {$pb_item->getTitle()|escape:'html'}</h3>
+            <ul class="actions">
+                <li>
+                    <button class="btn btn-mini content-slideUp">
+                        <i class="icon-angle-down"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="box-content nopadding">
+            <div class="row-fluid">
+                <dl class="box-list anonymous_links_list">
+                    {foreach from=$pb_item->getItemList() key=list_name item=list}
+                        {if $list->count()}
+                            {assign var=pb_item_group_name value="`$list_name`_admin"}
+                                <dt class="list-group">{$dict.SET_modules[$pb_item_group_name]|default:$dict.SET_entity_terms[$list_name]|escape:'html'}</dt>
+                            {while $list->valid()}
+                                <dd>
+                                    {assign var=pb_current value=$list->current()}
+                                    {$list->next()}
+                                    <dl class="box-list-item{if !$list->valid()} last{/if} {if $list->key() % 2}odd{else}even{/if}">
+                                        {if $pb_current->getIconName()}
+                                            <dd class="icon {$pb_current->getIconName()|escape:'html'}">
+                                                <i class="icon-{$pb_current->getIconName()|escape:'html'}"></i>
+                                            </dd>
+                                        {/if}
+                                        <dt>
+                                            <a href="{$pb_current->getUrl()|escape:'html'}" title="{$pb_current->getTitle()|escape:'html'}">{$pb_current->getTitle()|escape:'html'}</a>
+                                        </dt>
+                                        <dd class="description">
+                                            {$dict.LABEL_valid_until|escape:'html'}&nbsp;{$pb_current->getDescription()|escape:'html'}
+                                        </dd>
+                                        <dd class="action">
+                                            <ul class="action_list row-fluid">
+                                            {assign var=c value=0}
+                                            {assign var=total_action_num value=$pb_current->getActions()|@count}
+                                            {foreach from=$pb_current->getActions() item=action}
+                                                <li class="{if $total_action_num > 1}col-6{else}col-12{/if}">
+                                                    <span>{$action['title']|escape:'html'}</span>
+                                                    <input name="" type="text" class="readonly" readOnly="readonly" value="{$sets.paths['server_url']|escape:'html'}{$action['url']|escape:'html'}">
+                                                </li>
+                                            {/foreach}
+                                            </ul>
+                                        </dd>
+                                    </dl>
+                                </dd>
+                            {/while}
+                        {/if}
+                    {/foreach}
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

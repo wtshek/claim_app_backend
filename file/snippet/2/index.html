@@ -1,0 +1,63 @@
+ {if $snippet_data.is_homepage}
+<section id="testimonial" class="module parallax" style="background:url('{$snippet_data.bg_image}') no-repeat fixed 0% 0% / cover">
+    <div id="testimonial-overlay">
+        <div id="myCarousel_{$snippet_data['id_surfix']}" class="container carousel slide wow fadeIn" data-ride="carousel">
+            {if $snippet_data.titles|@count>1}
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                {foreach from=$snippet_data.titles key=k item=tit name=title}
+                <li data-target="#myCarousel_{$snippet_data.id_surfix}" data-slide-to="{$k}" {if $smarty.foreach.title.first}class="active" {/if}><b></b></li>
+                {/foreach}
+            </ol>
+            {/if}
+
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
+                {foreach from=$snippet_data.titles key=k item=tit name=title}
+                <div class="item {if $smarty.foreach.title.first}active{/if}">
+                    <div class="container">
+                        <h3 class="text-center para2" id="para{$k}">{$tit}</h3>
+                        <p class="text-center white">{$snippet_data.subtitles[$k]}</p>
+                        <br><br>
+                    </div>
+                </div>
+                {/foreach}
+            </div>
+
+            <!-- Wrapper for customization contents -->
+            <div id="tripadvisor_btn">
+                <div class="text-center wow fadeIn">
+                    <a href="{$dict.URL_tripadvisor}" class="btn btn-primary" target="_blank">{$snippet_data.btn_text}<i class="glyphicon glyphicon-menu-right"></i></a>
+                </div>
+            </div>
+            <!-- Left and right controls -->
+            <a class="left carousel-control" href="#myCarousel_{$snippet_data['id_surfix']}" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span></a>
+            <a class="right carousel-control" href="#myCarousel_{$snippet_data['id_surfix']}" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span></a>
+        </div>
+    </div>
+</section>
+{else}
+<div id="myCarousel-{$snippet_data.timestamp}" class="carousel slide dining wow fadeIn" data-ride="carousel">
+    {if $snippet_data.images|@count>1}
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+        {foreach from=$snippet_data.images key=k item=img name=image}
+        <li data-target="#myCarousel-{$snippet_data.timestamp}" data-slide-to="{$k}" {if $smarty.foreach.image.first}class="active" {/if}><b></b></li>
+        {/foreach}
+    </ol>
+    {/if}
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+        {foreach from=$snippet_data.images key=k item=img name=image}
+        <div class="item {if $smarty.foreach.image.first}active{/if}">
+            <div class="image_slide" title="" button_url="#" style="background:url('{$img}')"></div>
+        </div>
+        {/foreach}
+    </div>
+</div>
+{/if}

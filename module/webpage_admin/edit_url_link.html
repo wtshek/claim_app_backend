@@ -1,0 +1,285 @@
+{foreach from=$dict.SET_content_types key=content_type item=contents}
+<div class="tab-pane fade padding {if $contents@first}show active{/if}" id="setting-{$content_type|escape}" role="tabpanel" aria-labelledby="setting-{$content_type|escape}-tab" data-tab-type="{$content_type|escape}">
+  <div class="alias_fields {$content_type|escape}">
+    {if !$root_page}
+    <dl class="row input-field">
+      <dt class="col-3">
+        <label>{$dict.LABEL_parent_page|escape}</label>
+      </dt>
+
+      <dd class="col-9" id="{$content_type|escape}_path">
+        <div class="webpage_parent_input">
+          {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+          <div class="input-select view" class="line-height:30px;">
+            <span>{$data.webpage[$content_type].webpage_parent_text|escape}</span>
+          </div>
+          {/if}
+
+          <div {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)} style="display:none;"{/if}>
+            <input type="text" name="webpage_parent_text[{$content_type|escape}]" id="{$content_type|escape}_webpage_parent_text" value="{$data.webpage[$content_type].webpage_parent_text|escape}" class="form-control" />
+            <input type="hidden" name="webpage_parent_id[{$content_type|escape}]" id="{$content_type|escape}_webpage_parent_id" value="{$data.webpage[$content_type].webpage_parent_id|escape}" />
+            <input type="hidden" name="webpage_parent_path[{$content_type|escape}]" id="{$content_type|escape}_webpage_parent_path" value="{$data.webpage[$content_type].webpage_parent_path|escape}" />
+            <button type="button" id="{$content_type|escape}_parent_select" class="btn btn-primary">{$dict.ACTION_select|escape}</button>
+            {if isset($errors["webpage_parent_text[$content_type]"])}
+            <div class="error">
+              <span>{$errors["webpage_parent_text[$content_type]"][0]}</span>
+            </div>
+            {/if}
+          </div>
+        </div>
+      </dd>
+    </dl>
+
+    {field_text ratio="3:9" name="alias[{$content_type|escape}]" title=$dict.LABEL_alias id="`$content_type`_alias" error=$errors["alias[$content_type]"] value=$data.webpage[$content_type]['alias'] view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+    {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+    <div style="display:none;">
+      {field_text ratio="3:9" name="alias[{$content_type|escape}]" title=$dict.LABEL_alias id="`$content_type`_alias" error=$errors["alias[$content_type]"] value=$data.webpage[$content_type]['alias'] view_only=$viewOnly}
+    </div>
+    {/if}
+    {/if}
+
+    <dl class="row input-field">
+      <dt class="col-3">
+        <label></label>{$dict.LABEL_path|escape}</label>
+      </dt>
+      <dd class="col-9" id="{$content_type|escape}_path_field">{$data.webpage[$content_type]['path']|escape}</dd>
+    </dl>
+
+    {* Modal *}
+    {if !$root_page}
+    <div class="modal hide fade parent_page_modal" tabindex="-1" role="dialog" aria-hidden="true" data-platform="{$content_type|escape}">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{$dict.LABEL_parent_page|escape}</h5>
+
+            <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="webpage-tree"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {/if}
+  </div>
+
+  <div class="url_link_fields">
+    {field_select ratio="3:9" title=$dict.LABEL_target name="target[$content_type]" id="`$content_type`_target" options=$dict.SET_link_targets selected=$data.webpage[$content_type].target error=$errors["target[$content_type]"] view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+    {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+    <div style="display:none;">
+      {field_select ratio="3:9" title=$dict.LABEL_target name="target[$content_type]" id="`$content_type`_target" options=$dict.SET_link_targets selected=$data.webpage[$content_type].target error=$errors["target[$content_type]"] view_only=$viewOnly}
+    </div>
+    {/if}
+  </div>
+
+  {field_radio ratio="3:9" name="shown_in_menu[$content_type]" title=$dict.LABEL_shown_in_menu id="`$content_type`_shown_in_menu" options=$dict.SET_shown_in_menu selected=$data.webpage[$content_type]['shown_in_menu'] error=$errors["shown_in_menu[$content_type]"] view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+  {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+  <div style="display:none;">
+    {field_radio ratio="3:9" name="shown_in_menu[$content_type]" title=$dict.LABEL_shown_in_menu id="`$content_type`_shown_in_menu" options=$dict.SET_shown_in_menu selected=$data.webpage[$content_type]['shown_in_menu'] error=$errors["shown_in_menu[$content_type]"] view_only=$viewOnly}
+  </div>
+  {/if}
+
+  {field_radio ratio="3:9" name="shown_in_sitemap[$content_type]" title=$dict.LABEL_shown_in_sitemap id="`$content_type`_shown_in_sitemap" options=$dict.SET_shown_in_sitemap selected=$data.webpage[$content_type]['shown_in_sitemap'] error=$errors.shown_in_sitemap view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+  {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+  <div style="display:none;">
+    {field_radio ratio="3:9" name="shown_in_sitemap[$content_type]" title=$dict.LABEL_shown_in_sitemap id="`$content_type`_shown_in_sitemap" options=$dict.SET_shown_in_sitemap selected=$data.webpage[$content_type]['shown_in_sitemap'] error=$errors.shown_in_sitemap view_only=$viewOnly}
+  </div>
+  {/if}
+
+  {field_text class="text_input" ratio="3:9" name="order_index[$content_type]" title=$dict.LABEL_order_index id="`$content_type`_order_index" value=$data.webpage[$content_type]['order_index'] error=$errors["order_index[$content_type]"] view_only=!in_array(Right::EDIT, $current_webpage_rights) placeholder=false default="0"}
+  {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+  <div style="display:none;">
+    {field_text class="text_input" ratio="3:9" name="order_index[$content_type]" title=$dict.LABEL_order_index id="`$content_type`_order_index" value=$data.webpage[$content_type]['order_index'] error=$errors["order_index[$content_type]"] view_only=$viewOnly placeholder=false default="0"}
+  </div>
+  {/if}
+
+  <input type="hidden" name="temp_folder" value="{$data.temp_folder|escape}" />
+</div>
+{/foreach}
+
+{if $id>0}
+{foreach from=$dict.SET_content_types key=content_type item=contents}
+<div class="tab-pane fade padding" id="content-{$content_type|escape}" role="tabpanel" aria-labelledby="content-{$content_type|escape}-tab" data-tab-type="{$content_type|escape}">
+  <div class="form-inline">
+    <label for="locale-content-block-switch" class="my-1 mr-2"><i class="icon-globe"></i>&nbsp;{$dict.LABEL_language|escape}</label>
+
+    <select id="locale-content-block-switch" name="locale-content-block-switch" class="custom-select my-1 mr-sm-2">
+      {foreach from=$dict.SET_accessible_locales key=alias item=name}
+      <option value="{$alias|replace:'/':'-'}" {if $roll_back_locale == ''}{if $data['webpage']['expected_locale'] != ''}{if $data['webpage']['expected_locale']==$alias}selected{/if}{else}{if $default_locale==$alias}selected{/if}{/if}{else}{if $roll_back_locale==$alias}selected{/if}{/if}>{$name}</option>
+      {/foreach}
+    </select>
+  </div>
+
+  {foreach from=$dict.SET_accessible_locales key=locale item=locale_text}
+  <div class="webpage-content-block" id="{$locale|replace:'/':'-'}-webpage-content-block">
+    <input type="hidden" name="block_lan[]" value="{$locale}"/>
+    {if $default_locale != $locale}
+    <div style="width: 100%;margin: 10px 0;">
+      <button type="button" class="btn btn-primary duplicate_default_content">{$dict.ACTION_duplicate_from_global|escape}</button>
+    </div>
+    {/if}
+
+    {if $default_locale_read_only && $default_locale == $locale}
+    {assign var='viewOnly' value=$default_locale_read_only}
+    {/if}
+
+    {field_text class="text_input" ratio="3:9" name="webpage_title[$locale]" title=$dict.LABEL_webpage_title id="`$content_type`_webpage_title" value=$data.webpage['locales'][$locale]['webpage_title'] error=$errors["webpage_title[$locale]"] view_only=$viewOnly placeholder=false}
+
+    <dl class="row input-field">
+      <dt class="col-3">
+        <label>{$dict.LABEL_url|escape}</label>
+      </dt>
+
+      <dd class="col-9" id="{$locale|escape}_url_wrapper">
+        <div class="url_input">
+          {if $default_locale_read_only && $default_locale == $locale}
+            <span>{$data.webpage.locales[$locale].url|escape}</span>
+          {else}
+            <input type="text" name="url[{$locale|escape}]" id="{$locale|escape}_url" value="{$data.webpage.locales[$locale].url|escape}" class="form-control" />
+            <button type="button" id="{$locale|escape}_url_browse" class="btn btn-primary">{$dict.ACTION_browse|escape}</button>
+          {/if}
+        </div>
+        {if isset($errors["url[$locale]"])}
+          <div class="error">
+            <span>{$errors["url[$locale]"][0]}</span>
+          </div>
+        {/if}
+      </dd>
+    </dl>
+
+    <div>
+      <h4 style="margin-top:1.5em;font-weight:400;font-size:1.2em;color:#368ee0;">{$dict.LABEL_publish_attributes|escape}</h4>
+
+      <div class="snippet-fields-block"> 
+        <div class="parameter_group">
+          <dl class="input-field row">
+            <dt class="col-2">{$dict.LABEL_publish_schedule|escape}</dt>
+            <dd class="col-10">
+              <div class="input-group">
+                <input type="hidden" name="publish_schedule[{$locale}]">
+
+                <div class="form-control border-0 p-0">
+                  {capture "calendar"}
+                  {field_calendar name="publish_date[$locale]" id="publish_date_$locale" placeholder=TRUE title=$dict.LABEL_publish_date format="%Y-%m-%d" showsTime=TRUE value=$data.webpage.locales[$locale].publish_date}
+                  {/capture}
+                  {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+                </div>
+
+                <div class="input-group-prepend input-group-append">
+                  <div class="input-group-text bg-white border-white">&ndash;</div>
+                </div>
+
+                <div class="form-control border-0 p-0">
+                  {capture "calendar"}
+                  {field_calendar name="removal_date[$locale]" id="removal_date_$locale" placeholder=TRUE title=$dict.LABEL_removal_date format="%Y-%m-%d" showsTime=TRUE value=$data.webpage.locales[$locale].removal_date}
+                  {/capture}
+                  {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+                </div>
+              </div>
+
+              <div class="notes">{$dict.DESCRIPTION_publish_schedule|escape|nl2br}</div>
+            </dd>
+          </dl>
+          {field_select ratio="2:10" name="status[$locale]" id="status_$locale" title=$dict.LABEL_status options=$dict.SET_webpage_statuses selected=$data.webpage.locales[$locale].status view_only=true}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal hide fade edit_file_modal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{$dict.SET_modules.media_admin|escape}</h5>
+
+            <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <nav>
+              <div class="nav nav-tabs tabs-inline tabs-top" id="edit-file-{$locale|escape}-tab" role="tablist">
+                {if $hasShareFolderRight}
+                <a class="nav-item nav-link active" id="edit-file-{$locale|escape}-shared-tab" data-toggle="tab" href="#edit-file-{$locale|escape}-shared" role="tab" aria-controls="edit-file-{$locale|escape}-shared" aria-selected="true">
+                  {$dict.LABEL_share_files|escape}
+                </a>
+                {/if}
+
+                {if $hasPageFolderRight}
+                <a class="nav-item nav-link {if !$hasShareFolderRight}active{/if}" id="edit-file-{$locale|escape}-specific-tab" data-toggle="tab" href="#edit-file-{$locale|escape}-specific" role="tab" aria-controls="edit-file-{$locale|escape}-specific" aria-selected="{if !$hasShareFolderRight}true{else}false{/if}">
+                  {$dict.LABEL_page_specific_files|escape}
+                </a>
+                {/if}
+              </div>
+            </nav>
+
+            <div class="tab-content" id="edit-file-{$locale|escape}-tabContent">
+              {if $hasShareFolderRight}
+              <div class="tab-pane fade padding show active" id="edit-file-{$locale|escape}-shared" role="tabpanel" aria-labelledby="edit-file-{$locale|escape}-shared-tab">
+                <iframe src="about:blank" width="100%" height="500" class="mediashare"></iframe>
+              </div>
+              {/if}
+
+              {if $hasPageFolderRight}
+              <div class="tab-pane fade padding {if !$hasShareFolderRight}show active{/if}" id="edit-file-{$locale|escape}-specific" role="tabpanel" aria-labelledby="edit-file-{$locale|escape}-specific-tab">
+                <iframe src="about:blank" width="100%" height="500" class="pagespecific"></iframe>
+              </div>
+              {/if}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {/foreach}
+</div>
+{/foreach}
+{/if}
+
+<script>
+$('.url_input').delegate('button[id$="_url_browse"]', 'click', function(e){
+    e.preventDefault();
+    var content_locale = $('#locale-content-block-switch').val();
+    var edit_file_modal = $(this).closest('.webpage-content-block').find('.edit_file_modal');
+    var content_locale = $('#locale-content-block-switch').val();
+    var input = $(this).prev();
+    var value = input.val();
+    var field_id = input.attr("id");
+    var root = "webpage/shared/";
+    edit_file_modal.find( "iframe.mediashare" ).attr( "src", "{$sets.paths.app_from_doc|escape}/module/file_admin/dialog.php?" + $.param( {
+        lang: "en_EN",
+        root: root,
+        fldr: value.indexOf(root) == 0 && value != root ? value.substring( 0, value.lastIndexOf("/") + 1 ) : null,
+        field_id: field_id,
+        relative_url: 1
+    } ) );
+    root = "webpage/{$control.editor_media_subfolder|escape:javascript}/"+content_locale+"/{if $data.webpage.id != ''}{$data.webpage.id|escape:'javascript'}/{/if}";
+    edit_file_modal.find( "iframe.pagespecific" ).attr( "src", "{$sets.paths.app_from_doc|escape}/module/file_admin/dialog.php?" + $.param( {
+        lang: "en_EN",
+        root: root,
+        fldr: value.indexOf(root) == 0 && value != root ? value.substring( 0, value.lastIndexOf("/") + 1 ) : null,
+        field_id: field_id,
+        relative_url: 1
+    } ) );
+    edit_file_modal.modal();
+    /*window.open(
+            "{$sets.paths.app_from_doc|escape}/module/file_admin/filemanager.php?" + $.param( {
+                langCode: "{$request.locale}",
+                folder: "webpage/{$control.editor_media_subfolder|escape:url}/"+content_locale+"/{if $data.webpage.id != ''}{$data.webpage.id|escape:'javascript'}/{/if}",
+                field_name: $(this).prev().attr("id"),
+                char_decode: true
+            } ),
+            //"{$sets.paths.app_from_doc|escape:'javascript'}/module/file_admin/ajaxfilemanager.php?editor=form"
+                //        + "&language={$request.locale}&subfolder={$control.editor_media_subfolder|escape:url}&elementId=" + encodeURIComponent( $(this).prev().attr('id') ),
+            //"{$sets.paths.app_from_doc|escape:'javascript'}/include/Ajax_File_Manager/ajaxfilemanager/ajaxfilemanager.php?editor=form"
+            //    + "&language={$request.locale}&subfolder={$control.editor_media_subfolder|escape:url}&elementId=" + encodeURIComponent( this.getPrevious().id ),
+            "ajaxFileImageManager",
+            "width=785,height=440"
+    );*/
+
+});
+</script>

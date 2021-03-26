@@ -1,0 +1,390 @@
+<form id="edit_form" method="POST" accept-charset="UTF-8" action="?bare={$smarty.get.bare|escape:'url'}&amp;op=edit&amp;snippet_type={$snippet_type}&amp;id={$data.id}&amp;referer_url={$smarty.get.referer_url|escape:'url'}">
+  <div class="box box-color box-bordered">
+    <div class="box-title">
+      <h3>
+        <i class="icon-edit"></i>
+
+        {if $data.id > 0}
+        {$dict.SET_operations.edit|escape}
+        {else}
+        {$dict.SET_operations.new|escape}
+        {/if}
+      </h3>
+
+      <ul class="actions">
+        <li>
+          <button type="button" class="btn btn-mini content-slideUp">
+            <i class="icon-angle-down"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="box-content">
+      <div class="row">
+        <div class="col-12 col-lg-9">
+          <dl class="input-field select-field row edit" name="snippet_type_input">
+            <dt class="col-12 col-lg-4">
+              <lable for="snippet_type">{$dict.LABEL_snippet_type|escape}</lable>
+            </dt>
+
+            <dd class="col-12 col-lg-8">
+              <select name="snippet_type" id="snippet_type" class="form-control">
+                {foreach from=$snippet_types key=alias item=name}
+                <option value="{$alias}" {if $alias==$snippet_type}selected{/if}>{$name|escape}</option>
+                {/foreach}
+              </select>
+            </dd>
+          </dl>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-12">
+          <hr>
+        </div>
+      </div>
+    
+      <div class="row">
+        <div class="col-12 col-lg-9">
+          {field_text ratio="4:8" class="" name="snippet_name" title=$dict.LABEL_snippet_name id="snippet_name" maxlength="255" value=$data['name'] error=$errors['snippet_name'] view_only=false}
+        </div>
+
+        <div class="col-12 col-lg-3"></div>
+      </div>
+      
+      {$type_specific_form}
+      
+      {if $data.id > 0}
+      <div class="bottom-info">
+        <ul class="info-list">
+          {if $info.last_update_message}<li class="update_date">{$info.last_update_message}</li>{/if}
+          <li class="create_date">{$info.created_date_message}</li>
+        </ul>
+      </div>
+      {/if}
+    </div>
+
+    <div class="actions_container">
+      <ul class="actions">
+        <li>
+          <button type="submit" name="submit" class="btn btn-primary">
+            <i class="icon-save"></i>
+            {$dict.ACTION_save|escape}</button>
+        </li>
+
+        <li>
+          <button type="button" name="action-cancel" class="btn btn-primary">
+            <i class="icon-remove-circle"></i>
+            {$dict.ACTION_cancel|escape}</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <input type="hidden" name="snippet_type" value="{$snippet_type|escape}" />
+  <input type="hidden" name="id" id="id" value="{$data.id|escape}" />
+</form>
+
+<script>
+$(document).ready(function() {
+    new form_submit_panel( $("#edit_form") );
+    
+    avaMediaSelectorSettings.url1 = "{$sets.paths.app_from_doc|escape:'javascript'}/module/file_admin/dialog.php?lang=en_EN&type=-1&root=webpage%2Fshared%2F";
+    
+    $( '*[name="action-cancel"]' ).bind( 'click', function(e){
+        e.preventDefault();
+        window.location.href = "{if $smarty.get.referer_url}{$smarty.get.referer_url|escape:'javascript'}{else}?bare={$smarty.get.bare|escape:'url'}{/if}#/{$snippet_type}_snippet_list";
+    } );
+    
+    $( '*[name="submit"]' ).bind( 'click', function(e){
+        e.preventDefault();
+        if(confirm("{$dict.MESSAGE_save_confirmation|escape}"))
+        {
+            $("#edit_form").submit();
+        }
+        else
+            return false;
+    } );
+    
+    $('#snippet_type').bind('change', function(e){
+        window.location.href = "?bare={$smarty.get.bare|escape:'url'}&op=edit&snippet_type="+$(this).val();
+    });
+    
+    var switchSnippetFieldsBlock = function(field_locale){
+        if(field_locale == '')
+        {
+            field_locale = $('#locale-fields-block-switch').val();
+        }
+        if(field_locale != '')
+        {
+            $('.snippet-fields-block').hide();
+            $('#'+field_locale+'-snippet-fields-block, #wildcard-snippet-fields-block').show();
+        }
+    };
+    
+    if($('#locale-fields-block-switch').length>0)
+    {
+        switchSnippetFieldsBlock(''); 
+        $('#locale-fields-block-switch').bind('change', function(e){
+            switchSnippetFieldsBlock($(this).val());
+        });
+    }
+    
+    /* Add number surfix and re-order the index for parameters of in parameters group */
+    var addParameterSurfix = function(init){
+        if(init==undefined)
+            init=false;
+        if($('.parameter_group').length>0)
+        {
+            $('.snippet-fields-block').each(function(index){
+                var sub_groups = [];
+                $(this).find('.parameter_group').each(function(i){
+                    var classstr = $(this).attr('class').replace(' ', '.');
+                    if(sub_groups.indexOf(classstr) == '-1')
+                        sub_groups.push(classstr);
+                });
+
+                for(var k=0; k<sub_groups.length; k++)
+                {
+                    $(this).find('.'+sub_groups[k]).each(function(i){
+                        var j = i+1; //start from 1
+                        $(this).children('.row').each(function(ind){
+                            if($(this).find('input, .visualSnippetEditor, textarea, select').length>0)
+                            {
+                                var input_id = $(this).find('input, .visualSnippetEditor, textarea, select').attr('id');
+                                //window.console.dir(input_id);
+                                var input_id_new = input_id.replace(/([0-9]+\])$/i, j+']');
+                                //window.console.dir(input_id_new);
+                                var input_label = $(this).find('label').html();
+                                if(input_label.match(/([0-9]+\])$/i))
+                                    var input_label_new = input_label.replace(/([0-9]+\])$/i, j+']');
+                                else if(input_label.match(/([0-9]+)$/i))
+                                    var input_label_new = input_label.replace(/([0-9]+)$/i, j);
+                                else
+                                    var input_label_new = input_label+j;
+                                $(this).find('label').attr('for', input_id_new).html(input_label_new);
+                                $(this).find('input, .visualSnippetEditor, textarea, select').attr('id', input_id_new).attr('name', input_id_new);
+                                
+                                if($(this).find('.visualSnippetEditor').length>0 && !init)
+                                {
+                                    $(this).find('.visualSnippetEditor').each(function(ind){
+                                        var id = $(this).attr('id');
+                                        if($(this).css('display') != 'none')
+                                        {
+                                            //window.console.dir(id);
+                                            tinymce.EditorManager.execCommand('mceAddEditor', true, id);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }); 
+                }
+            });
+        }
+    };
+    var removeParameterGroup = function($this){
+        var classstr= $this.closest('.parameter_group').attr('class').replace(' ', '.');
+        if($this.closest('.snippet-fields-block').find('.'+classstr).length>1)
+        {
+            $this.closest('.parameter_group').remove();
+            addParameterSurfix();
+        }
+    };
+    var addParameterGroup = function($this){
+        var target_container = $this.closest('.snippet-fields-block');
+        var classstr= $this.closest('.parameter_group').attr('class').replace(' ', '.');
+        var parameter_group_html = target_container.find('.'+classstr+':eq(0)').clone(true);
+            
+        parameter_group_html.find('.visualSnippetEditor').each(function(ind){
+            var id = $(this).attr('id');
+            if($(this).css('display') == 'none')
+            {
+                $(this).show();
+                $(this).prevAll('.mce-tinymce').remove();
+            }
+        });
+        if(parameter_group_html.find('input[name*="[year"]').length>0 && $('#snippet_type').val()=='financial_tab_panel')
+            parameter_group_html.find('input[name*="[year"]').val('');
+        //target_container.append(parameter_group_html);
+        
+        parameter_group_html.insertAfter( target_container.find('.'+classstr+':last') );
+        $("html, body").animate({ scrollTop: parameter_group_html.offset().top }, "slow");
+        
+        addParameterSurfix();
+    };
+    if($('button[name^="parameter_group_add"]').length>0)
+    {
+        $('button[name^="parameter_group_add"]').bind('click', function(e){
+            addParameterGroup($(this));
+        });
+    }
+    if($('button[name^="parameter_group_remove"]').length>0)
+    {
+        $('button[name^="parameter_group_remove"]').bind('click', function(e){
+            removeParameterGroup($(this));
+        });
+    }
+    addParameterSurfix(true);
+    
+    /* Image Select triggers */
+    if($( "#edit_file_modal" ).length==1 && $( ".edit_file_trigger" ).length>0)
+    {
+        var edit_file_modal = $( "#edit_file_modal" );
+        $( ".edit_file_trigger" ).click( function() {
+            //window.console.dir($(this).prev());
+            var input = $(this).parent().prev();
+            var value = input.val();
+            edit_file_modal.find( "iframe" ).attr( "src", "{$sets.paths.app_from_doc|escape}/module/file_admin/dialog.php?" + $.param( {
+                root: 'webpage/shared/',
+                fldr: value.indexOf("webpage/shared/") == 0 && value != "webpage/shared/" ? value.substring( 0, value.lastIndexOf("/") + 1 ) : null,
+                field_id: input.attr("id"),
+                relative_url: 1,
+                lang: "en_EN"
+            } ) );
+            edit_file_modal.modal();
+        } );
+    }
+    
+    /* Change the name and id of fields when dropdown change */
+    if($('.fake_field_switcher').length>0)
+    {
+        var imageSlideshowFake = function(current_select){
+            var target_container = current_select.closest('.parameter_group');
+            if(current_select.val() == 'video')
+            {
+                var fake_backgroundmp4source = target_container.find('input[name*="[fake_backgroundmp4source"]:eq(0)');
+                var fake_backgroundmp4sourceformat = target_container.find('input[name*="[fake_backgroundmp4sourceformat"]');
+                var fake_backgroundwebmsource = target_container.find('input[name*="[fake_backgroundwebmsource"]:eq(0)');
+                var fake_backgroundwebmsourceformat = target_container.find('input[name*="[fake_backgroundwebmsourceformat"]');
+                var real_backgroundsource = target_container.find('input[name*="[backgroundsource"]');
+                var real_backgroundposition = target_container.find('input[name*="[backgroundposition"]');
+                
+                fake_backgroundmp4source.closest('.select_change_toggle').show();
+                fake_backgroundmp4sourceformat.closest('.select_change_toggle').show();
+                fake_backgroundwebmsource.closest('.select_change_toggle').show();
+                fake_backgroundwebmsourceformat.closest('.select_change_toggle').show();
+                real_backgroundsource.closest('.select_change_toggle').hide();
+                real_backgroundposition.closest('.select_change_toggle').hide();
+
+                fake_backgroundmp4source.attr('name', fake_backgroundmp4source.attr('name').replace('fake_', ''));
+                fake_backgroundmp4sourceformat.attr('name', fake_backgroundmp4sourceformat.attr('name').replace('fake_', ''));
+                fake_backgroundwebmsource.attr('name', fake_backgroundwebmsource.attr('name').replace('fake_', ''));
+                fake_backgroundwebmsourceformat.attr('name', fake_backgroundwebmsourceformat.attr('name').replace('fake_', ''));
+
+                real_backgroundsource.attr('name', real_backgroundsource.attr('name').replace('[', '[fake_'));
+                real_backgroundposition.attr('name', real_backgroundposition.attr('name').replace('[', '[fake_'));
+            }
+            else
+            {
+                var real_backgroundmp4source = target_container.find('input[name*="[backgroundmp4source"]:eq(0)');
+                var real_backgroundmp4sourceformat = target_container.find('input[name*="[backgroundmp4sourceformat"]');
+                var real_backgroundwebmsource = target_container.find('input[name*="[backgroundwebmsource"]:eq(0)');
+                var real_backgroundwebmsourceformat = target_container.find('input[name*="[backgroundwebmsourceformat"]');
+                var fake_backgroundsource = target_container.find('input[name*="[fake_backgroundsource"]');
+                var fake_backgroundposition = target_container.find('input[name*="[fake_backgroundposition"]');
+                
+                fake_backgroundsource.closest('.select_change_toggle').show();
+                fake_backgroundposition.closest('.select_change_toggle').show();
+                real_backgroundmp4source.closest('.select_change_toggle').hide();
+                real_backgroundmp4sourceformat.closest('.select_change_toggle').hide();
+                real_backgroundwebmsource.closest('.select_change_toggle').hide();
+                real_backgroundwebmsourceformat.closest('.select_change_toggle').hide();
+                
+                fake_backgroundsource.attr('name', fake_backgroundsource.attr('name').replace('fake_', ''));
+                fake_backgroundposition.attr('name', fake_backgroundposition.attr('name').replace('fake_', ''));
+                
+                real_backgroundmp4source.attr('name', real_backgroundmp4source.attr('name').replace('[', '[fake_'));
+                real_backgroundmp4sourceformat.attr('name', real_backgroundmp4sourceformat.attr('name').replace('[', '[fake_'));
+                real_backgroundwebmsource.attr('name', real_backgroundwebmsource.attr('name').replace('[', '[fake_'));
+                real_backgroundwebmsourceformat.attr('name', real_backgroundwebmsourceformat.attr('name').replace('[', '[fake_'));
+            }
+        };
+        
+        $('.fake_field_switcher').bind('change', function(e){
+            var snippet_type = $('input[name="snippet_type"]').val();
+            var target_container = $(this).closest('.snippet-fields-block');
+            if(snippet_type == 'lightbox_btn')
+            {
+                if($(this).val() == 'html')
+                {
+                    var fake_title = target_container.find('input[name$="[title_fake]"]');
+                    var fake_content = target_container.find('textarea[name$="[content_fake]"]');
+                    var current_real_content = target_container.find('input[name$="[content]"]');
+                    
+                    fake_title.closest('.select_change_toggle').show();
+                    fake_content.closest('.select_change_toggle').show();
+                    current_real_content.closest('.select_change_toggle').hide();
+                    
+                    fake_title.attr('name', fake_title.attr('name').replace('_fake', ''));
+                    
+                    fake_content.attr('name', fake_content.attr('name').replace('_fake', ''));
+                    
+                    current_real_content.attr('name', current_real_content.attr('name').replace(']', '_fake]'));
+                }
+                else
+                {
+                    var fake_content = target_container.find('input[name$="[content_fake]"]');
+                    var current_real_title = target_container.find('input[name$="[title]"]');
+                    var current_real_content = target_container.find('textarea[name$="[content]"]');
+                    
+                    fake_content.closest('.select_change_toggle').show();
+                    current_real_title.closest('.select_change_toggle').hide();
+                    current_real_content.closest('.select_change_toggle').hide();
+                    
+                    fake_content.attr('name', fake_content.attr('name').replace('_fake', ''));
+                    
+                    current_real_title.attr('name', current_real_title.attr('name').replace(']', '_fake]'));
+                    
+                    current_real_content.attr('name', current_real_content.attr('name').replace(']', '_fake]'));
+                }
+            }
+            else if(snippet_type == 'image_slideshow' || snippet_type == 'product')
+            {
+                imageSlideshowFake($(this));
+            }
+        });
+        
+        // Initial Image Slideshow
+        if($('input[name="snippet_type"]').val() == 'image_slideshow' || $('input[name="snippet_type"]').val() == 'product')
+        {
+            $('.fake_field_switcher').each(function(index){
+                var target_container = $(this).closest('.parameter_group');
+                if($(this).val() == 'video')
+                {
+                    var fake_backgroundmp4source = target_container.find('input[name*="[backgroundmp4source"]');
+                    var fake_backgroundmp4sourceformat = target_container.find('input[name*="[backgroundmp4sourceformat"]');
+                    var fake_backgroundwebmsource = target_container.find('input[name*="[backgroundwebmsource"]');
+                    var fake_backgroundwebmsourceformat = target_container.find('input[name*="[backgroundwebmsourceformat"]');
+                    var real_backgroundsource = target_container.find('input[name*="[fake_backgroundsource"]');
+                    var real_backgroundposition = target_container.find('input[name*="[fake_backgroundposition"]');
+                    
+                    fake_backgroundmp4source.closest('.select_change_toggle').show();
+                    fake_backgroundmp4sourceformat.closest('.select_change_toggle').show();
+                    fake_backgroundwebmsource.closest('.select_change_toggle').show();
+                    fake_backgroundwebmsourceformat.closest('.select_change_toggle').show();
+                    real_backgroundsource.closest('.select_change_toggle').hide();
+                    real_backgroundposition.closest('.select_change_toggle').hide();
+                }
+                else
+                {
+                    var real_backgroundmp4source = target_container.find('input[name*="[fake_backgroundmp4source"]');
+                    var real_backgroundmp4sourceformat = target_container.find('input[name*="[fake_backgroundmp4sourceformat"]');
+                    var real_backgroundwebmsource = target_container.find('input[name*="[fake_backgroundwebmsource"]');
+                    var real_backgroundwebmsourceformat = target_container.find('input[name*="[fake_backgroundwebmsourceformat"]');
+                    var fake_backgroundsource = target_container.find('input[name*="[backgroundsource"]');
+                    var fake_backgroundposition = target_container.find('input[name*="[backgroundposition"]');
+                    
+                    fake_backgroundsource.closest('.select_change_toggle').show();
+                    fake_backgroundposition.closest('.select_change_toggle').show();
+                    real_backgroundmp4source.closest('.select_change_toggle').hide();
+                    real_backgroundmp4sourceformat.closest('.select_change_toggle').hide();
+                    real_backgroundwebmsource.closest('.select_change_toggle').hide();
+                    real_backgroundwebmsourceformat.closest('.select_change_toggle').hide();
+                }
+            });
+        }
+    }
+});
+</script>

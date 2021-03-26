@@ -1,0 +1,987 @@
+<div class="container-fluid nopadding role-content-wrapper">
+  <div class="row">
+    <div class="col-12 col-xl-4">
+      <form name="find_form" action="./" method="GET">
+        <div class="find_bar">
+          <div class="keywords">
+            {field_text class="text_input" name="keywords" title="" id="keywords_top" maxlength="255" value=$_get.keywords error=null view_only=false placeholder=true}
+          </div>
+
+          <div class="status">
+            {field_select name="status" id="status_top" options=$webpage_status_options selected=$_get.status view_only=false placeholder=true}
+          </div>
+
+          <div class="action">
+            <button type="submit" name="find_btn" class="btn btn-primary">
+              <i class="icon-search"></i>
+              {$dict.ACTION_find|escape}</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-12 col-xl-8">
+      <div class="form_actions">
+        {if is_array($accessible_webpages) && in_array($webpage.id, $accessible_webpages)}
+        <ul>
+          {*if $user->hasRights('webpage_admin', Right::CREATE) && $user->isGlobalUser()*}
+          {if $user->hasRights('webpage_admin', Right::CREATE) && in_array(Right::CREATE, $current_webpage_rights)}
+          <li>
+            <button type="button" name="new_page" class="btn btn-primary" disabled="disabled">
+              <i class="icon-plus-sign"></i>
+              {$dict.ACTION_new_page|escape}</button>
+          </li>
+
+          <li>
+            <button type="button" name="duplicate_page" class="btn btn-primary" disabled="disabled">
+              <i class="icon-copy"></i>
+              {$dict.ACTION_duplicate|escape}</button>
+          </li>
+          {/if}
+
+          {if $webpage['locked'] && $user->hasRights('webpage_admin', Right::EDIT) && in_array(Right::EDIT, $current_webpage_rights)}
+          <li>
+            <button type="button" name="check-in" class="btn btn-primary" disabled="disabled">
+              <i class="icon-signin"></i>
+              {$dict.ACTION_check_in|escape}</button>
+          </li>
+          {/if}
+
+          {if $user->hasRights('webpage_admin', Right::EDIT) && in_array(Right::EDIT, $current_webpage_rights)}
+          <li>
+            <button type="button" name="edit_page" class="btn btn-primary {if $webpage['locked']}disabled{/if}" disabled="disabled">
+              <i class="icon-edit"></i>
+              {$dict.ACTION_edit|escape}</button>
+          </li>
+          {/if}
+
+          {if $user->hasRights('webpage_admin', Right::VIEW) && in_array(Right::VIEW, $current_webpage_rights)}
+          <li>
+            <button type="button" name="preview_page" class="btn btn-primary" disabled="disabled">
+              <i class="icon-eye-open"></i>
+              {$dict.ACTION_preview|escape}</button>
+          </li>
+          {/if}
+
+          {*if $user->hasRights('webpage_admin', Right::EDIT) && $user->isGlobalUser()*}
+          {if $user->hasRights('webpage_admin', Right::EDIT) && in_array(Right::EDIT, $current_webpage_rights)}
+          <li>
+            <button type="button" name="move_page" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+              <i class="icon-reply"></i>
+              {$dict.ACTION_move|escape}</button>
+          </li>
+          {/if}
+
+          {if !$is_root && $user->isGlobalUser()}
+          <li>
+            <button type="button" name="delete_page" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+              <i class="icon-trash"></i>
+              {$dict.ACTION_delete|escape}</button>
+          </li>
+          {/if}
+
+          {if !$user->hasRights('webpage_admin', Right::APPROVE) && $webpage.status == "draft" && in_array(Right::EDIT, $current_webpage_rights)}
+          <li>
+            <button type="button" name="save_approval" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+              <i class="icon-envelope"></i>
+              {$dict.ACTION_send_approve|escape}</button>
+          </li>
+          {elseif $user->hasRights('webpage_admin', Right::APPROVE) && $webpage.status == "draft" && in_array(Right::APPROVE, $current_webpage_rights) && $webpage.pages_to_approve>0}
+          <li>
+            <button type="button" name="save_approved" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+              <i class="icon-globe"></i>
+              {$dict.ACTION_publish|escape} ({sprintf($dict.MESSAGE_page_num, $webpage.pages_to_approve)})</button>
+          </li>
+          {elseif $user->hasRights('webpage_admin', Right::APPROVE) && $webpage.pages_to_approve > 0  && in_array(Right::APPROVE, $current_webpage_rights)}
+          <li>
+            <button type="button" name="save_approved" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+              <i class="icon-ok-sign"></i>
+              {$dict.ACTION_approve|escape} ({sprintf($dict.MESSAGE_page_num, $webpage.pages_to_approve)})</button>
+          </li>
+          {/if}
+        </ul>
+        {/if}
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top: 1em;">
+    <div class="col-12 col-lg-4 position-relative">
+      <div class="tabs-box" id="tree_list" style="{if $search_result_list && $search_result_list|@count > 0}display: none{/if}">
+        <div class="tabs-container">
+          <nav>
+            <div class="nav nav-tabs tabs-inline tabs-top" id="site-tree-tab" role="tablist">
+              {foreach from=$dict.SET_content_types key=platform item=contents}
+              {if in_array($platform, $existed_platforms)}
+              <a class="nav-item nav-link {if $platform == $_get.p}active{/if}" id="{$platform|escape}-tab" data-toggle="tab" href="#{$platform|escape}" role="tab" aria-controls="{$platform|escape}" aria-selected="true" data-tab-type="{$platform|escape}">
+                {$dict["LABEL_`$platform`"]|escape}
+              </a>
+              {/if}
+              {/foreach}
+            </div>
+          </nav>
+        </div>
+
+        <div class="tab-content tab-content-inline tab-content-bottom" id="site-tree-tabContent">
+          {foreach from=$dict.SET_content_types key=platform item=contents}
+          {if in_array($platform, $existed_platforms)}
+          <div class="tab-pane fade padding {if $platform == $_get.p}show active{/if}" id="{$platform|escape}">
+            <div class="webpage-tree" data-platform="{$platform|escape}">
+              {if $site_tree[$platform]}
+              {$site_tree[$platform]}
+              {/if}
+            </div>
+          </div>
+          {/if}
+          {/foreach}
+        </div>
+      </div>
+
+      <div id="search_result">
+        <h4>{$dict.LABEL_results|escape}:</h4>
+
+        {if $search_result_list|@count > 0}
+        <ul>
+        {foreach from=$search_result_list item=item}
+          {assign var=data value=$item.data}
+          <li class="searchResultPanel-list-item{if $item.webpage_id == $webpage.id} active{/if}">
+            <dl class="search-result-item">
+              <dt class="search-result-item-title"><a href="{$sets.paths['mod_from_doc']|escape:'javascript'}?id={$item.webpage_id|escape}&keywords={$_get.keywords|escape:'url'}&status={$_get.status|escape:'url'}">{if $item.webpage_title}{$item.webpage_title|escape}{else}{$dict.LABEL_no_title|escape}{/if}</a></dt>
+              <dd class="search-result-item-type"><span class='title'>{$dict.LABEL_page_type|escape:'javascript'}: </span>{$item.type|escape}</dd>
+              <dd class="search-result-item-status"><span class='title multiple_title'>{$dict.LABEL_status|escape:'javascript'}: </span><div class='multiple_line_wrapper'>{foreach from=$item.status_locale item=status_info}<span></span>{$status_info|escape}</span>{/foreach}</div></dd>
+              <dd class="search-result-item-platforms"><span class='title'>{$dict.LABEL_platforms|escape:'javascript'}: </span>{$item.platforms|escape}</dd>
+              <dd class="search-result-item-paths"><ul>
+                  {foreach from=$item.paths item=path key=platform}
+                    <li><span class="title">{$platform|escape}: </span>{$path|escape}</li>
+                  {/foreach}
+              </ul></dd>
+              <dd class="search-result-item-major-version"></dd>
+              <dd class="search-result-item-minor-version"></dd>
+            </dl>
+          </li>
+        {/foreach}
+        </ul>
+        {/if}
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+      {if $webpage.locked}
+      <div class="col-12 nopadding">
+        <p class="reminder">{$dict.DESCRIPTION_edit_locked|escape|nl2br}</p>
+
+        <div class="spacer">&nbsp;</div>
+      </div>
+      {/if}
+
+      <div class="tabs-box" id="webpage-info-container">
+        <nav>
+          <div class="nav nav-tabs tabs-inline tabs-top" id="info-tab" role="tablist">
+            <a class="nav-item nav-link active" id="basic-info-tab" data-toggle="tab" href="#basic-info" role="tab" aria-controls="basic-info" aria-selected="true">
+              {$dict.LABEL_basic_information|escape}
+            </a>
+
+            <a class="nav-item nav-link" id="platform-specific-settings-tab" data-toggle="tab" href="#platform-specific-settings" role="tab" aria-controls="platform-specific-settings" aria-selected="false">
+              {$dict.LABEL_platform_specific_settings|escape}
+            </a>
+
+            <a class="nav-item nav-link" id="current-version-status-tab" data-toggle="tab" href="#current-version-status" role="tab" aria-controls="current-version-status" aria-selected="false">
+              {$dict.LABEL_current_version_status|escape}
+            </a>
+
+            <a class="nav-item nav-link" id="webpage-comments-tab" data-toggle="tab" href="#webpage-comments" role="tab" aria-controls="webpage-comments" aria-selected="false">
+              {$dict.LABEL_comments|escape} ({$webpage.comments.summary.record_count})
+            </a>
+
+            {*
+            <a class="nav-item nav-link" id="webpage-versions-tab" data-toggle="tab" href="#webpage-versions" role="tab" aria-controls="webpage-versions" aria-selected="false">
+              {$dict.LABEL_old_versions|escape}
+            </a>
+            *}
+          </div>
+        </nav>
+
+        <div class="tab-content tab-content-inline tab-content-bottom" id="info-tabContent">
+          <div class="tab-pane fade padding show active" id="basic-info" role="tabpanel" aria-labelledby="basic-info-tab">
+            <h3>{$webpage.webpage_title|escape}</h3>
+
+            {if $user->hasRights('webpage_admin', Right::EDIT)}
+            <div class="live_preview box-color box-bordered box" style="margin-bottom: 1em;">
+              <div class="form_actions" style="text-align: right;">
+                <ul style="overflow: hidden;">
+                  <li>
+                    <button type="button" name="generate_token" class="btn btn-primary">
+                      <i class="icon-external-link"></i>
+                      {$dict.ACTION_generate_token|escape}</button>
+                  </li>
+
+                  {if $webpage.token.token}
+                  <li>
+                    <button type="button" name="remove_token" class="btn btn-primary">
+                      <i class="icon-remove"></i>
+                      {$dict.ACTION_remove_token|escape}</button>
+                  </li>
+                  {/if}
+                </ul>
+              </div>
+
+              {if $webpage.token.token}
+              <div class="box-content">
+              <p style="float: left;"><b>{$dict.LABEL_generated_by|escape}:</b>&nbsp;{$webpage.token.creator_name|escape}&lt;{$webpage.token.creator_email|escape}&gt;</p>
+              <p style="text-align: right;"><b>{$dict.LABEL_valid_until|escape}:</b>&nbsp;{$webpage.token.expire_time|escape}</p>
+              {foreach from=$webpage.platforms key=platform item=platform_data}
+              <dl class="input-field text-field view fullwidth-inputs" style="position: relative;">
+                <dt style="position: absolute; left: 10px; top: 50%; margin-top: -1em;">{$dict.SET_webpage_page_types[$platform]|escape}</dt>
+                <dd style="margin-left: 0;"><div style="padding-left: 80px; position: relative;"><input type="text" class="readonly" readonly="readonly" value="{$sets['paths']['server_url']|escape}{$sets['paths']['app_from_doc']|escape}/{$user->getPreferredLocale()|escape}/preview/?pvtk={$webpage.token.encoded_code|escape}{*&m={if $platform == "mobile"}1{else}0{/if}*}" /></div></dd>
+              </dl>
+              {/foreach}
+              {/if}
+              <p class="note" style="text-align: justify;margin-top: 0.5em;">{$dict.DESCRIPTION_live_preview_explaination|escape}</p>
+
+              {if $webpage.token.token}
+              </div>
+              {/if}
+            </div>
+            {/if}
+            {field_text type="text" title=$dict.LABEL_webpage_id view_only=true value=$webpage.id}
+            {field_text type="text" title=$dict.LABEL_type view_only=true value=$dict.SET_webpage_types[$webpage.type]}
+            {*
+            {field_text type="text" title=$dict.LABEL_display_on view_only=true value=$display_types}
+            *}
+            {foreach from=$webpage.platforms key=k item=platform}
+              {field_text type="text" title=$dict["LABEL_`$k`_path"] view_only=true value=$platform.path}
+              {if $platform.alias}
+              {field_text type="text" title=$dict["LABEL_`$k`_alias"] view_only=true value=$platform.alias}
+              {/if}
+            {/foreach}
+            {if $webpage.type == "url_link"}
+              {foreach from=$sets.locales key=locale item=locale_text}
+              <dl class="input-field text-field row view">
+                <dt class="col-4">
+                  {$dict.LABEL_url|escape} ({$locale_text|escape})
+                </dt>
+                <dd class="col-8">
+                  <div>
+                    <div class="input-text view">
+                      <a href="{$webpage.locale_urls[$locale].url|escape}" title="{$webpage.locale_urls[$locale].webpage_title|escape}">
+                        {$webpage.locale_urls[$locale].webpage_title|escape}
+                      </a>
+                    </div>
+                  </div>
+                </dd>
+              </dl>
+              {/foreach}
+            {/if}
+
+            {field_text type="text" title=$dict.LABEL_shown_in_site view_only=true value=$webpage.shown_in_site}
+            {field_text type="text" title=$dict.LABEL_deleted view_only=true value=$webpage.deleted}
+            {*field_text type="text" title=$dict.LABEL_status view_only=true value=$dict.SET_webpage_statuses[$webpage.status]*}
+            {field_text type="text" title=$dict.LABEL_version view_only=true value=$webpage.version}
+
+            {if $webpage.public_accessible_roles|@count}
+            <dl class="input-field text-field row view" name="_input" >
+              <dt class="col-4">{$dict.LABEL_public_accessible_roles|escape}</dt>
+              <dd class="col-8">
+                <div>
+                  <div class="input-text view">
+                  {foreach from=$webpage.public_accessible_roles item=public_role name=public_accessible_roles}
+                    <span>{if $user->hasRights('role_admin', Right::VIEW)}<a href="{$sets.paths['app_from_doc']|escape}/admin/{$request.locale|escape}/role/?op=view&id={$public_role->getId()|escape}" title="{$public_role->getName()|escape}">{/if}
+                      {$public_role->getName()|escape}
+                    {if $user->hasRights('role_admin', Right::VIEW)}</a>{/if}</span>{if !$smarty.foreach.public_accessible_roles.last}, {/if}
+                  {/foreach}
+                  </div>
+                </div>
+              </dd>
+            </dl>
+            {/if}
+
+            <ul class="info-list">
+              {if $info.last_update_message}<li class="update_date">{$info.last_update_message}</li>{/if}
+              <li class="create_date">{$info.created_date_message}</li>
+            </ul>
+          </div>
+
+          <div class="tab-pane fade padding" id="platform-specific-settings">
+            {if $webpage.type == "static"}
+              {foreach from=$webpage.platforms key=k item=platform name=platform_specific_settings}
+                <div{if $smarty.foreach.platform_specific_settings.first} class="first"{/if}>
+                <div class="box-title">
+                  <h4>
+                    <i class="icon-{$k}"></i>
+                    {$dict.SET_webpage_page_types[$k]}
+                  </h4>
+                </div>
+                {field_text type="text" title=$dict.LABEL_shown_in_menu view_only=true value=$dict.SET_bool[$platform.shown_in_menu]}
+                {field_text type="text" title=$dict.LABEL_shown_in_sitemap view_only=true value=$dict.SET_bool[$platform.shown_in_sitemap]}
+                {field_text type="text" title=$dict.LABEL_submenu view_only=true value=$dict.SET_shown_in_submenu[$platform.submenu_shown]}
+                {if $platform.template_id}
+                  <dl class="input-field text-field row view">
+                    <dt class="col-4">
+                      {$dict.LABEL_template|escape}
+                    </dt>
+                    <dd class="col-8">
+                      <div>
+                        <div class="input-text" style="padding: 5px;">
+                          <img src="{$sets.paths['app_from_doc']|escape}/{$platform.template_thumbnail|escape}" />
+                          <span>{$platform.template_name|escape}</span>
+                        </div>
+                      </div>
+                    </dd>
+                  </dl>
+                {/if}
+                {field_text type="text" title=$dict.LABEL_child_order_field view_only=true value=$dict.SET_child_order_fields[$platform.child_order_field]}
+                {field_text type="text" title=$dict.LABEL_child_order_direction view_only=true value=$dict.SET_child_order_directions[$platform.child_order_direction]}
+                {field_text type="text" title=$dict.LABEL_order_index view_only=true value=$platform.order_index}
+                </div>
+              {/foreach}
+            {elseif $webpage.type == "webpage_link"}
+              {foreach from=$webpage.platforms key=k item=platform name=platform_specific_settings}
+                <div{if $smarty.foreach.platform_specific_settings.first} class="first"{/if}>
+                  <div class="box-title">
+                    <h4>
+                      <i class="icon-{$k}"></i>
+                      {$dict.SET_webpage_page_types[$k]}
+                    </h4>
+                  </div>
+                  {field_text type="text" title=$dict.LABEL_shown_in_menu view_only=true value=$dict.SET_bool[$platform.shown_in_menu]}
+                  {field_text type="text" title=$dict.LABEL_order_index view_only=true value=$platform.order_index}
+                  <dl class="input-field text-field row view">
+                    <dt class="col-4">
+                      {$dict.LABEL_webpage_linked_to|escape}
+                    </dt>
+                    <dd class="col-8">
+                      <div>
+                        <div class="input-text">
+                        <a href="?id={$platform.webpage_id|escape}" title="{$platform.path|escape}">{$sets['paths']['server_url']|escape}{$sets['paths']['app_from_doc']|escape}/[lang]{$platform.path|escape}</a>
+                        </div>
+                      </div>
+                    </dd>
+                  </dl>
+                  {field_text type="text" title=$dict.LABEL_target view_only=true value=$dict.SET_link_targets[$platform.target]}
+                </div>
+              {/foreach}
+            {elseif $webpage.type == "url_link"}
+              {foreach from=$webpage.platforms key=k item=platform name=platform_specific_settings}
+                <div{if $smarty.foreach.platform_specific_settings.first} class="first"{/if}>
+                  <div class="box-title">
+                    <h4>
+                      <i class="icon-{$k}"></i>
+                      {$dict.SET_webpage_page_types[$k]}
+                    </h4>
+                  </div>
+                  {field_text type="text" title=$dict.LABEL_shown_in_menu view_only=true value=$dict.SET_bool[$platform.shown_in_menu]}
+                  {field_text type="text" title=$dict.LABEL_order_index view_only=true value=$platform.order_index}
+                  {field_text type="text" title=$dict.LABEL_target view_only=true value=$dict.SET_link_targets[$platform.target]}
+                </div>
+              {/foreach}
+            {/if}
+          </div>
+
+          <div class="tab-pane fade padding" id="current-version-status">
+            {$webpage.current_version_status.content}
+          </div>
+
+          <div class="tab-pane fade padding" id="webpage-comments">
+            {$webpage.comments.content}
+
+            <div id="new_comment">
+              <form id="comment_form" method="POST" action="?op=save_comment&id={$webpage.id|escape}">
+                <div class="box-title">
+                  <h4>
+                    <i class="icon-comment"></i>
+                    {$dict.ACTION_new_comment|escape}
+                  </h4>
+                </div>
+
+                <div class="input-field text-field">
+                  <div style="margin-top: 1em;">
+                    <textarea name="content" cols="65" rows="6" style="width:100%;"></textarea>
+                  </div>
+                </div>
+
+                <div class="form_actions">
+                  <ul>
+                    <li>
+                      <button type="submit" name="save" class="btn">
+                        <i class="icon-save"></i>
+                        {$dict.ACTION_save|escape}
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+                <input type="hidden" name="id" value="{$webpage.id|escape}" />
+                <input type="hidden" id="preferred_locale" name="preferred_locale" value="{$user->getPreferredLocale()|escape}" />
+              </form>
+            </div>
+          </div>
+
+          {*
+          <div class="tab-pane fade padding" id="webpage-versions">
+            {$webpage.archives.content}
+          </div>
+          *}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="form_actions">
+        {if is_array($accessible_webpages) && in_array($webpage.id, $accessible_webpages)}
+        <ul>
+          {*if $user->hasRights('webpage_admin', Right::CREATE) && $user->isGlobalUser()*}
+          {if $user->hasRights('webpage_admin', Right::CREATE) && in_array(Right::CREATE, $current_webpage_rights)}
+          <li>
+            <button type="button" name="new_page" class="btn btn-primary" disabled="disabled">
+              <i class="icon-plus-sign"></i>
+              {$dict.ACTION_new_page|escape}</button>
+          </li>
+
+          <li>
+            <button type="button" name="duplicate_page" class="btn btn-primary" disabled="disabled">
+              <i class="icon-copy"></i>
+              {$dict.ACTION_duplicate|escape}</button>
+          </li>
+          {/if}
+
+          {if $webpage['locked'] && $user->hasRights('webpage_admin', Right::EDIT) && in_array(Right::EDIT, $current_webpage_rights)}
+          <li>
+            <button type="button" name="check-in" class="btn btn-primary" disabled="disabled">
+              <i class="icon-signin"></i>
+              {$dict.ACTION_check_in|escape}</button>
+          </li>
+          {/if}
+
+          {if $user->hasRights('webpage_admin', Right::EDIT) && in_array(Right::EDIT, $current_webpage_rights)}
+          <li>
+            <button type="button" name="edit_page" class="btn btn-primary {if $webpage['locked']}disabled{/if}" disabled="disabled">
+              <i class="icon-edit"></i>
+              {$dict.ACTION_edit|escape}</button>
+          </li>
+          {/if}
+
+          {if $user->hasRights('webpage_admin', Right::VIEW) && in_array(Right::VIEW, $current_webpage_rights)}
+          <li>
+            <button type="button" name="preview_page" class="btn btn-primary" disabled="disabled">
+              <i class="icon-eye-open"></i>
+              {$dict.ACTION_preview|escape}</button>
+          </li>
+          {/if}
+
+          {*if $user->hasRights('webpage_admin', Right::EDIT) && $user->isGlobalUser()*}
+          {if $user->hasRights('webpage_admin', Right::EDIT) && in_array(Right::EDIT, $current_webpage_rights)}
+          <li>
+            <button type="button" name="move_page" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+              <i class="icon-reply"></i>
+              {$dict.ACTION_move|escape}</button>
+          </li>
+          {/if}
+
+          {if !$is_root && $user->isGlobalUser()}
+          <li>
+            <button type="button" name="delete_page" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+              <i class="icon-trash"></i>
+              {$dict.ACTION_delete|escape}</button>
+          </li>
+          {/if}
+
+          {if !$user->hasRights('webpage_admin', Right::APPROVE) && $webpage.status == "draft" && in_array(Right::EDIT, $current_webpage_rights)}
+          <li>
+            <button type="button" name="save_approval" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+              <i class="icon-envelope"></i>
+              {$dict.ACTION_send_approve|escape}</button>
+          </li>
+          {elseif $user->hasRights('webpage_admin', Right::APPROVE) && $webpage.status == "draft" && in_array(Right::APPROVE, $current_webpage_rights) && $webpage.pages_to_approve>0}
+            <li>
+              <button type="button" name="save_approved" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+                <i class="icon-globe"></i>
+                {$dict.ACTION_publish|escape} ({sprintf($dict.MESSAGE_page_num, $webpage.pages_to_approve)})</button>
+            </li>
+          {elseif $user->hasRights('webpage_admin', Right::APPROVE) && $webpage.pages_to_approve>0  && in_array(Right::APPROVE, $current_webpage_rights)}
+            <li>
+              <button type="button" name="save_approved" class="btn btn-primary{if $webpage['locked']} disabled{/if}" disabled="disabled">
+                <i class="icon-ok-sign"></i>
+                {$dict.ACTION_approve|escape} ({sprintf($dict.MESSAGE_page_num, $webpage.pages_to_approve)})</button>
+            </li>
+          {/if}
+        </ul>
+        {/if}
+      </div>
+    </div>
+  </div>
+</div>
+
+{* Modal *}
+<div class="modal hide fade chose_pages_locales_modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form action="?op=update_status" method="POST" id="batch_approve_form">
+        <div class="modal-header">
+          <h5 class="modal-title">{$dict.LABEL_select_webpage_to_continue|escape}</h5>
+
+          <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div id="webpages-locale-accordion">
+            {foreach from=$webpages_to_approval key=locale item=webpages name=wls}
+            <div class="card">
+              <div class="card-header" id="{$locale|replace:'/':'-'}-heading">
+                <h5 class="mb-0">
+                  <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#{$locale|replace:'/':'-'}-collapse" aria-expanded="true" aria-controls="{$locale|replace:'/':'-'}-collapse">
+                    {$locale_set[$locale]} <span class="page_checked_no">({$webpages|@count})</span>
+                  </button>
+                </h5>
+              </div>
+
+              <div id="{$locale|replace:'/':'-'}-collapse" class="collapse show" aria-labelledby="{$locale|replace:'/':'-'}-heading" data-parent="#webpages-locale-accordion">
+                <div class="card-body">
+                  <div class="row" style="margin-bottom: 10px;">
+                    <div class="col-12">
+                      <input type="checkbox" id="{$locale|replace:'/':'-'}_all_locales" name="approve_all_webpages[{$locale}][]" value="" checked style="margin-top: 0px;">
+                      <!--label for="select_all_locales" style="display:inline-block;"--><span>{$dict.LABEL_check_all}</span><!--/label-->
+                    </div>
+                  </div>
+
+                  {foreach from=$webpages key=k item=wp}
+                  <div class="row">
+                    <div class="col-12">
+                      <input type="checkbox" name="approve_webpages[{$locale}][]" value="{$wp.webpage_id}" checked style="margin-top: 0px;">
+                      <!--label for="select_all_locales" style="display:inline-block;"--><span>{$wp.webpage_title} - [#{$wp.webpage_id}] ({$wp.path})</span><!--/label-->
+                    </div>
+                  </div>
+                  {/foreach}
+                </div>
+              </div>
+            </div>
+            {/foreach}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <input name="a" value="approved" type="hidden"/>
+          <input type="hidden" name="id" value="{$webpage.id|escape}" />
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{$dict.ACTION_cancel|escape}</button>
+          <button type="button" class="btn btn-primary" name="continue_btn">{$dict.ACTION_continue|escape}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * Author: Patrick Yeung
+ * Email: <patrick(at)avalade(dot)com>
+ * Date: 2013-07-11
+ * Time: 09:41
+ */
+var t = $('.webpage-tree');
+for(var i = 0; i < t.length; i++) {
+    (function(){
+        var p = $(t[i]).attr('data-platform');
+
+        $(t[i]).fancytree({
+            {if $smarty.get.id}
+            init: function(event, data) {
+                var node = data.tree.getNodeByKey("{$smarty.get.id|escape:'javascript'}");
+                if(node)
+                {
+                    node.setActive(true, {
+                        noEvents: true
+                    });
+                }
+            },
+            {/if}
+            activate: function(event, data) {
+                window.location.href = data.node.data.href;
+            },
+            select: function(event, data) {
+                tree.find("input").val(data.node.key);
+            },
+            lazyLoad: function(event, data) {
+                data.result = $.getJSON("./", {
+                    "op": "get_webpage_nodes",
+                    "ajax": 1,
+                    "disable_root": true,
+                    "platform": p,
+                    "parent": data.node.key
+                });
+            }
+        });
+    })();
+}
+
+new form_submit_panel($('#comment_form'));
+
+// button actions
+$('.form_actions button[name="new_page"]').bind('click', function(e){
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=edit&parent={$webpage.id|escape}&t=" + $('#site-tree-tab a.active').attr('data-tab-type');
+});
+
+$('.form_actions button[name="edit_page"]').bind('click', function(e){
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=edit&id={$webpage.id|escape}#/content-desktop";
+});
+
+$('.form_actions button[name="move_page"]').bind('click', function(e){
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=move&id={$webpage.id|escape}";
+});
+
+$('.form_actions button[name="delete_page"]').bind('click', function(e){
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=delete&id={$webpage.id|escape}";
+});
+
+$('.form_actions button[name="duplicate_page"]').bind('click', function(e){
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=edit&dup={$webpage.id|escape}";
+});
+
+$('.form_actions button[name="save_approval"]').bind('click', function(e){
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=update_status&a=pending&id={$webpage.id|escape}";
+});
+
+$('.form_actions button[name="save_approved"]').bind('click', function(e){
+    e.preventDefault();
+    $('.chose_pages_locales_modal').modal();
+    //window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=update_status&a=approved&id={$webpage.id|escape}";
+});
+
+$('.form_actions button[name="check-in"]').bind('click', function(e){
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=check_in&id={$webpage.id|escape}";
+});
+
+$('button[name="generate_token"]').bind('click', function(e) {
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=generate_token&id={$webpage.id|escape}";
+});
+
+$('button[name="remove_token"]').bind('click', function(e) {
+    e.preventDefault();
+
+    window.location.href = "{$sets.paths['mod_from_doc']|escape}?op=remove_token&id={$webpage.id|escape}";
+});
+
+$('input.readonly').bind('click', function (e){
+   this.select();
+});
+
+$('button[name="continue_btn"]').bind('click', function(e){
+    e.preventDefault();
+
+    var form = $('#batch_approve_form');
+    $('.chose_pages_locales_modal').modal("hide");
+    
+    form.trigger('submit');
+});
+
+$('input[name^="approve_all_webpages"]').bind('click', function(e){
+    var page_checked_no_ele = $(this).closest('.card').find('span.page_checked_no');
+    if($(this).is(':checked'))
+    {
+        $(this).closest('.card-body').find('input[name^="approve_webpages"]').prop('checked', true);
+        page_checked_no_ele.html('('+$(this).closest('.card-body').find('input[name^="approve_webpages"]:checked').length+')');
+    }
+    else
+    {
+        $(this).closest('.card-body').find('input[name^="approve_webpages"]').prop('checked', false);
+        page_checked_no_ele.html('('+0+')');
+    }
+});
+
+$('input[name^="approve_webpages"]').bind('click', function(e){
+    var page_checked_no_ele = $(this).closest('.card').find('span.page_checked_no');
+    if($(this).is(':checked'))
+    {
+        if($(this).closest('.card-body').find('input[name^="approve_webpages"]:checked').length == $(this).closest('.card-body').find('input[name^="approve_webpages"]').length)
+            $(this).closest('.card-body').find('input[name^="approve_all_webpages"]').prop('checked', true);
+    }
+    else
+    {
+        $(this).closest('.card-body').find('input[name^="approve_all_webpages"]').prop('checked', false);
+    }
+    page_checked_no_ele.html('('+$(this).closest('.card-body').find('input[name^="approve_webpages"]:checked').length+')');
+});
+
+$('.form_actions button[name="preview_page"]').bind('click', function(e) {
+    e.preventDefault();
+
+    var paths = {
+        {foreach from=$webpage.platforms key=k item=platform name=platform_sets}
+        "{$k|escape:'javascript'}": "{$platform.path|escape:'javascript'}"{if !$smarty.foreach.platform_sets.last},{/if}
+        {/foreach}
+    };
+
+        var p = $('#site-tree-tab a.active').attr('data-tab-type');
+        var target_path = paths[p];
+
+        if(target_path == undefined) {
+            for (p in paths) {
+                if(paths.hasOwnProperty(p)) {
+                    target_path = paths[p];
+                    break;
+                }
+            }
+        }
+
+        //window.open("{$sets.paths['app_from_doc']|escape:'javascript'}/{$default_public_locale|escape:'javascript'}/preview" + target_path + (p == "mobile" ? '?m=1' : '?m=0'), "{$conf.app_id|escape:'javascript'}_preview");
+        window.open("{$sets.paths['app_from_doc']|escape:'javascript'}/"+$('#preferred_locale').val()+"/preview" + target_path /*+ (p == "mobile" ? '?m=1' : '?m=0')*/, "{$conf.app_id|escape:'javascript'}_preview");
+    });
+
+        var searchResultPanel = function(root, conf){
+            this.root = null;
+            this.UI = null;
+            this.prefix = "searchResultPanel";
+            this.items = [];
+            this.count = 0;
+            this.animation = null;
+            this.container = null;
+            this.initHeight = null;
+            this.alt = null;
+            this.conf = {
+                'duration': 500
+            };
+            this.init(root, conf);
+            this.root.css({
+                'visibility': 'visible'
+            })
+        };
+
+        (function($){
+            searchResultPanel.prototype = {
+                'init': function(root, conf) {
+                    this.root = root;
+                    var list = $('<ul></ul>');
+                    var me = this;
+
+                    this.UI = {
+                        'list': null,
+                        'controls': {
+                            'close': $('<a href="#" class="' + this.prefix + '-close" title="Close">Close</a>')
+                        },
+                        'no_records': $('<span class="no-records">{$dict.LABEL_no_records|escape:'javascript'}</span>')
+                };
+
+            if(conf.alt != undefined) {
+                this.alt = conf.alt;
+            }
+
+            this.container = this.root.parent();
+            this.initHeight = this.container.innerHeight();
+
+            if(this.root.find('> ul').length == 0) {
+                this.UI.list = list;
+                this.root.append(list);
+            } else {
+                var list = this.root.find('> ul');
+                this.UI.list = list;
+            }
+
+            this.root.append(this.UI.controls.close);
+            this.root.append(this.UI.no_records.hide());
+            this.UI.controls.close.bind('click', function(e) {
+                e.preventDefault();
+                me.animate('hide', me.conf.duration);
+            });
+
+            this.UI.list.addClass(this.prefix + '-list');
+            this.refresh();
+            if(this.count) {
+                this.animate('show', 0);
+            } else {
+                this.animate('hide', 0);
+            }
+        },
+        'refresh': function() {
+            var items = this.UI.list.find('> li');
+            this.items = [];
+            for(var i = 0; i < items.length; i++) {
+                var item = items[i];
+                this.items.push(item);
+                this.count++;
+            }
+        },
+        'add': function(obj) {
+            var li = $('<li class="' + this.prefix + '-list-item"></li>');
+            li.append(obj);
+            this.UI.list.append(li);
+            this.items.push(li);
+            this.count++;
+        },
+        'clear': function() {
+            for(var i = 0; i < this.items.length; i++) {
+                $(this.items[i]).remove();
+            }
+
+            this.count = 0;
+        },
+        'animate': function(action, duration) {
+            var me = this;
+            if(duration == undefined || duration < 0) {
+                duration = me.duration;
+            }
+
+            var target = action == "show" ? this.root : this.alt;
+            var alt = action == "show" ? this.alt : this.root;
+
+            alt.css({
+                'position': 'absolute'
+            });
+
+            var h = target.css({
+                'position': 'absolute',
+                'opacity': 0
+            }).show().innerHeight();
+            target.hide();
+
+            if(h < this.container.innerHeight())
+                h = this.container.innerHeight();
+
+            if(duration == 0) {
+                target.stop();
+                alt.stop();
+                this[action]();
+            } else {
+                target.css({
+                    'height': h,
+                    'width': '100%'
+                });
+
+                alt.stop().animate({
+                    'opacity': 0
+                });
+
+                target.css({
+                    'top': 0,
+                    'left': 0
+                }).stop().show().animate({
+                        'opacity': 1
+                    }, {
+                        'complete': function(){
+                            me[action]();
+                        }
+                    });
+            }
+
+            if(action == "show") {
+                var h = $(window).height();
+                var p = this.UI.list.offset();
+
+                this.UI.list.css('max-height', h - Math.round(p.top) - 60);
+            }
+        },
+        'show': function() {
+            this.root.css({
+                'position': 'relative',
+                'opacity': 1,
+                'height': 'auto'
+            }).show();
+            this.alt.hide();
+        },
+        'hide': function() {
+            this.root.hide();
+            this.alt.css({
+                'position': 'relative',
+                'opacity': 1
+            }).show();
+        }
+    }
+
+    $(window).bind('load', function(){
+        $('.form_actions').find('button[disabled]').filter(':not(.disabled)').prop('disabled', false);
+    });
+})(jQuery);
+
+var find_form = $('form[name="find_form"]');
+new form_submit_panel(find_form);
+
+var search = new searchResultPanel($('#search_result'), {
+    'alt': $('#tree_list')
+});
+
+find_form.bind('ajaxSuccess', function(e, json){
+    var data = json.data;
+    var keyword_str = json.keyword;
+    var status = json.status;
+
+    var item_template = $('<dl class="search-result-item">'
+        + '<dt class="search-result-item-title"></dt>'
+        + '<dd class="search-result-item-type"></dd>'
+        + '<dd class="search-result-item-status"></dd>'
+        + '<dd class="search-result-item-platforms"></dd>'
+        + '<dd class="search-result-item-paths"></dd>'
+        + '<dd class="search-result-item-major-version"></dd>'
+        + '<dd class="search-result-item-minor-version"></dd>'
+        + '</dl>');
+
+    search.clear();
+    for(var i = 0; i < data.length; i++) {
+        var record = data[i];
+        var paths = {
+
+        };
+        var item = item_template.clone();
+        var display_title = record.webpage_title==null ? "{$dict.LABEL_no_title|escape}" : record.webpage_title;
+        item.find('.search-result-item-title').html('<a href="{$sets.paths['mod_from_doc']|escape:'javascript'}/?id=' + record.webpage_id
+            + '&keywords=' + encodeURIComponent(keyword_str) + '&status=' + encodeURIComponent(status)
+            + '">' + display_title + '</a>');
+        item.find('.search-result-item-type').html("<span class='title'>{$dict.LABEL_page_type|escape:'javascript'}:</span> " + record.type);
+        item.find('.search-result-item-status').html("<span class='title multiple_title'>{$dict.LABEL_status|escape:'javascript'}:</span> <div class='multiple_line_wrapper'></div>");
+        for(var j=0; j<record['status_locale'].length; j++)
+        {
+            item.find('.search-result-item-status .multiple_line_wrapper').append('<span>'+record['status_locale'][j]+'</span>');
+        }
+        item.find('.search-result-item-platforms').html("<span class='title'>{$dict.LABEL_platforms|escape:'javascript'}:</span> " + record.platforms);
+
+        var paths_el = $('<ul></ul>');
+
+        for(var platform in record.paths) {
+            paths_el.append('<li><span class="title">' + platform + ' - </span>' + record.paths[platform] + '</li>');
+        }
+        item.find('.search-result-item-paths').append(paths_el);
+        item.find('.search-result-item-version').html("<span class='title'>{$dict.LABEL_version|escape:'javascript'}</span>: " + record.major_version + "." + record.minor_version);
+
+        search.add(item);
+    }
+
+    search.UI.no_records.hide();
+    search.animate('show');
+
+    if(!search.count) {
+        search.UI.no_records.show();
+    }
+});
+
+$('.row').delegate('.searchResultPanel-list-item', 'click', function(e){
+    e.preventDefault();
+
+    window.location.href = $(this).find('.search-result-item-title a').attr('href');
+});
+
+var selected_item = $('.searchResultPanel-list .searchResultPanel-list-item.active');
+if(selected_item.length) {
+    selected_item.parent().scrollTop(selected_item.position().top -35);
+}
+
+$( ".fancytree-icon, .fancytree-title" ).click( function() {
+    var dyn_title_parent = $(this).parent();
+    if(!dyn_title_parent.hasClass('not_accessible') && !dyn_title_parent.hasClass('fancytree-active'))
+        $("<div class='modal-backdrop fade show' style='cursor: wait'/>").appendTo( document.body );
+} );
+</script>

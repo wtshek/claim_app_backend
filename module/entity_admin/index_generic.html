@@ -1,0 +1,65 @@
+<div class="col-12 col-lg-6">
+  {foreach $entity_def.search_fields as $field => $field_def}
+  {if $field_def@index == ceil(count($entity_def.search_fields)/2)}
+  </div><div class="col-12 col-lg-6">
+  {/if}
+
+  <div class="form-group row">
+    <label class="col-12 col-lg-3 col-form-label" for="search_{$field|escape}">{$dict["LABEL_$field"]|escape}</label>
+
+    <div class="col-12 col-lg-9">
+      {if $field_def.type == 'text'}
+      <input type="text" id="search_{$field|escape}" name="search_{$field|escape}" class="form-control" value="{$smarty.get["search_$field"]|escape}">
+
+      {elseif $field_def.type == 'select'}
+      <select id="search_{$field|escape}" name="search_{$field|escape}" class="form-control {if count($field_def.options) > 10}chosen-select{/if}">
+        <option value="">&nbsp;</option>
+        {html_options options=$field_def.options selected=$smarty.get["search_$field"]}
+      </select>
+
+      {elseif $field_def.type == 'date'}
+      <div class="input-group">
+        <div class="form-control border-0 p-0">
+          {capture "calendar"}
+          {field_calendar id="search_$field" name="search_min_$field" placeholder=TRUE title=$dict.LABEL_from format="%Y-%m-%d" showsTime=FALSE value=$smarty.get["search_min_$field"]}
+          {/capture}
+          {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+        </div>
+
+        <div class="input-group-prepend input-group-append">
+          <div class="input-group-text bg-white border-white">&ndash;</div>
+        </div>
+
+        <div class="form-control border-0 p-0">
+          {capture "calendar"}
+          {field_calendar name="search_max_$field" placeholder=TRUE title=$dict.LABEL_to format="%Y-%m-%d" showsTime=FALSE value=$smarty.get["search_max_$field"]}
+          {/capture}
+          {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+        </div>
+      </div>
+
+      {elseif $field_def.type == 'number'}
+      <div class="input-group">
+        <div class="form-control border-0 p-0">
+          {capture "text"}
+          {field_text id="search_$field" name="search_min_$field" placeholder=TRUE title=$dict.LABEL_from type="number" value=$smarty.get["search_min_$field"]}
+          {/capture}
+          {$smarty.capture.text|replace:'input-field':'input-field m-0'}
+        </div>
+
+        <div class="input-group-prepend input-group-append">
+          <div class="input-group-text bg-white border-white">&ndash;</div>
+        </div>
+
+        <div class="form-control border-0 p-0">
+          {capture "text"}
+          {field_text id="search_$field" name="search_max_$field" placeholder=TRUE title=$dict.LABEL_to type="number" value=$smarty.get["search_max_$field"]}
+          {/capture}
+          {$smarty.capture.text|replace:'input-field':'input-field m-0'}
+        </div>
+      </div>
+      {/if}
+    </div>
+  </div>
+  {/foreach}
+</div>

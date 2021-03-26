@@ -1,0 +1,193 @@
+<style type="text/css">
+label {
+/*
+    font-size: 1.2em;
+*/
+}
+.box-title {
+    position: relative;
+}
+
+.box-title h3 {
+    position: absolute;
+    bottom: 0;
+}
+.checkbox-values .checkbox-field {
+    border: 0;
+    margin-top: 5px;
+}
+.checkbox-values .checkbox-field h4 {
+    font-size: 1.4em;
+    line-height: 1.8em;
+    margin: 0;
+    width: 100%;
+    display: block;
+    float: none;
+}
+.checkbox-values input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+.checkbox-values dl {
+    padding-left: 50px;
+    position: relative;
+    float: none;
+}
+.checkbox-values dt {
+    display: block;
+    width: 100%;
+    float: none;
+}
+.checkbox-values dd {
+    position: absolute;
+    top:50%;
+    left: 10px;
+    margin-top: -14px;
+    float: none;
+}
+.radio-field dt, .checkbox-field dt {
+    padding-right: 2em;
+}
+.checkbox-values .box {
+    float: left;
+    margin-right: 1em;
+    /*color: #FFF;*/
+}
+.checkbox-values .box.checked {
+    background-color: #c5e3ff;
+}
+</style>
+
+<div class="box box-color box-bordered">
+  <div class="box-title">
+    <h3><i class="icon-trash"></i>
+      <b>{$dict.ACTION_delete|escape}</b>&nbsp;{$data.webpage.webpage_title|escape}</h3>
+
+    <ul class="actions">
+      <li>
+        <button type="button" class="btn btn-mini content-slideUp">
+          <i class="icon-angle-down"></i>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <form id="move_form" method="POST" accept-charset="UTF-8" action="?op=delete&amp;id={$data.webpage.id}{if $_get.dr}&amp;dr={$_get.dr|escape:'url'}{/if}">
+    <div class="box-content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 nopadding">
+            <div style="font-size: 1.1em;">
+              <p style="margin-top: 1em;">{$dict.DESCRIPTION_delete|escape}</p>
+
+              <div class="input-field checkbox-field">
+                <div class="checkbox-values" style="font-size: 1.3em;font-weight: bold;">
+                  <dl>
+                    <dd>
+                      <input type="checkbox" name="select_all" id="select_all" />
+                    </dd>
+
+                    <dt>
+                      <label for="select_all"  style="font-size: 1.2em;font-weight: bold;"><b>{$dict.LABEL_select_all|escape}</b></label>
+                    </dt>
+                  </dl>
+                </div>
+              </div>
+
+              <div class="checkbox-values" style="clear: both;">
+                {foreach from=$data.platforms key=platform item=platform_text}
+                <div class="box box-color">
+                  <div class="checkbox-values" style="margin: 0;">
+                    <dl class="checkbox-field">
+                      <dd><input type="checkbox" id="delete_platform_{$platform|escape}" name="delete_platform[]" value="{$platform|escape}"{if in_array($platform, $deleted_platforms)} checked="checked"{/if} /></dd>
+                      <dt><label for="delete_platform_{$platform|escape}"><h4>
+                        <i class="icon-{$platform|escape}"></i>
+                        {$platform_text|escape}</h4></label></dt>
+                    </dl>
+                  </div>
+                </div>
+                {/foreach}
+              </div>
+
+              {*field_checkbox ratio="12:12" name="delete_platform" id="delete_platform" options=$data.platforms selected=$deleted_platforms error=$errors['platforms[]'] view_only=$viewOnly*}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions_container">
+      <ul class="actions">
+        <li>
+          <button type="submit" name="submit" class="btn btn-primary">
+            <i class="icon-save"></i>
+            {$dict.ACTION_save|escape}</button>
+        </li>
+
+        <li>
+          <button type="reset" name="cancel" class="btn btn-primary">
+            <i class="icon-remove-circle"></i>
+            {$dict.ACTION_cancel|escape}</button>
+        </li>
+      </ul>
+    </div>
+  </form>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('button[name="submit"]').on("click", function (e) {
+        var r=confirm("{$dict.MESSAGE_delete_confirm|escape:'javascript'}");
+        if (!r) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
+    });
+
+    new form_submit_panel($('form'));
+
+    $('form').delegate('button[name="cancel"]', 'click', function(e){
+        e.preventDefault();
+
+        window.location.href = "{$reference_url|escape:'javascript'}";
+    });
+
+    $('#select_all').bind('click', function(e){
+        var checked = $(this).prop('checked');
+
+        var inputs = $("input[name='delete_platform[]']");
+        for(var i = 0; i < inputs.length; i++) {
+            $(inputs[i]).prop('checked', checked).triggerHandler('click');
+        }
+    });
+
+    function checkAllSelected() {
+        var totalCheckBox = $("input[name='delete_platform[]']").length;
+
+        var checked_platforms = $("input[name='delete_platform[]']:checked");
+        var checkedCount = checked_platforms.length;
+
+        $('#select_all').prop('checked', checkedCount == totalCheckBox);
+    }
+
+    function updateCbStatus(el) {
+        if(el.prop('checked'))
+            el.parentsUntil('.box').parent().addClass('checked');
+        else
+            el.parentsUntil('.box').parent().removeClass('checked');
+    }
+
+    $("input[name='delete_platform[]']").bind('click', function(){
+        updateCbStatus($(this));
+        checkAllSelected();
+    });
+
+    checkAllSelected();
+
+    var checked_inputs = $("input[name='delete_platform[]']:checked");
+    for(var i = 0; i < checked_inputs.length; i++) {
+        $(checked_inputs[i]).triggerHandler('click');
+    }
+});
+</script>

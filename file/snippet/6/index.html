@@ -1,0 +1,196 @@
+<div class="container" style="min-height: 510px;">
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<h2 class="text-center">{$contact_dict.MESSAGE_contact_subject_line|escape:'html'}</h2>
+			<p>{$contact_dict.MESSAGE_subtitle|escape:'html'}</p>
+			<div class="row">
+				<form id="rfp" method="POST">
+					<div class="form-group col-md-12">
+						<label>{$contact_dict.LABEL_title|escape:'html'} *</label><br />
+						<div class="span8 radio_wrap">
+							{foreach from=$contact_dict.SET_titles key=k item=title}
+							<label class="radio-inline"><input type="radio" name="title" id="inlineRadio{$k}" value="{$k}" /> {$title} </label>
+							{/foreach}
+							<div class="error"><span></span></div>
+						</div>
+					</div>
+					<div class="form-group col-md-12">
+						<label>{$contact_dict.LABEL_firstname|escape:'html'} *</label><input type="text" class="form-control" id="givenName" value="" name="first_name"/>
+						<div class="error"><span></span></div>
+					</div>
+					<div class="form-group col-md-12">
+						<label>{$contact_dict.LABEL_lastname|escape:'html'} *</label><input type="text" class="form-control" id="familyName" value="" name="last_name"/>
+						<div class="error"><span></span></div>
+					</div>
+					<div class="form-group col-md-12">
+						<label>{$contact_dict.LABEL_email|escape:'html'} *</label><input type="email" class="form-control" id="emailAddress" value="" name="email"/>
+						<div class="error"><span></span></div>
+					</div>
+					<div class="form-group col-md-12">
+						<label>{$contact_dict.LABEL_number|escape:'html'}</label><input type="text" class="form-control" id="phoneNumber" value="" name="telephone"/>
+					</div>
+					<div class="form-group col-md-12">
+						<label>{$contact_dict.LABEL_address|escape:'html'}</label><input type="text" class="form-control" id="address" value="" name="address"/>
+					</div>
+					<div class="form-group col-md-12">
+						<label>{$contact_dict.LABEL_country|escape:'html'}</label>
+						<select class="form-control" name="country" id="enquiry_country">
+							<option value="">{$dict.TEXT_select_country}</option>
+								{foreach from=$dict.SET_country[$request.locale] key=v item=country}
+									<option value="{$v}">{$country}</option>
+								{/foreach}
+							</select>
+						</select>
+					</div>
+					<div class="form-group col-md-8">
+						<label>{$contact_dict.LABEL_city|escape:'html'}</label><input type="text" class="form-control" id="city" value="" name="city">
+					</div>
+					<div class="form-group col-md-4">
+						<label>{$contact_dict.LABEL_zipcode|escape:'html'}</label><input type="text" class="form-control" id="zipCode" value="" name="zipcode"/>
+					</div>
+					<div class="col-md-12">
+						<label>{$contact_dict.LABEL_message|escape:'html'} *</label><textarea class="form-control" rows="3" name="message" id="message"></textarea>
+						<div class="error"><span></span></div>
+					</div>
+					<p class="col-md-12"><br /> {$contact_dict.MESSAGE_enquriy_note}</p>
+					<div class="col-md-12">
+						<a href="#" class="btn btn-default" id="submit_btn">{$contact_dict.LABEL_submit|escape:'html'}</a>&nbsp;<a href="#" class="btn btn-default" id="reset_btn">{$contact_dict.LABEL_reset|escape:'html'}</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var isOpera = !!window.opera || navigator.userAgent.indexOf('Opera') >= 0;
+	// Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+	var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+	var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+	// At least Safari 3+: "[object HTMLElementConstructor]"
+	var isChrome = !!window.chrome;                          // Chrome 1+
+	var isIE = /*@cc_on!@*/false;                            // At least IE6
+
+	function count(obj) {
+		var size = 0, key; 
+		for (key in obj) { 
+		if (obj.hasOwnProperty(key)) size++;
+	}
+		return size;
+	}
+	$(document).ready(function(){
+		$('.error').hide().html();
+		$(".chosen-select").chosen({
+			disable_search_threshold: 10
+		});
+		var validate = function(){
+			var valid = true;
+			var error = '';
+			var error1 = '';
+			var error2 = '';
+			
+			$('.error, .number_msg .error > span').hide().html();
+			$('#rfp div').removeClass('errors');
+			if($('input[name="title"]:checked').size()==0)
+			{
+				$('input[name="title"]').parent().parent().find('.error').children().html("{$contact_dict.ERROR_title_blank}");
+				$('input[name="title"]').parent().parent().find('.error').show();
+				valid = false;
+			}
+			if($('input[name="first_name"]').val()=='')
+			{
+				$('input[name="first_name"]').next('.error').children().html("{$contact_dict.ERROR_firstname_blank}");
+				$('input[name="first_name"]').next('.error').show();
+				valid = false;
+			}
+			if($('input[name="last_name"]').val()=='')
+			{
+				$('input[name="last_name"]').next('.error').children().html("{$contact_dict.ERROR_lastname_blank}");
+				$('input[name="last_name"]').next('.error').show();
+				valid = false;
+			}
+			if($('#message').val()=='')
+			{
+				$('#message').next('.error').children().html("{$contact_dict.ERROR_message_blank}");
+				$('#message').next('.error').show();
+				valid = false;
+			}
+			if($('input[name="email"]').val()=='')
+			{
+				$('input[name="email"]').next('.error').children().html("{$contact_dict.ERROR_email_blank}");
+				$('input[name="email"]').next('.error').show();
+				valid = false;
+			}
+			else
+			{
+				$.ajax({
+					'url': '',
+					'type': $("#rfp").attr('method'),
+					'cache': false,
+					'async': true,
+					'data': "ajax=1&email="+$('input[name="email"]').val(),
+					'beforeSend': function(){
+						$('.loading').css('padding-top', parseFloat($(window).scrollTop()+$('html').height()/2)+'px').fadeIn('fast');
+					},
+					'error': function(ajax, text, err){
+					},
+					'complete': function(ajax, status){
+						$('.loading').delay( 400 ).fadeOut("fast");
+						switch(ajax.status){
+						}
+					},
+					'success': function(data){
+						//window.console.log(data);
+						var json = JSON.parse(data);
+						//window.console.log(json.errors);
+						if(json.result == 'success')
+						{
+							var count = 0;
+							var errors = json.errors;
+							for(var n in errors)
+							{
+								if(errors.hasOwnProperty(n))
+								{
+									var target = $("#rfp").find('input[name="'+n+'"]');
+									if(target.length>0)
+									{
+										switch($(target[0]).prop('tagName').toLowerCase())
+										{
+											case "select":
+												target.next().next().html(errors[n]);
+											default:
+												target.next('.error').children().html("{$contact_dict.ERROR_email_invalid|escape}");
+												target.next('.error').show();
+										}
+									}
+									count++;
+								}
+							}
+							if(count==0 && $('input[name="first_name"]').val()!='' && $('input[name="last_name"]').val()!='' && $('#message').val()!='' && $('input[name="title"]:checked').size()!=0)
+							{
+								$("#rfp").submit();
+							}
+							else
+								return false;
+						}
+						else
+							return false;
+					}
+				});
+			}
+		}
+		
+		$('#submit_btn').bind('click', function(e){
+			e.preventDefault();
+			validate();
+		});
+		
+		$('#reset_btn').bind('click', function(e){
+			e.preventDefault();
+			$('#rfp .error').hide();
+			$('#rfp input[name!="title"], #rfp textarea').val('');
+			$('#enquiry_country').val('');
+			$('#rfp input[name="title"]:checked').prop('checked', false);
+		});
+	});
+</script>

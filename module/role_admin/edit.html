@@ -1,0 +1,572 @@
+<div class="padding">
+  {field_text name="role_name" title=$dict.LABEL_role_name id="role_name" maxlength="255" value=$data.role.name error=$errors.role_name view_only=$viewOnly}
+  {if !$data.role.root_role}{field_select name="parent_role" title=$dict.LABEL_parent_role id="parent_role" options=$role_tree_options has_empty=true error=$errors.parent_role selected=$data.role.parent_id default=$default_parent_id disabled_items=$exclude_ids view_only=$viewOnly}{/if}
+  {if $data.role.type!="public"}{field_select name="edm_role" title=$dict.LABEL_edm_role id="edm_role" options=$dict.SET_edm_roles selected=$data.role.edm_role error=$errors.edm_role view_only=$viewOnly has_empty=TRUE}{/if}
+  {field_radio name="enabled" title=$dict.LABEL_status id="status" options=$dict.SET_role_statuses selected=$data.role.enabled error=$errors.enabled view_only=$viewOnly||$data.role.root_role||($data.has_active_users && $data.role.enabled==1)}
+
+  {if ($viewOnly||$data.role.root_role||($data.has_active_users && $data.role.enabled==1))}
+  <input type="hidden" value="{$data.role.enabled}" name="enabled"/>
+  {/if}
+
+  {if $data.has_active_users}
+  <dl class="input-field view row">
+    <dt class="col-12 col-lg-4"></dt>
+    <dd class="col-12 col-lg-8">
+      <div class="view">
+        <span style="font-size:12px;">{$dict.MESSAGE_cannot_disabled}</span>
+      </div>
+    </dd>
+  </dl>
+  {/if}
+</div>
+
+{if $data.role.type!="public"}
+<div class="rights_wrapper" style="border-top: 1px solid #CCC;">
+  <nav>
+    <div class="nav nav-tabs tabs-inline tabs-top" id="role-tab" role="tablist">
+      <a class="nav-item nav-link active" id="admin-permissions-tab" data-toggle="tab" href="#admin-permissions" role="tab" aria-controls="admin-permissions" aria-selected="true">
+        {$dict.LABEL_admin_site_permission|escape}
+      </a>
+
+      <a class="nav-item nav-link" id="webpage-admin-permissions-tab" data-toggle="tab" href="#webpage-admin-permissions" role="tab" aria-controls="webpage-admin-permissions" aria-selected="false">
+        {$dict.LABEL_webpage_admin_permission|escape}
+      </a>
+    </div>
+  </nav>
+
+  <div class="tab-content nopadding tab-content-inline tab-content-bottom" id="role-tabContent">
+    <div class="tab-pane padding active" id="admin-permissions">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" class="role_rights" id="role_rights">
+        <thead>
+          <tr>
+            <th></th>
+            {foreach from=$admin_rights item=right_name}
+            <th>{$right_name|escape}</th>
+            {/foreach}
+          </tr>
+        </thead>
+
+        <tbody>
+          {foreach from=$admin_modules key=mid item=module_name}
+          <tr>
+            <th>{$module_name|escape}</th>
+            {foreach from=$admin_rights key=rid item=right_name}
+            {assign var=val value=$mid|cat:'|'|cat:$rid}
+            {assign var=available value=!isset($available_rights[$mid][$rid])}
+            <td>{field_checkbox name="rights" value=$val id=$val wrap=false checked=in_array($rid, $data.module_rights[$mid]) view_only=$viewOnly disabled=$available}</td>
+            {/foreach}
+          </tr>
+          {/foreach}
+        </tbody>
+      </table>
+
+      <div class="loading"><span>{$dict.LABEL_loading|escape}</span></div>
+    </div>
+
+    <div class="tab-pane padding border" id="webpage-admin-permissions">
+      <h4>{$dict.LABEL_accessible_webpages|escape}</h4>
+
+      <div class="tabs-container">
+        <nav>
+          <div class="nav nav-tabs tabs-inline tabs-top" id="role-webpages-tab" role="tablist">
+            {foreach from=array_keys($dict.SET_webpage_page_types) item=content name=content_types}
+            <a class="nav-item nav-link {if $smarty.foreach.content_types.first}active{/if}"
+              id="platform-{$content}-tab" data-toggle="tab" href="#platform-{$content}" role="tab"
+              aria-controls="platform-{$content}" aria-selected="{if $smarty.foreach.content_types.first}true{else}false{/if}">
+              {$dict.SET_webpage_page_types[$content]|escape}
+            </a>
+            {/foreach}
+          </div>
+        </nav>
+
+        <div class="tab-content nopadding tab-content-inline tab-content-bottom" id="role-webpages-tabContent">
+          {foreach from=array_keys($dict.SET_webpage_page_types) item=content name=content_types}
+          <div class="tab-pane padding {if $smarty.foreach.content_types.first}active{/if}" id="platform-{$content}" data-platform-type="{$content|escape}">
+            {*$tree_html[$content]*}
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="role_rights" id="webpage_role_rights">
+              <colgroup width="60%"></colgroup>
+              <colgroup width="4%"></colgroup>
+              <colgroup width="9%"></colgroup>
+              <colgroup width="9%"></colgroup>
+              <colgroup width="9%"></colgroup>
+              <colgroup width="9%"></colgroup>
+
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                  {foreach from=$admin_rights key=k item=right_name}
+                  {if $k!=6}
+                  <th>{$right_name|escape}</th>
+                  {/if}
+                  {/foreach}
+                </tr>
+              </thead>
+
+              <tbody>
+                {foreach from=$flatten_tree_html[$content] key=k item=webpage}
+                <tr class="webpage_role_row">
+                  <th><a href="{$webpage.href}" data-level="{$webpage.level}" data-parent="{$webpage.parent}" target="_blank">{$webpage.title}</a><input type="hidden" value="{$webpage.key}" name="webpage_id[]"/></th>
+                  <td>&nbsp;</td>
+                  {foreach from=$admin_rights key=rid item=right_name}
+                  {if $rid!=6}
+                  {assign var=val value=$webpage.key|cat:'|'|cat:$rid}
+                  {assign var=available value=($rid>$webpage_max_available_right)}
+                  <td>{field_checkbox name="webpage_rights" value=$val id=$val wrap=false checked=in_array($rid, $webpage.rights) view_only=$viewOnly disabled=$available}</td>
+                  {/if}
+                  {/foreach}
+                </tr>
+                {/foreach}
+              </tbody>
+            </table>
+          </div>
+          {/foreach}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{/if}
+
+<input type="hidden" name="role_id" value="{$data.role.id|escape}" />
+<input type="hidden" name="t" value="{$type|escape}" />
+
+<style>
+tr.webpage_role_row:hover{
+    background-color: #d9f0fa;
+}
+</style>
+
+<script>
+var tbChecker = function(target) {
+    this.root = null;
+    this.init(target);
+};
+
+var form = null;
+var trees = {
+
+};
+
+/*
+$('form').bind('submit', function(){
+    form.additionalData = {
+        'webpage_id': {
+
+        }
+    };
+
+    for( var tn in trees ) {
+        var tree = trees[tn];
+        var selectedPages = [];
+
+        form.additionalData['webpage_id'][tn] = [];
+
+        var nodes = tree.dynatree('getSelectedNodes');
+        for( var i = 0; i < nodes.length; i++ ) {
+            selectedPages.push(nodes[i].data.key);
+        }
+
+        if(selectedPages.length > 0) {
+            form.additionalData['webpage_id'][tn] = selectedPages;
+        }
+    }
+});
+*/
+
+tbChecker.prototype = {
+    'init': function(target) {
+        var me = this;
+        this.root = target;
+
+        var vCols = this.root.find('thead th:not(:empty)');
+        if(vCols.length > 0) {
+            vCols.bind('click', function() {
+                me.toggleColItems($(this).prevAll().length);
+            });
+        }
+
+        var hCols = this.root.find('tbody th:not(:empty)');
+        if(hCols.length > 0) {
+            hCols.bind('click', function() {
+                me.toggleRowItems($(this).parent().prevAll().length);
+            });
+        }
+    },
+    'toggleColItems': function(i) {
+        var cb = this.root.find('tbody tr > *:nth-child(' + (i+1) + ') input[type="checkbox"]');
+        this.toggleChecks(cb);
+    },
+    'toggleRowItems': function(i) {
+        var cb = this.root.find('tbody tr:nth-child(' + (i+1) + ') td input[type="checkbox"]');
+        this.toggleChecks(cb);
+    },
+    'toggleChecks': function(els) {
+        var tocheck = false;
+
+        els = els.not(':disabled');
+
+        for( var i = 0; i < els.length; i++ ) {
+            if(!$(els[i]).prop('checked'))
+                tocheck = true;
+        }
+
+        els.prop('checked', tocheck);
+        $(els).trigger('cbChanged', true);
+    }
+};
+
+{if $data.role.type!="public"}
+(function($){
+    var rd = {json_encode($dependent_rights)};
+    var group_rights = {json_encode($group_dependent_rights)};
+    var group_modules = {json_encode($group_rights_modules)};
+
+    var prefix = 'r';
+    var initItem = null;
+
+    var changeInheritedChildren = function(node, flag) {
+        var children = node.getChildren();
+        if(children && children != undefined) {
+            for(var i = 0; i < children.length; i++) {
+                var child = children[i];
+                child.select(flag);
+                changeInheritedChildren(child, flag);
+                /*if($(child.span).find('.webpage-status.inherited').length) {
+                    child.data.unselectable = false;
+                    child.select(flag);
+                    child.data.unselectable = true;
+                }*/
+            }
+        }
+    }
+
+    $('#role_rights').delegate('input[type="checkbox"][name="rights[]"]', 'click', function(){
+        $(this).trigger('cbChanged');
+    });
+
+    $('#role_rights').delegate('input[type="checkbox"][name="rights[]"]', 'cbChanged', function(){
+        var value = this.value;
+        var t = value.split('|');
+        var name = t[0];
+        var rid = parseInt(t[1]);
+
+        var str = [];
+        var regExp = new RegExp("^"+prefix, 'i');
+
+        if(this.checked) {
+            // checked - check also the required fields
+            for(var e in rd) {
+                var i = parseInt(e.replace(regExp, ""));
+                if(rd.hasOwnProperty(e) && rid != i && $.inArray(rid, rd[e]) > -1) {
+                    str.push('input[value="' + name + "|" + i + '"]');
+                }
+                
+                if($.inArray(name, group_modules) > -1)
+                {
+                    if(group_rights.hasOwnProperty(e) && rid != i && $.inArray(rid, group_rights[e]) > -1) {
+                        if($('input[value="' + name + "|" + i + '"]').prop('disabled') == false)
+                            str.push('input[value="' + name + "|" + i + '"]');
+                    }
+                }
+            }
+
+            $(str.join(",")).prop('checked', true);
+        } else {
+            // unchecked
+            if(rd["r" + rid] != undefined) {
+                for(var i = 0; i < rd["r" + rid].length; i++) {
+                    str.push('input[value="' + name + "|" + rd["r" + rid][i] + '"]');
+                }
+            }
+            
+            if(group_rights["r" + rid] != undefined) {
+                if($.inArray(name, group_modules) > -1)
+                {
+                    for(var i = 0; i < group_rights["r" + rid].length; i++) {
+                        str.push('input[value="' + name + "|" + group_rights["r" + rid][i] + '"]');
+                    }
+                }
+            }
+
+            $(str.join(",")).removeProp('checked');
+        }
+
+    });
+
+    $('#webpage_role_rights').delegate('input[type="checkbox"][name="webpage_rights[]"]', 'click', function(){
+        $(this).trigger('wcbChanged');
+    });
+    
+    var traversial_webpages = function(wid, flag){
+        var descend_ids = [];
+        
+        if(flag)
+        {
+            $('body #tmp_descend').remove();
+            $('body').append('<input type="hidden" value="" id="tmp_descend"/>');
+        }
+        $('a[data-parent="'+wid+'"]').each(function(index){
+            descend_ids.push($(this).next().val());
+            traversial_webpages($(this).next().val(), false);
+        });
+        
+        var descend_id_str = $('#tmp_descend').val();
+        var tmp_descend_array = descend_id_str.split(',');
+        for(var i=0;i<tmp_descend_array.length;i++)
+        {
+            var duplicate = false;
+            for(var j=0;j<descend_ids.length;j++)
+            {
+                if(descend_ids[j] === tmp_descend_array[i])
+                    duplicate = true;
+            }
+            if(!duplicate)
+                descend_ids.push(tmp_descend_array[i]);
+        }
+        descend_id_str = descend_ids.join(',');
+        $('#tmp_descend').val(descend_id_str);
+    };
+    
+    $('#webpage_role_rights').delegate('input[type="checkbox"][name="webpage_rights[]"]', 'wcbChanged', function(){
+        var value = this.value;
+        var t = value.split('|');
+        var wid = t[0];
+        var rid = parseInt(t[1]);
+
+        var str = [];
+        var regExp = new RegExp("^"+prefix, 'i');
+        
+        traversial_webpages(wid, true);
+        var descend_webpages = $('#tmp_descend').val().split(',');
+        
+        
+        if(this.checked) {
+            // checked - check also the required fields
+            for(var e in rd) {
+                var i = parseInt(e.replace(regExp, ""));
+                if(rd.hasOwnProperty(e) && rid != i && $.inArray(rid, rd[e]) > -1) {
+                    str.push('input[value="' + wid + "|" + i + '"]');
+                    
+                    // check descend webpages
+                    for(var j=0; j<descend_webpages.length; j++)
+                    {
+                        str.push('input[value="' + descend_webpages[j] + "|" + i + '"]');
+                    }
+                }
+                
+                // check descend webpages
+                for(var j=0; j<descend_webpages.length; j++)
+                {
+                    str.push('input[value="' + descend_webpages[j] + "|" + rid + '"]');
+                }
+            }
+
+            $(str.join(",")).prop('checked', true);
+        } else {
+            // unchecked
+            if(rd["r" + rid] != undefined) {
+                for(var i = 0; i < rd["r" + rid].length; i++) {
+                    str.push('input[value="' + wid + "|" + rd["r" + rid][i] + '"]');
+                    
+                    // un-check descend webpages
+                    for(var j=0; j<descend_webpages.length; j++)
+                    {
+                        str.push('input[value="' + descend_webpages[j] + "|" + rd["r" + rid][i] + '"]');
+                    }
+                }
+            }
+
+            // un-check descend webpages
+            for(var j=0; j<descend_webpages.length; j++)
+            {
+                str.push('input[value="' + descend_webpages[j] + "|" + rd["r" + rid][i] + '"]');
+            }
+
+            $(str.join(",")).removeProp('checked');
+        }
+    });
+
+    $('#parent_role').bind('change', function(){
+        var v = $(this).val();
+        $.ajax({
+            'url': './',
+            'data': {
+                'op': 'get_privileges',
+                'id': v
+            },
+            'beforeStart': function() {
+                $(".rights_wrapper .loading").show();
+            },
+            'complete': function() {
+                $(".rights_wrapper .loading").hide();
+            },
+            'success': function(json){
+                if(json.result && json.result == 'success') {
+                    var data = json.data;
+                    var available_fields = [];
+                    for(var module in data.modules) {
+                        if(data.modules.hasOwnProperty(module)) {
+                            for( var i = 0; i < data.modules[module].length; i++ ) {
+                                available_fields.push($('input[id="' + module + '|' + data.modules[module][i] + '"]')[0]);
+                            }
+
+                        }
+                    }
+
+                    $('input[name="rights[]"]').not(available_fields).prop('checked', false).prop('disabled', true);
+                    for(var i = 0; i < available_fields.length; i++) {
+                        var f = $(available_fields[i]);
+                        if(f.prop('disabled'))
+                            f.prop('disabled', false);
+                    }
+
+                    var available_webpage_rights = data.webpages;
+                    var available_webpage_fields = [];
+                    for(var webpage_id in data.webpages) {
+                        if(data.webpages.hasOwnProperty(webpage_id)) {
+                            for( var i = 0; i < data.webpages[webpage_id].length; i++ ) {
+                                available_webpage_fields.push($('input[id="' + webpage_id + '|' + data.webpages[webpage_id][i] + '"]')[0]);
+                            }
+
+                        }
+                    }
+
+                    $('input[name="webpage_rights[]"]').not(available_webpage_fields).prop('checked', false).prop('disabled', true);
+                    for(var i = 0; i < available_webpage_fields.length; i++) {
+                        var f = $(available_webpage_fields[i]);
+                        if(f.prop('disabled'))
+                            f.prop('disabled', false);
+                    }
+                    /*for( var tn in trees ) {
+                        if(trees.hasOwnProperty(tn)) {
+                            var tree = trees[tn];
+                            tree.dynatree("getRoot").visit(function(node){
+                                if(node.data.addClass == null) {
+                                    node.data.addClass = "";
+                                }
+                                if($.inArray(parseInt(node.data.key), available_webpages) < 0) {
+                                    node.select(false);
+                                    node.data.unselectable = true;
+                                    node.data.addClass = node.data.addClass + ' disabled';
+                                    //$(node.li).find('> span').addClass('disabled');
+                                } else {
+                                    node.data.unselectable = false;
+                                    node.data.addClass = node.data.addClass.replace(/^((?:.+\s)|(?:\s))*disabled((?:\s.+)|(?:\s))*/
+                                              /*  , function(a, b, c, d){
+                                            var str = "";
+                                            str = b;
+                                            if(c != undefined) {
+                                                str = str + c;
+                                            }
+
+                                            return str;
+                                        });
+                                }
+                                node.render();
+                                //window.console.dir(node);
+                            }, true);
+                        }
+                    }*/
+                }
+            }
+        });
+    });
+    
+    var webpagePermissionInit = function(){
+        $('.webpage_role_row').each(function(index){
+            var level = $(this).find('th:eq(0) a').data('level');
+            var margin_left = level*10;
+            $(this).find('th:eq(0)').find('a').css({
+                'display': 'inline-block',
+                'overflow': 'hidden',
+                'width': '100%',
+                'margin-left': margin_left+'px',
+                'border-left': '1px dashed #000000',
+                'padding-left': '5px',
+                'color': '#000000',
+                'font-weight': 'normal'
+            });
+        });
+    };
+
+    $('#parent_role').trigger('change');
+
+    new tbChecker($("#role_rights"));
+    webpagePermissionInit();
+
+    /*var tmp = $('#webpage-admin-permissions .platform-tree');
+    for(var i = 0; i < tmp.length; i++) {
+        (function($) {
+            var me = $(tmp[i]);
+            trees[me.attr('data-platform-type')] =
+                me.dynatree({
+                'title': "",
+                'fx': {
+                    height: "toggle",
+                    duration: 200
+                },
+                'imagePath': "{$sets.paths['app_from_doc']|escape:'javascript'}/images/",
+                'activeVisible': true,
+                'autoFocus': false, // Set focus to first child, when expanding or lazy-loading.
+                'selectMode': 2,
+                'checkbox': true,
+                onClick: function(node, e) {
+                    e.preventDefault();
+                },
+                onSelect: function(flag, node) {
+                    if(node.tree.isUserEvent()) {
+                        var children = node.getChildren();
+                        var key = node.data.key;
+
+                        if(initItem == null && children != null && children.length && window.confirm("{$dict.MESSAGE_confirm_select_children|escape:'javascript'}")) {
+                            initItem = key;
+                            changeInheritedChildren(node, flag);
+                            initItem = null;
+                        }
+
+                        for(var name in trees) {
+                            if(trees.hasOwnProperty(name)) {
+                                var t = trees[name];
+                                if(t != node.tree) {
+                                    var n = t.dynatree("getTree").selectKey(key, flag);
+                                }
+                            }
+                        }
+                    }
+                },
+                onActivate: function(node) {
+                    //window.location.href = "?id=" + node.data.key + '&p=' + encodeURIComponent($('#site_tree li.active').attr('data-tab-type'));
+                },
+                onLazyRead: function(node) {
+                    $.ajax({
+                        url: "./",
+                        data: {
+                            'op': 'get_child_pages',
+                            'ajax': 1,
+                            'p': me.attr('data-platform-type'),
+                            'id': node.data.key,
+                            'u': '{if $_get.op == "edit"}0{else}1{/if}'
+                        },
+                        'success': function(json, status, ajax) {
+                            if(json.result != undefined && json.result == "session_timeout") {
+                                node.resetLazy();
+                                t.data('loaded', false);
+                            } else {
+                                node.addChild(json.items, null);
+                            }
+                        }
+                    });
+                },
+                'onPostInit': function(){
+                }
+            });
+
+        })(jQuery);
+    }*/
+
+})(jQuery);
+{/if}
+
+form = new form_submit_panel($("form"));
+</script>

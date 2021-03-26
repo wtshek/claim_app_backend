@@ -1,0 +1,844 @@
+<form id="proposal_form"  method="POST">
+
+
+<span  class="title"> {$proposal_dict.LABEL_block1|escape:'html'} </span><br>
+<span id="message" > {$proposal_dict.LABEL_block2}  </span><br> <br> 
+
+
+
+<table style="width:100%" id="table_event_type">
+	<tr>
+		<td class="title">
+			{$proposal_dict.LABEL_event_type|escape:'html'}
+		</td>
+		<td>
+				<table style="width:100%" id="event_group">
+				<tr>
+					<td style="width:20%">
+						<label><input type="radio" id="event_type" name="event_type" value="{$form_data['event_type']['0']|escape}" onClick="eventType(1)" /><label>{$proposal_dict.LABEL_event_type_wedding|escape:'html'}</label></label>
+					</td>
+					<td style="width:20%">
+						<label><input type="radio" id="event_type" name="event_type" value="{$form_data['event_type']['1']|escape}"  onClick="eventType(2)" /><label>{$proposal_dict.LABEL_event_type_meeting|escape:'html'}</label></label>
+					</td>
+					<td style="width:60%">
+					
+						<label style="margin-right:{$space}px"><input type="radio" id="event_type" name="event_type" value="{$form_data['event_type']['2']|escape}"  onClick="eventType(3)" /><label>{$proposal_dict.LABEL_event_type_outside_catering|escape:'html'}</label></label>
+						<label><input type="radio" id="event_type" name="event_type" value="{$form_data['event_type']['3']|escape}"  onClick="eventType(4)" /><label>{$proposal_dict.LABEL_event_type_celebration_party|escape:'html'}</label></label>				
+					</td>
+					</tr>
+				</table>
+
+				</td>	
+		</tr>
+	</table>
+	
+						
+						
+
+					
+						
+	<div id="output_form">
+	</div>
+	
+	<div id="form1">
+	<table id="table_expected_day_1">
+	<tr>
+		<td class="title">
+			<label id="expected_wedding_day" > {$proposal_dict.LABEL_expected_wedding_date}</label>
+		</td>
+		<td>
+			<div class="innertd">
+				<table>
+					<tr>
+						<td>
+									<div class="calender-input input-append">
+										<input  id="expected_day_1" name="expected_day_1" type="text" placeholder="{$proposal_dict.LABEL_first_preference|escape:'html'}" class="expected_day" />
+										<span class="add-on">
+											<button class="calender" id="calender1">cal</button>			
+										</span>
+									</div>
+						</td>
+						<td>
+									<div class="calender-input input-append">
+										<input  id="expected_day_2" name="expected_day_2" type="text" placeholder="{$proposal_dict.LABEL_second_preference|escape:'html'}" class="expected_day" />
+										<span class="add-on">
+											<button class="calender" id="calender2">cal</button>			
+										</span>
+									</div>
+						</td>
+						<td>
+									<div class="calender-input input-append">
+										<input  id="expected_day_3" name="expected_day_3" type="text" placeholder="{$proposal_dict.LABEL_third_preference|escape:'html'}" class="expected_day" />
+										<span class="add-on">
+											<button class="calender" id="calender3">cal</button>			
+										</span>
+									</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	</tr>
+	</table>
+	
+	<table id="table_expected_day_2">
+	<tr>
+		<td class="title">
+			<label id="expected_event_day" > {$proposal_dict.LABEL_expected_event_date}</label>
+		</td>
+		<td>
+			<div class="innertd">
+				<table>
+					<tr>
+						<td>
+									<div class="calender-input input-append">
+										<input  id="expected_start" name="expected_start" type="text" placeholder="{$proposal_dict.LABEL_expected_event_date_start|escape:'html'}" class="expected_day" />
+										<span class="add-on">
+											<button class="calender" id="calender_start">cal</button>			
+										</span>
+									</div>
+						</td>
+						<td>
+									<div class="calender-input input-append">
+										<input  id="expected_end" name="expected_end" type="text" placeholder="{$proposal_dict.LABEL_expected_event_date_end|escape:'html'}"  class="expected_day"/>
+										<span class="add-on">
+											<button class="calender" id="calender_end">cal</button>			
+										</span>
+									</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	</tr>
+	</table>
+	
+	
+	
+			
+			
+	<table id="table_expected_number" style="margin-bottom:3px">
+		<tr>
+		<td class="title">
+			<label id="label_guest">{$proposal_dict.LABEL_expected_guest}</label>
+		</td>
+		<td>
+			<div class="innertd">
+				<input id="number_of_guest" name="number_of_guest" type="text" />
+			</div>
+		</td>
+	</tr>
+</table>
+
+	<table style="width:100%" id="table_cuisine_type">
+		<tr>
+			<td class="title">
+				<label id="cuisine" >{$proposal_dict.LABEL_cuisine}</label>
+			</td>
+			<td>
+				<table  style="width:100%" id="cuisine_group">
+					<tr>
+						<td style="width:20%">
+							<label><input type="radio" name="cuisine_type" value="{$form_data['cuisine'][0]|escape}"/><label>{$proposal_dict.LABEL_cuisine_chinese|escape:'html'}</label></label>
+						</td>
+						<td style="width:20%">
+							<label><input type="radio" name="cuisine_type" value="{$form_data['cuisine'][1]|escape}"/><label>{$proposal_dict.LABEL_cuisine_western|escape:'html'}</label></label>
+						</td>
+						<td style="width:20%">
+							<label><input type="radio" name="cuisine_type" value="{$form_data['cuisine'][2]|escape}"/><label>{$proposal_dict.LABEL_cuisine_buffet|escape:'html'}</label></label>
+							</td>
+						<td style="width:20%">
+							<label><input type="radio" name="cuisine_type" value="{$form_data['cuisine'][3]|escape}"/><label>{$proposal_dict.LABEL_cuisine_cocktail|escape:'html'}</label></label>
+						</td>
+						<td style="width:20%">
+							
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	
+	<table style="width:100%" id="table_meal_period">
+		<tr>
+			<td class="title">
+				<div style="margin-top:5px"><label id="label_meal_period">{$proposal_dict.LABEL_meal_period}</label></div>
+			</td>
+			<td>
+				<table  style="width:100%" id="cuisine_group" >
+					<tr>
+						<td style="width:20%">
+							<label><input type="radio" name="meal_period" value="{$form_data['meal_period'][0]|escape}"/><label>{$proposal_dict.LABEL_meal_period_lunch|escape:'html'}</label></label>
+						</td>
+						<td style="width:20%">
+							<label><input type="radio" name="meal_period" value="{$form_data['meal_period'][1]|escape}"/><label>{$proposal_dict.LABEL_meal_period_dinner|escape:'html'}</label></label>
+						</td>
+						<td style="width:60%">
+							<label><input type="radio" name="meal_period" value="{$form_data['meal_period'][2]|escape}"/><label>{$proposal_dict.LABEL_meal_period_other|escape:'html'}</label></label>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	
+	<table style="width:100%" id="table_company_name">
+			<tr>
+				<td class="title">
+						<div>{$proposal_dict.LABEL_company_name|escape:'html'}</div>
+				</td>
+				<td>
+					<div class="innertd">
+						<input id="company_name" name="company_name" type="text"  />		
+					</div>
+				</td>	
+			</tr>
+	</table>
+			 
+	<table id="table_general_info" style="margin-top:-5px">
+		
+	<tr>
+		<td class="title">
+			<label id="contact_name" >{$proposal_dict.LABEL_contact_name}</label>
+		</td>
+		<td>
+			
+			<div class="innertd" style="margin-left:5px;margin-top:5px" id="contact">
+			
+									<select name="salutation" id="salutation" class="chosen-select" style="width:100px;">
+										<option value="">{$proposal_dict.LABEL_contact_name_salutation|escape:'html'}</option>
+										<option value="{$form_data['salutation'][0]|escape}">{$proposal_dict.LABEL_contact_name_salutation_mr|escape:'html'}</option>
+										<option value="{$form_data['salutation'][1]|escape}">{$proposal_dict.LABEL_contact_name_salutation_mrs|escape:'html'}</option>
+										<option value="{$form_data['salutation'][2]|escape}">{$proposal_dict.LABEL_contact_name_salutation_ms|escape:'html'}</option>
+									</select>
+				
+					
+								<input id="firstname" name="firstname" type="text" placeholder="{$proposal_dict.LABEL_contact_name_firstname|escape:'html'}" style="width:145px;" />	
+								<input id="lastname" name="lastname" type="text" placeholder="{$proposal_dict.LABEL_contact_name_lastname|escape:'html'}" style="width:145px;"  />  
+						
+			</div>
+		</td>	
+	</tr>
+	<tr>
+		<td class="title">
+			<label id="contact_email" >{$proposal_dict.LABEL_contact_email}</label>
+		</td>
+		<td>
+			<div class="innertd">
+				<input id="email" name="email" type="text"/>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td class="title">
+			<label id="contact_number" >{$proposal_dict.LABEL_contact_number}</label>
+		</td>
+		<td>
+			<div class="innertd">
+				<input id="primaryphone" name="primaryphone" type="text" placeholder="{$proposal_dict.LABEL_contact_number_primary}"/>
+				<input id="secondaryphone" name="secondaryphone" type="text" placeholder="{$proposal_dict.LABEL_contact_number_secondary}"/>
+			</div>
+		</td>
+	</tr>
+	</table>
+	
+	<table id="table_prefered_time">
+	<tr>
+		<td class="title">
+			<label id="preferred_time" >{$proposal_dict.LABEL_perferred_time}</label>
+		</td>
+		<td>
+			<div class="innertd">
+				<input id="preferredtime" name="preferredtime" type="text" />
+			</div>
+		</td>
+	</tr>
+	</table>
+	
+	<table style="width:100%" id="table_previous_purchase">
+			<tr>
+		<td class="title">
+			{$proposal_dict.LABEL_previous_purchase|escape:'html'}
+		</td>
+		<td>
+			<table style="width:100%" id="purchase_group">
+				<tr>
+					<td style="width:20%">
+						<label><input type="radio" name="purchase_type" value="yes"/><label>{$proposal_dict.LABEL_previous_purchase_yes|escape:'html'}</label></label>
+					</td>
+					<td style="width:80%">
+						<label><input type="radio" name="purchase_type" value="no" /><label>{$proposal_dict.LABEL_previous_purchase_no|escape:'html'}</label></label>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	</table>
+	
+			<div  style="margin-top:5px;"> <span class="title">{$proposal_dict.LABEL_textarea|escape:'html'}</span></div>
+			<textarea id="command" name="command" rows="3" cols="60"></textarea>
+	
+	
+	</div>
+
+	
+	<div class="form_actions" >
+		
+		<input type="button" id="submitBtn" name="submitBtn" class="button" style="margin-left:0px;width:120px"  value="{$proposal_dict.LABEL_submit|escape:'html'}" onClick="validation();"/>
+		
+	</div>
+	
+</form>
+
+<style>
+
+#proposal_form #message{
+font-size: 	11px;
+}
+
+
+#proposal_form #event_group label, 
+#proposal_form #cuisine_group label,
+#proposal_form #purchase_group label{
+font-size: 13px;	
+}
+
+.title{
+font-size: 13px;	
+}
+</style>		
+ <script >
+//var action = 1;
+var isOpera = !!window.opera || navigator.userAgent.indexOf('Opera') >= 0;
+// Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+// At least Safari 3+: "[object HTMLElementConstructor]"
+var isChrome = !!window.chrome;                          // Chrome 1+
+var isIE = /*@cc_on!@*/false;                            // At least IE6
+
+var form1;
+var form2;
+var contact;
+
+var max_td = 0;
+var html = "";
+
+var data = {$form_data|json_encode};
+
+
+/* Init ShadowBox */
+Shadowbox.init({
+	skipSetup : true,
+	overlayOpacity : '0.9',
+	onOpen : function () {
+		$('#sb-info').after($('#sb-wrapper-inner'));
+		$('#sb-wrapper-inner').after($('#sb-title'));
+	},
+	onClose : function () {
+		html = ""
+	},
+	modal : true
+});
+
+
+$('document').ready(function () {
+
+	/* Init Validator */
+	//$("h1").css("margin-bottom","0px");
+//
+ /* Validate the form, email field is required */
+$("#proposal_form").validate({
+
+	
+	rules : {
+
+		email : {
+			required : false,
+			email:true
+		}
+
+	}
+});
+	
+
+	$('input[type="radio"]').prop('checked', false);
+	$('#event_type[value="'+data.default_type+'"]').prop('checked', true);
+	$('#salutation option[value=""]').attr('selected', 'selected');
+	
+	$('#proposal_form input[type="text"]').each(function() {
+			$(this).val('');
+	});
+	
+	$('#proposal_form textarea').each(function() {
+			$(this).val('');
+	});
+	
+
+	
+	
+	/* Adjust all td conting title */
+	$('.title').each(function () {
+		$(this).css("width", "170px");
+	});
+	
+	
+	/* Detach all table as alternative*/
+
+	
+	//form1 = $("#form1").detach();
+	//form2 = $("#form2").detach();
+	
+	//$("#div_daytype_1").hide();
+	//$("#div_daytype_2").hide();
+	
+	/* Remove all origan tables */
+	//$("#form1").remove();
+	//$("#form2").remove();
+
+	
+	
+	/* Add back the daytype1 table as default */
+	eventType(data.default_key);
+	
+
+});
+
+	if(isFirefox){
+		$('#dinnerdiv').css("margin-left","26px");
+		$('#otherdiv').css("margin-left","27px");
+		$('.calender-input').css('padding-right','5px');
+	}
+	else
+	
+	if(isIE){
+		$('#dinnerdiv').css("margin-left","26px");
+		$('#otherdiv').css("margin-left","25px");
+		$('.calender-input').css('padding-right','0px');
+	}
+
+	//Disable days
+		var today = new Date();
+        today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        var date_selected = new Date();
+        var action = 'init';
+        var start_date = null;
+        var end_date = null;
+        var calSets = [$('#expected_day_1'), $('#expected_day_2'), $('#expected_day_3')];
+        var selectedDates = [];
+
+        var dateStatus = function(date) {
+            if(action == 'init' || this.params.inputField == document.getElementById("expected_start"))
+            {
+                if( date < today ) {
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                if( date < start_date ){
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
+
+        var dateStatus2 = function(date) {
+            var m = (date.getMonth() + 1);
+            var d = date.getFullYear() + '-' + (m < 10 ? '0' : '') + (date.getMonth() + 1) + '-' + (date.getDate() < 10 ? '0' : '') + date.getDate();
+            return date < today || $.inArray(d, selectedDates)  > -1;
+        }
+
+        //Disable day interval based on selection of users
+        function dateSelect(calendar, date){
+            var input_field = calendar.params.inputField;
+            var start_field = document.getElementById("expected_start");
+
+            if (calendar.dateClicked) {
+
+                if ( start_field == input_field ){
+                    action = "disable_end" ;
+                    input_field.value = date;
+                    var date_array = date.split(/\D/);
+                    var date_selected_1 = new Date(date_array[0], (date_array[1]-1),date_array[2]);
+                    date_selected = new Date(date_selected_1);
+                    date_selected.setDate(date_selected.getDate());
+                    start_date = date_selected;
+                    calendar.setDisabledHandler(dateStatus);
+                    calendar.callCloseHandler();
+
+                    if(end_date != null && end_date < date_selected) {
+                        $("#expected_end").val('');
+                        end_date = null;
+                    }
+                } else{
+                    action = "disable_start" ;
+                    input_field.value = date;
+                    date_array = date.split(/\D/);
+                    date_selected_1 = new Date(date_array[0], (date_array[1]-1),date_array[2]);
+
+                    date_selected = new Date(date_selected_1);
+                    date_selected.setDate(date_selected.getDate());
+                    end_date = date_selected;
+                    calendar.setDisabledHandler(dateStatus);
+                    calendar.callCloseHandler();
+
+                    if(start_date != null && start_date > date_selected) {
+                        $("#expected_start").val('');
+                        start_date = null;
+                    }
+                }
+
+            }
+
+        }
+
+        function dateSelect2(calendar, date) {
+            if (calendar.dateClicked) {
+                var input_field = calendar.params.inputField;
+                var a = date.split(/\D/);
+                a = new Date(a[0], (a[1]-1),a[2]);
+
+                date_selected = new Date(a);
+                date_selected.setDate(date_selected.getDate());
+
+                $(input_field).data('dateSelected', date);
+
+                selectedDates = [];
+
+                for(var i = 0; i < calSets.length; i++) {
+                    var sd = calSets[i].data('dateSelected');
+                    if( sd != null ) {
+                        selectedDates.push(sd);
+                    }
+                }
+
+                input_field.value = date;
+                calendar.callCloseHandler();
+            }
+        }
+		
+
+/** Setup Calendar **/
+Calendar.setup({
+	inputField : 'expected_day_1',
+	ifFormat : '%Y-%m-%d',
+	button : 'calender1',
+	dateStatusFunc : dateStatus2,
+    onSelect: dateSelect2
+});
+Calendar.setup({
+	inputField : 'expected_day_2',
+	ifFormat : '%Y-%m-%d',
+	button : 'calender2',
+	dateStatusFunc : dateStatus2,
+    onSelect: dateSelect2
+});
+Calendar.setup({
+	inputField : 'expected_day_3',
+	ifFormat : '%Y-%m-%d',
+	button : 'calender3',
+	dateStatusFunc : dateStatus2,
+    onSelect: dateSelect2
+});
+Calendar.setup({
+	inputField : 'expected_start',
+	ifFormat : '%Y-%m-%d',
+	button : 'calender_start',
+	dateStatusFunc : dateStatus,
+    onSelect: dateSelect
+
+});
+Calendar.setup({
+	inputField : 'expected_end',
+	ifFormat : '%Y-%m-%d',
+	button : 'calender_end',
+	dateStatusFunc : dateStatus,
+    onSelect: dateSelect
+
+});
+
+
+function validation() {
+
+	var text = "#4c4c4b";
+	var flat = 0;
+	var messageflat = 0;
+	var phone_flat = 0;
+	var total_count = 0;
+
+	
+
+		
+	if($("#proposal_form input:radio[name=event_type]:checked").val() == "wedding")
+	{
+	
+	$("#table_expected_day_1 input[name*='expected']").each(function () {
+		if ($(this).val() != "" && isDate($(this).val() ))
+			flat++;
+		else if( $(this).val() != "" && !isDate($(this).val()))
+			html += "{$proposal_dict.LABEL_error_statement1|escape:'javascript'}"+ "<br>";
+	});
+	
+	if (flat != 0) {
+		$("#expected_wedding_day").each(function () {
+
+			$(this).css("color", text);
+		});
+
+	} else if (flat == 0) {
+
+		total_count++;
+		$("#expected_wedding_day").each(function () {
+
+			if ($(this).find("#warning").length > 0) { ;
+			} else {
+				//$(this).append("<span id=\"warning\"><br>Please select at least one date</span>");
+				$(this).css("color", "red");
+				//html += "- " + $(this).text() + "<br>";
+				html += "{$proposal_dict.LABEL_error_statement2|escape:'javascript'}"+ "<br>";
+			}
+		});
+	}
+	
+	}
+	else
+	{
+	
+	$("#table_expected_day_2 input[name*='expected']").each(function () {
+		if ($(this).val() != "" && isDate($(this).val() ))
+			flat++;
+		else if( $(this).val() != "" && !isDate($(this).val()))
+			html += "{$proposal_dict.LABEL_error_statement3|escape:'javascript'}"+ "<br>";
+	});
+
+	if (flat == 2) {
+		$("#expected_event_day").each(function () {
+
+			$(this).css("color", text);
+		});
+
+	} else if (flat != 2) {
+
+		total_count++;
+		$("#expected_event_day").each(function () {
+
+			if ($(this).find("#warning").length > 0) {
+			;
+			} else {
+				//$(this).append("<span id=\"warning\"><br>Please select at least one date</span>");
+				$(this).css("color", "red");
+				html += "- " + $(this).text() + "<br>";
+				//html += "- Please select at least one expected wedding day"+ "<br>";
+			}
+		});
+	}
+	
+	
+	}
+	
+	
+	if ($("#number_of_guest").val() == "" ) {
+
+		$("#label_guest").css("color", "red");
+		html += "- " + $("#label_guest").text() + "<br>";
+		total_count++;
+	
+	} 
+	else if ($("#number_of_guest").val() != "" && !isInt($("#number_of_guest").val())) {
+
+		$("#label_guest").css("color", "red");
+		html += "- Please enter valid number of guest<br>";
+		total_count++;
+	
+	} 
+	
+	else if ($("#number_of_guest").val() != "" && isInt($("#number_of_guest").val())) {
+	
+		$("#label_guest").css("color", text);
+	}
+
+	if ($("#salutation").val() == "" || $("#firstname").val() == "" || $("#lastname").val() == "") {
+
+		$("#contact_name").css("color", "red");
+		html += "- " + $("#contact_name").text() + "<br>";
+		total_count++;
+
+	} else {
+		$("#contact_name").css("color", text);
+	}
+	
+//$("#submitBtn").click(function(){
+//
+//$("#email").each(function(){
+//	$(this).rules("add", {
+//		required: true,
+//		messages: {
+//			required: "Specify the reference name"
+//		}
+//		})
+//	});			
+//});
+	
+	if ($("#email").val() == "") {
+
+		$("#contact_email").css("color", "red");
+		html += "- " + $("#contact_email").text() + "<br>";
+		total_count++;
+	} else {
+
+		$("#contact_email").css("color", text);
+	}
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	$("#proposal_form input[name*='phone']").each(function () {
+		if ($(this).val() != "" && isInt($(this).val()))
+			phone_flat++;
+		else if ($(this).val() != "" && !isInt($(this).val()))
+			html += "{$proposal_dict.LABEL_error_statement4|escape:'javascript'}" + "<br>";
+	});
+
+	if (phone_flat != 0) {
+
+		$("#contact_number").each(function () {
+			$(this).css("color", text);
+		});
+
+		$("span[id*='message']").each(function () {
+			$(this).css("color", text);
+		});
+		$("span[id*='star']").each(function () {
+			$(this).css("color", "#af8f6f");
+		});
+
+		$("#phone_message").each(function () {
+			$(this).text("");
+		});
+
+		
+	} else if (phone_flat == 0) {
+
+		total_count++;
+
+		$("#contact_number").each(function () {
+
+			$(this).css("color", "red");
+			html += "{$proposal_dict.LABEL_error_statement5|escape:'javascript'}" + "<br>";
+
+		});
+
+	}
+
+	if ($("#preferredtime").val() == "") {
+
+		$("#preferred_time").css("color", "red");
+		html += "- " + $("#preferred_time").text() + "<br>";
+		total_count++;
+	} else {
+		$("#preferred_time").css("color", text);
+	}
+
+	if ($("#proposal_form input[type='radio'][name='cuisine_type']:checked").val() == null) {
+
+		$("#cuisine").css("color", "red");
+		html += "- " + $("#cuisine").text() + "<br>";
+		total_count++;
+	} else {
+		$("#cuisine").css("color", text);
+	}
+
+	if ($("#proposal_form input[type='radio'][name='meal_period']:checked").val() == null) {
+
+		$("#label_meal_period").css("color", "red");
+		html += "- " + $("#label_meal_period").text() + "<br>";
+		total_count++;
+	} else {
+		$("#label_meal_period").css("color", text);
+	}
+
+	if (total_count != 0) {
+
+		html = html.replace(/\*:/g, " ");
+		//html = html.substr(0, html.length - 4);
+
+		Shadowbox.open({
+			content : "<div style='font-size:14px'>{$proposal_dict.LABEL_error_statement_head|escape:'javascript'}</div><br>" + "<div>" + html + "</div>",
+			player : "html",
+
+			height : 220,
+			width : 350
+		});
+
+		$("#proposal_form span[id*='message']").each(function () {
+			$(this).css("color", "red");
+		});
+		
+	} else {
+
+		$("#proposal_form span[id*='message']").each(function () {
+			$(this).css("color", text);
+		});
+		$("#proposal_form span[id*='star']").each(function () {
+			$(this).css("color", "#af8f6f");
+		});
+	
+	//alert(total_count);
+        $('#proposal_form input[name="submitBtn"]').attr('disabled', 'disabled');
+		$("#proposal_form").submit();
+	}
+
+}
+
+function eventType(action) {
+
+
+	if (action == 1) {
+			
+		
+		$("#table_expected_day_1").show();
+		$("#table_expected_day_2").hide();
+		$("#table_company_name").hide();
+		$("#table_previous_purchase").hide();
+		
+		
+	} else {
+		
+
+		$("#table_expected_day_1").hide();
+		$("#table_expected_day_2").show();
+		$("#table_company_name").show();
+		$("#table_previous_purchase").show();
+	}
+}
+function isDate(text){
+
+var comp = text.split('-');
+var y = parseInt(comp[0], 10);
+var m = parseInt(comp[1], 10);
+var d = parseInt(comp[2], 10);
+var date = new Date(y,m-1,d);
+if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
+    return true;
+} else {
+    return false;
+}
+
+
+}
+
+function isInt(str){
+	 if(!isNaN(str)){
+		if(str > 0)
+			return true;
+		else
+			return false;
+	}
+	else
+	 return false;
+    }
+
+</script >

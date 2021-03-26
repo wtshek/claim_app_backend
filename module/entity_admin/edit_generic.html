@@ -1,0 +1,813 @@
+{if in_array($response.module, array('basic_product_admin', 'other_product_admin'))}
+{assign 'module_folder' 'product'}
+{else}
+{assign 'module_folder' $response.module|rtrim:'_admin'}
+{/if}
+
+{if count($entity_def.panels) > 1}
+{assign use_tabs TRUE}
+{/if}
+<form id="edit_form" method="POST" accept-charset="UTF-8"
+  action="?entity={$smarty.get.entity|escape:'url'}&amp;op=edit&amp;referer_url={$smarty.get.referer_url|escape:'url'}&amp;opener_field={$smarty.get.opener_field|escape:'url'}&amp;id={$data.base_table.id}">
+  <div class="box box-color box-bordered">
+    <div class="box-title">
+      <h3>
+        <i class="icon-edit"></i>
+        {$response.titles|@end|escape}
+      </h3>
+    </div>
+
+    <div class="box-content {if $use_tabs}nopadding{/if}">
+      {if $use_tabs}
+      <nav>
+        <div class="nav nav-tabs" id="edit-tab" role="tablist">
+          {foreach $entity_def.panels as $panel => $fields}
+          <a class="nav-item nav-link {if $fields@first}active{/if}" id="edit-{$panel|escape}-tab"
+            data-toggle="tab" href="#edit-{$panel|escape}" role="tab"
+            aria-controls="edit-{$panel|escape}" aria-selected="{if $panel@first}true{else}false{/if}"
+            data-tab-type="{$panel|escape}">
+            <i class="{$dict.SET_panel_icons[$panel]|escape}"></i>
+            {$dict.SET_panels[$panel]|escape}
+          </a>
+          {/foreach}
+        </div>
+      </nav>
+
+      <div class="tab-content tab-content-inline tab-content-bottom" id="edit-tabContent">
+      {/if}
+
+        {foreach $entity_def.panels as $panel => $fields}
+        {capture name=panel_content}
+        <div class="row-fluid">
+          <div class="col-12">
+            {assign "change_locale_shown" 0}
+            {foreach $fields as $field}
+            {assign var=field_parts value="."|explode:$field}
+            {assign field_title $dict["LABEL_{$field_parts.1}"]}
+            {assign field_id "edit_{$field_parts.1}"}
+
+            {* ID *}
+            {if in_array($panel, array('', 'basic', 'global')) && $field@first}
+            {field_text ratio="3:9" title=$dict.LABEL_record_id id=edit_id name="base_table[id]" value=$data.base_table.id view_only=TRUE}
+            {/if}
+
+            {* Change locale field *}
+            {if !$change_locale_shown && $field_parts.0 == 'locale_table'}
+            {field_select ratio="3:9" title=$dict.ACTION_change_locale id="edit_change_locale_{$panel}" name="change_locale" options=$dict.SET_accessible_locales selected=$data.preferred_locale}
+            {assign "change_locale_shown" 1}
+            {/if}
+
+            {*****************************************************************
+             * Base table
+             ****************************************************************}
+            {if $field_parts.0 == 'base_table'}
+            {assign field_def $entity_def.base_table.fields[$field_parts.1]}
+            {assign field_name "base_table[{$field_parts.1}]"}
+            {assign field_value $data.base_table[$field_parts.1]}
+
+            {* Text field *}
+            {if $field_def.type == 'text' && $field_def.maxlength < 256}
+            {field_text ratio="3:9" title=$field_title id=$field_id name=$field_name value=$field_value maxlength=$field_def.maxlength error=$errors[$field_name]}
+
+            {* Textarea field *}
+            {elseif in_array($field_def.type, array('text', 'html'))}
+            {field_textarea ratio="3:9" title=$field_title id=$field_id name=$field_name value=$field_value maxlength=$field_def.maxlength error=$errors[$field_name] class="{if $field_def.type == 'html'}tinymce{/if}" style="height: {if $field_def.maxlength > POW(2, 16)}360{else}240{/if}px"}
+
+            {* Number field *}
+            {elseif $field_def.type == 'number'}
+            {field_text ratio="3:9" title=$field_title id=$field_id name=$field_name value=$field_value type="number" min=$field_def.min max=$field_def.max step=$field_def.step error=$errors[$field_name]}
+
+            {* Radio field *}
+            {elseif $field_def.type == 'radio'}
+            {field_radio ratio="3:9" title=$field_title id=$field_id name=$field_name options=$field_def.options selected=$field_value error=$errors[$field_name]}
+
+            {* Select field *}
+            {elseif $field_def.type == 'select'}
+            {field_select ratio="3:9" title=$field_title id=$field_id name=$field_name options=$field_def.options selected=$field_value error=$errors[$field_name] has_empty=!$field_def.required}
+
+            {* Date field *}
+            {elseif $field_def.type == 'date'}
+            {field_calendar ratio="3:9" title=$field_title id=$field_id name=$field_name format="%Y-%m-%d" showsTime=FALSE value=$field_value error=$errors[$field_name]}
+
+            {* Datetime field *}
+            {elseif $field_def.type == 'datetime'}
+            {field_calendar ratio="3:9" title=$field_title id=$field_id name=$field_name format="%Y-%m-%d %h:%m:%s" showsTime=TRUE value=$field_value error=$errors[$field_name]}
+
+            {* File field *}
+            {elseif $field_def.type == 'file'}
+            <dl class="input-field text-field row edit fileupload {if $errors[$field_name]}hasError{/if}">
+              <dt class="col-12 col-lg-3"><label for="{$field_id|escape}">{$field_title|escape}</label></dt>
+              <dd class="col-12 col-lg-9">
+                {* Error messages *}
+                {foreach $errors[$field_name] as $error}
+                <div class="error"><span>{$error|escape}</span></div>
+                {/foreach}
+
+                {* File input *}
+                <div class="input-group">
+                  <input type="text" id="{$field_id|escape}" name="{$field_name|escape}"
+                    value="{$field_value|escape}" maxlength="{$field_def.maxlength}"
+                    class="form-control">
+                  <div class="input-group-append">
+                    <button type="button" class="btn btn-outline-secondary edit_file_browse">
+                      <i class="icon-folder-open-alt"></i>
+                      {$dict.ACTION_browse|escape}
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary edit_file_open">
+                      <i class="icon-external-link"></i>
+                      {$dict.ACTION_open|escape}
+                    </button>
+                  </div>
+                </div>
+
+                {* Thumbnail *}
+                {if strpos($field_id, 'image') !== FALSE}
+                <div class="thumbnail input-field">
+                  <img src="{strip}{if $conf.aws_enabled && strpos($field_value, $module_folder) === 0}
+                    https://{$conf.s3_domain|escape}/{$field_value|escape}
+                    {elseif $field_value === ''}
+                    https://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text={$dict.LABEL_no_image|escape:'url'}
+                    {elseif strpos($field_value, ':') === FALSE}
+                    {$sets.paths.app_from_doc|escape}/file/{$field_value|escape}
+                    {else}
+                    {$field_value|escape}
+                    {/if}{/strip}" width="200" alt="">
+                </div>
+
+                {if $dict.SET_image_descriptions[$smarty.get.entity][$field_parts.1]}
+                <div class="help-block">{$dict.SET_image_descriptions[$smarty.get.entity][$field_parts.1]|escape}</div>
+                {/if}
+
+                {* Change image *}
+                <script>
+                (function() {
+                    var image_interval = window.setInterval( function() {
+                        var image_input = document.getElementById( "{$field_id|escape:'javascript'}" );
+                        if ( image_input && $(image_input).is(":visible") )
+                        {
+                            var image_url = image_input.value;
+                            if ( {$conf.aws_enabled|intval} && image_input.value.indexOf("{$module_folder|escape:'javascript'}/") == 0 )
+                            {
+                                image_url = "https://{$conf.s3_domain|escape:'javascript'}/" + image_input.value;
+                            }
+                            else if ( image_input.value == "" )
+                            {
+                                image_url = "https://www.placehold.it/200x150/EFEFEF/AAAAAA&text={$dict.LABEL_no_image|escape:'url'|escape:'javascript'}";
+                            }
+                            else if ( image_input.value.indexOf(":") < 0 )
+                            {
+                                image_url = "{$sets.paths.app_from_doc|escape}/file/" + image_input.value;
+                            }
+                            var image_img = $( image_input ).closest( "dd" ).find( "img" )[0];
+                            if ( image_img.src != image_url )
+                            {
+                                image_img.src = image_url;
+                            }
+                        }
+                        else
+                        {
+                            window.clearInterval( image_interval );
+                        }
+                    }, 1000 );
+                } )();
+                </script>
+                {/if}
+              </dd>
+            </dl>
+
+            {* Pair field *}
+            {elseif $field_def.type == 'pair'}
+            <dl class="input-field text-field row edit {if $errors[$field_name]}hasError{/if}">
+              <dt class="col-12 col-lg-3"><label for="{$field_id|escape}">{$field_title|escape}</label></dt>
+              <dd class="col-12 col-lg-9">
+                {* Error messages *}
+                {foreach $errors[$field_name] as $error}
+                <div class="error"><span>{$error|escape}</span></div>
+                {/foreach}
+
+                {* Pair input *}
+                <div class="input-group">
+                  <input type="hidden" name="{$field_name|escape}" value="">
+
+                  {foreach $field_def.fields as $pair_field_def}
+                  <div class="form-control border-0 p-0">
+                    <select id="edit_{$pair_field_def.field|escape}" name="base_table[{$pair_field_def.field|escape}]" class="form-control m-0">
+                      <option value="">&nbsp;</option>
+                      {html_options options=$pair_field_def.options selected=$data.base_table[$pair_field_def.field]}
+                    </select>
+                  </div>
+
+                  {if $pair_field_def@first}
+                  <div class="input-group-prepend input-group-append">
+                    <div class="input-group-text bg-white border-white">{$field_def.separator|escape}</div>
+                  </div>
+                  {/if}
+                  {/foreach}
+                </div>
+              </dd>
+            </dl>
+            {/if}
+
+            {*****************************************************************
+             * Locale table
+             ****************************************************************}
+            {elseif $field_parts.0 == 'locale_table'}
+            {assign field_def $entity_def.locale_table.fields[$field_parts.1]}
+            {assign field_name "locale_table[{$field_parts.1}]"}
+
+            {* Text field *}
+            {if $field_def.type == 'text' && $field_def.maxlength < 256}
+            <dl class="input-field text-field row edit {if $errors[$field_name]}hasError{/if}">
+              <dt class="col-12 col-lg-3"><label for="{$field_id|escape}">{$field_title|escape}</label></dt>
+              <dd class="col-12 col-lg-9">
+                {* Error messages *}
+                {foreach $errors[$field_name] as $error}
+                <div class="error"><span>{$error|escape}</span></div>
+                {/foreach}
+                <div><input type="hidden" id="{$field_id|escape}" name="locale_table[{$field_parts.1|escape}]" value=""></div>
+
+                {* Inputs *}
+                {foreach $dict.SET_accessible_locales as $locale => $locale_name}
+                <div class="edit_change_locale edit_change_locale_{$locale|replace:'/':'_'} {if $locale != $data.preferred_locale}d-none{/if}">
+                  <input type="text" name="locale_table[{$locale}][{$field_parts.1|escape}]"
+                    value="{$data.locale_table[$locale][$field_parts.1]|escape}" maxlength="{$field_def.maxlength}"
+                    class="form-control">
+                </div>
+                {/foreach}
+              </dd>
+            </dl>
+
+            {* Textarea field *}
+            {elseif in_array($field_def.type, array('text', 'html'))}
+            <dl class="input-field text-field row edit {if $errors[$field_name]}hasError{/if}">
+              <dt class="col-12 col-lg-3"><label for="{$field_id|escape}">{$field_title|escape}</label></dt>
+              <dd class="col-12 col-lg-9">
+                {* Error messages *}
+                {foreach $errors[$field_name] as $error}
+                <div class="error"><span>{$error|escape}</span></div>
+                {/foreach}
+                <div><input type="hidden" id="{$field_id|escape}" name="locale_table[{$field_parts.1|escape}]" value=""></div>
+
+                {* Inputs *}
+                {foreach $dict.SET_accessible_locales as $locale => $locale_name}
+                <div class="edit_change_locale edit_change_locale_{$locale|replace:'/':'_'} {if $locale != $data.preferred_locale}d-none{/if}">
+                  <textarea name="locale_table[{$locale}][{$field_parts.1|escape}]" maxlength="{$field_def.maxlength}"
+                    class="form-control {if $field_def.type == 'html'}tinymce{/if}" style="height: {if $field_def.maxlength > POW(2, 16)}360{else}240{/if}px">{$data.locale_table[$locale][$field_parts.1]|escape}</textarea>
+                </div>
+                {/foreach}
+
+                {if $field_def.help}
+                <div class="help-block">{$field_def.help|escape}</div>
+                {/if}
+              </dd>
+            </dl>
+
+            {* File field *}
+            {elseif $field_def.type == 'file'}
+            <dl class="input-field text-field row edit fileupload {if $errors[$field_name]}hasError{/if}">
+              <dt class="col-12 col-lg-3"><label for="{$field_id|escape}">{$field_title|escape}</label></dt>
+              <dd class="col-12 col-lg-9">
+                {* Error messages *}
+                {foreach $errors[$field_name] as $error}
+                <div class="error"><span>{$error|escape}</span></div>
+                {/foreach}
+                <div><input type="hidden" id="{$field_id|escape}" name="locale_table[{$field_parts.1|escape}]" value=""></div>
+
+                {* File input *}
+                {foreach $dict.SET_accessible_locales as $locale => $locale_name}
+                <div class="edit_change_locale edit_change_locale_{$locale|replace:'/':'_'} {if $locale != $data.preferred_locale}d-none{/if}">
+                  <div class="input-group">
+                    <input type="text" id="{$field_id|escape}_{$locale|replace:'/':'_'}" name="locale_table[{$locale}][{$field_parts.1|escape}]"
+                      value="{$data.locale_table[$locale][$field_parts.1]|escape}" maxlength="{$field_def.maxlength}"
+                      class="form-control">
+                    <div class="input-group-append">
+                      <button type="button" class="btn btn-outline-secondary edit_file_browse">
+                        <i class="icon-folder-open-alt"></i>
+                        {$dict.ACTION_browse|escape}
+                      </button>
+                      <button type="button" class="btn btn-outline-secondary edit_file_open">
+                        <i class="icon-external-link"></i>
+                        {$dict.ACTION_open|escape}
+                      </button>
+                    </div>
+                  </div>
+
+                  {* Thumbnail *}
+                  {if strpos($field_id, 'image') !== FALSE}
+                  <img src="{strip}{if $conf.aws_enabled && strpos($data.locale_table[$locale][$field_parts.1], $module_folder) === 0}
+                    https://{$conf.s3_domain|escape}/{$data.locale_table[$locale][$field_parts.1]|escape}
+                    {elseif $data.locale_table[$locale][$field_parts.1] === ''}
+                    https://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text={$dict.LABEL_no_image|escape:'url'}
+                    {elseif strpos($data.locale_table[$locale][$field_parts.1], ':') === FALSE}
+                    {$sets.paths.app_from_doc|escape}/file/{$data.locale_table[$locale][$field_parts.1]|escape}
+                    {else}
+                    {$field_value|escape}
+                    {/if}{/strip}" width="200" alt="">
+                  </div>
+
+                  {if $dict.SET_image_descriptions[$smarty.get.entity][$field_parts.1]}
+                  <div class="help-block">{$dict.SET_image_descriptions[$smarty.get.entity][$field_parts.1]|escape}</div>
+                  {/if}
+
+                  {* Change image *}
+                  <script>
+                  (function() {
+                      var image_interval = window.setInterval( function() {
+                          var image_input = document.getElementById( "{$field_id|escape:'javascript'}_{$locale|replace:'/':'_'}" );
+                          if ( image_input && $(image_input).is(":visible") )
+                          {
+                              var image_url = image_input.value;
+                              if ( {$conf.aws_enabled|intval} && image_input.value.indexOf("{$module_folder|escape:'javascript'}/") == 0 )
+                              {
+                                  image_url = "https://{$conf.s3_domain|escape:'javascript'}/" + image_input.value;
+                              }
+                              else if ( image_input.value == "" )
+                              {
+                                  image_url = "https://www.placehold.it/200x150/EFEFEF/AAAAAA&text={$dict.LABEL_no_image|escape:'url'|escape:'javascript'}";
+                              }
+                              else if ( image_input.value.indexOf(":") < 0 )
+                              {
+                                  image_url = "{$sets.paths.app_from_doc|escape}/file/" + image_input.value;
+                              }
+                              var image_img = $( image_input ).closest( "dd" ).find( "img" )[0];
+                              if ( image_img.src != image_url )
+                              {
+                                  image_img.src = image_url;
+                              }
+                          }
+                          else
+                          {
+                              window.clearInterval( image_interval );
+                          }
+                      }, 1000 );
+                  } )();
+                  </script>
+                  {/if}
+                </div>
+                {/foreach}
+              </dd>
+            </dl>
+            {/if}
+
+            {*****************************************************************
+             * Multivalued table
+             ****************************************************************}
+            {else}
+            {assign field_def $entity_def.multivalued_tables[$field_parts.1]}
+            {assign field_name "multivalued_tables[{$field_parts.1}][]"}
+            {assign field_values $data.multivalued_tables[$field_parts.1]}
+
+            {* Select field *}
+            {if $field_def.type == 'select'}
+            {field_select ratio="3:9" title=$field_title id=$field_id name=$field_name options=$field_def.options selected=$field_values multiple=TRUE error=$errors[$field_name] class="chosen-select-tab"}
+
+            {* Tabular field *}
+            {elseif $field_def.type == 'tabular'}
+            <dl class="input-field text-field row edit {if $errors[$field_name]}hasError{/if}"">
+              <dt class="col-12 col-lg-3">{$field_title|escape}</dt>
+              <dd class="col-12 col-lg-9">
+                {* Error messages *}
+                {foreach $errors[$field_name] as $error}
+                <div class="error"><span>{$error|escape}</span></div>
+                {/foreach}
+                <div><input type="hidden" id="{$field_id|escape}" name="{$field_name|escape}" value=""></div>
+
+                <ol id="{$field_id|escape}_list" class="pl-4">
+                  {foreach $field_values as $i => $tabular_values}
+                  <li style="position: relative; clear: both;">
+                    <div style="float: left; width: 100%">
+                      <div style="padding: 0 60px 0 1em">
+                        <table>
+                          {foreach $field_def.fields as $tabular_field => $tabular_field_def}
+                          <tr>
+                            <th>{$dict["LABEL_{$tabular_field}"]|escape}</th>
+                            <td>
+                              {* Text subfield *}
+                              {if $tabular_field_def.type == 'text'}
+                              <input type="text" name="multivalued_tables[{$field_parts.1|escape}][{$tabular_field|escape}][]"
+                                maxlength="{$tabular_field_def.maxlength}" class="form-control"
+                                value="{$tabular_values[$tabular_field]|escape}">
+
+                              {* Number subfield *}
+                              {elseif $tabular_field_def.type == 'number'}
+                              <input type="number" name="multivalued_tables[{$field_parts.1|escape}][{$tabular_field|escape}][]"
+                                min="{$tabular_field_def.min}" max="{$tabular_field_def.max}" class="form-control"
+                                value="{$tabular_values[$tabular_field]|escape}">
+
+                              {* Select subfield *}
+                              {elseif $tabular_field_def.type == 'select'}
+                              <select name="multivalued_tables[{$field_parts.1|escape}][{$tabular_field|escape}][]" class="form-control">
+                                <option value="">&nbsp;</option>
+                                {html_options options=$tabular_field_def.options selected=$tabular_values[$tabular_field]}
+                              </select>
+
+                              {* File subfield *}
+                              {elseif $tabular_field_def.type == 'file'}
+                              <div class="input-group">
+                                <input type="text" id="{$field_parts.1|escape}_{$tabular_field|escape}_{$i}"
+                                  name="multivalued_tables[{$field_parts.1|escape}][{$tabular_field|escape}][]"
+                                  maxlength="{$tabular_field_def.maxlength}" class="form-control"
+                                  value="{$tabular_values[$tabular_field]|escape}">
+                                <div class="input-group-append">
+                                  <button type="button" class="btn btn-outline-secondary edit_file_browse">
+                                    <i class="icon-folder-open-alt"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary edit_file_open">
+                                    <i class="icon-external-link"></i>
+                                  </button>
+                                </div>
+                              </div>
+                              {/if}
+                            </td>
+                          </tr>
+                          {/foreach}
+                        </table>
+                      </div>
+                    </div>
+
+                    <div style="position: absolute; right: 0; width: 60px; text-align: right;">
+                      <input type="hidden" name="multivalued_tables[{$field_parts.1|escape}][{$field_def.field|escape}][]" value="">
+                    </div>
+                  </li>
+                  {foreachelse}
+                  <li style="position: relative; clear: both;">
+                    <div style="float: left; width: 100%">
+                      <div style="padding: 0 60px 0 1em">
+                        <table>
+                          {foreach $field_def.fields as $tabular_field => $tabular_field_def}
+                          <tr>
+                            <th>{$dict["LABEL_{$tabular_field}"]|escape}</th>
+                            <td>
+                              {* Text subfield *}
+                              {if $tabular_field_def.type == 'text'}
+                              <input type="text" name="multivalued_tables[{$field_parts.1|escape}][{$tabular_field|escape}][]"
+                                maxlength="{$tabular_field_def.maxlength}" class="form-control">
+
+                              {* Number subfield *}
+                              {elseif $tabular_field_def.type == 'number'}
+                              <input type="number" name="multivalued_tables[{$field_parts.1|escape}][{$tabular_field|escape}][]"
+                                min="{$tabular_field_def.min}" max="{$tabular_field_def.max}" class="form-control">
+
+                              {* Select subfield *}
+                              {elseif $tabular_field_def.type == 'select'}
+                              <select name="multivalued_tables[{$field_parts.1|escape}][{$tabular_field|escape}][]" class="form-control">
+                                <option value="">&nbsp;</option>
+                                {html_options options=$tabular_field_def.options}
+                              </select>
+
+                              {* File subfield *}
+                              {elseif $tabular_field_def.type == 'file'}
+                              <div class="input-group">
+                                <input type="text" id="{$field_parts.1|escape}_{$tabular_field|escape}_1"
+                                  name="multivalued_tables[{$field_parts.1|escape}][{$tabular_field|escape}][]"
+                                  maxlength="{$tabular_field_def.maxlength}" class="form-control">
+                                <div class="input-group-append">
+                                  <button type="button" class="btn btn-outline-secondary edit_file_browse">
+                                    <i class="icon-folder-open-alt"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-outline-secondary edit_file_open">
+                                    <i class="icon-external-link"></i>
+                                  </button>
+                                </div>
+                              </div>
+                              {/if}
+                            </td>
+                          </tr>
+                          {/foreach}
+                        </table>
+                      </div>
+                    </div>
+
+                    <div style="position: absolute; right: 0; width: 60px; text-align: right;">
+                      <input type="hidden" name="multivalued_tables[{$field_parts.1|escape}][{$field_def.field|escape}][]" value="">
+                    </div>
+                  </li>
+                  {/foreach}
+                </ol>
+
+                {if $field_def.help}
+                <div class="help-block">{$field_def.help|escape}</div>
+                {/if}
+
+                <script>
+                (function() {
+                    {* Sortable dynamic list *}
+                    $( "#{$field_id|escape:'javascript'}_list" ).sortable().css( "cursor", "move" ).dynamicList( {
+                        "list_tag": "ol",
+                        "item_tag": "li"
+                    } );
+                } )();
+                </script>
+              </dd>
+            </dl>
+
+            {* Webpage field *}
+            {elseif $field_def.type == 'webpage'}
+            <dl class="input-field text-field row edit {if $errors[$field_name]}hasError{/if}"">
+              <dt class="col-12 col-lg-3">{$field_title|escape}</dt>
+              <dd class="col-12 col-lg-9">
+                {* Error messages *}
+                {foreach $errors[$field_name] as $error}
+                <div class="error"><span>{$error|escape}</span></div>
+                {/foreach}
+                <div><input type="hidden" id="{$field_id|escape}" name="{$field_name|escape}"></div>
+
+                <div id="{$field_id|escape}_tree"></div>
+
+                <script>
+                (function() {
+                    {* Webpage Fancytree *}
+                    var id = "#{$field_id|escape:'javascript'}_tree";
+                    var tree = $( id ).fancytree( {
+                        checkbox: true,
+                        source: {$data.webpage_nodes|json_encode},
+                        click: function(event, data) {
+                            if ( data.targetType == "icon" || data.targetType == "title" )
+                            {
+                                data.node.setSelected( !data.node.isSelected() );
+                            }
+                        },
+                        select: function(event, data) {
+                            tree.find( "input[type=hidden]" ).remove();
+                            var nodes = fancytree.findAll( function(node) {
+                                return node.selected;
+                            } );
+                            $.each( nodes, function(i, node) {
+                                tree.append( $("<input type='hidden' name='{$field_name|escape:'javascript'}'>").val(node.key) );
+                            } );
+                        },
+                    } );
+                    var fancytree = $.ui.fancytree.getTree( id );
+
+                    {if count($field_values) > 0}
+                    var nodes = fancytree.findAll( function(node) {
+                        return {$field_values|json_encode}.indexOf( node.key ) >= 0;
+                    } );
+                    $.each( nodes, function(i, node) {
+                        node.setSelected( true );
+                        node.setActive();
+                    } );
+                    {/if}
+                } )();
+                </script>
+              </dd>
+            </dl>
+            {/if}
+            {/if}
+
+            {*****************************************************************
+             * Status field
+             ****************************************************************}
+
+            {if $fields@first && $field@last && $entity_def.status_table}
+
+            {* Base table *}
+            {if $entity_def.status_table == 'base_table'}
+            {field_select ratio="3:9" title=$dict.LABEL_status id="edit_status" name="status" options=$dict.SET_statuses selected=$data.base_table.status view_only=1}
+
+            {* Locale table *}
+            {else}
+            <dl class="input-field text-field row edit">
+              <dt class="col-12 col-lg-3">{$dict.LABEL_status|escape}</dt>
+              <dd class="col-12 col-lg-9">
+                {foreach $dict.SET_accessible_locales as $locale => $locale_name}
+                <div class="edit_change_locale edit_change_locale_{$locale|replace:'/':'_'} {if $locale != $data.preferred_locale}d-none{/if} view">
+                  <span>{$dict.SET_statuses[$data.locale_table[$locale].status]|escape}</span>
+                </div>
+                {/foreach}
+              </dd>
+            </dl>
+            {/if}
+
+            {/if}
+            {/foreach}
+          </div>
+        </div>
+        {/capture}
+
+        {if $use_tabs}
+        <div class="tab-pane fade padding {if $fields@first}show active{/if}" id="edit-{$panel|escape}">
+          {$smarty.capture.panel_content}
+        </div>
+        {else}
+        {$smarty.capture.panel_content}
+        {/if}
+        {/foreach}
+
+      {if $use_tabs}
+      </div>
+      {/if}
+
+      <div id="edit_file_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-xl" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{$dict.SET_modules.media_admin|escape}</h5>
+
+              <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <iframe src="about:blank" width="100%" height="500"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="edit_locale_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{$dict.ACTION_select_locales|escape}</h5>
+
+              <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <div>
+                <label>
+                  <input type="checkbox" id="edit_locale_toggle" checked>
+                  {$dict.ACTION_check_all|escape}
+                </label>
+              </div>
+
+              {foreach $dict.SET_accessible_locales as $locale => $locale_name}
+              <div style="padding-left: 1.5em">
+                <label>
+                  <input type="checkbox" name="locales[]" value="{$locale|escape}" class="edit_locale" checked>
+                  {$locale_name|escape}
+                </label>
+              </div>
+              {/foreach}
+            </div>
+
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary" id="edit_locale_continue">{$dict.ACTION_continue|escape}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions_container">
+      <ul class="actions">
+        {if $entity_def.status_table}
+        <li>
+          <input type="hidden" name="status" value="">
+          <button type="submit" name="status" value="draft" class="btn btn-primary"><i class="icon-pencil"></i> {$dict.ACTION_save_draft|escape}</button>
+        </li>
+        {if $user->hasRights($response.module, Right::APPROVE)}
+        <li><button type="submit" name="status" value="approved" class="btn btn-primary"><i class="icon-save"></i> {$dict.ACTION_approve|escape}</button></li>
+        {else}
+        <li><button type="submit" name="status" value="pending" class="btn btn-primary"><i class="icon-envelope"></i> {$dict.ACTION_send_approve|escape}</button></li>
+        {/if}
+        {else}
+        <li><button type="submit" class="btn btn-primary"><i class="icon-save"></i> {$dict.ACTION_save|escape}</button></li>
+        {/if}
+        <li><a href="{$smarty.get.referer_url|default:"?entity={$smarty.get.entity|escape:'url'}"|escape}" class="btn btn-primary"><i class="icon-remove-circle"></i> {$dict.ACTION_cancel|escape}</button></a>
+      </ul>
+    </div>
+  </div>
+</form>
+
+<script>
+(function() {
+    {if $smarty.server.HTTP_X_REQUESTED_WITH != 'XMLHttpRequest'}
+    var edit_form = $( "#edit_form" );
+
+    {* Form submission *}
+    var edit_locale_modal = $( "#edit_locale_modal" );
+    new form_submit_panel( edit_form );
+    edit_form.find( "button[name=status]" ).click( function() {
+        edit_form.find( "input[name=status]" ).val( this.value );
+
+        {* Select locales *}
+        {if $entity_def.status_table == 'locale_table'}
+        edit_locale_modal.modal();
+        {else}
+        edit_form.submit();
+        {/if}
+
+        return false;
+    } );
+    {/if}
+
+    {* File browses *}
+    var edit_file_modal = $( "#edit_file_modal" );
+    $( ".edit_file_browse" ).click( function() {
+        var folder = "{$module_folder|escape:'javascript'}/{$smarty.get.entity|escape:'javascript'}/";
+        var expanded_folder = null;
+        var input = $( this ).parent().prev();
+        var value = input.val();
+        if ( value.indexOf(folder) == 0 && value != folder )
+        {
+            expanded_folder = value.substring( 0, value.lastIndexOf("/") + 1 );
+        }
+        edit_file_modal.find( "iframe" ).attr( "src", "{$sets.paths.app_from_doc|escape:'html'}/module/file_admin/dialog.php?" + $.param( {
+            root: folder,
+            fldr: expanded_folder,
+            field_id: input.attr( "id" ),
+            relative_url: 1,
+            lang: "en_EN"
+        } ) );
+        edit_file_modal.modal();
+    } );
+
+    {* File opens *}
+    $( ".edit_file_open" ).click( function() {
+        var value = $( this ).parent().prev().val();
+        if ( {$conf.aws_enabled|intval} && value.indexOf("{$module_folder|escape:'javascript'}/") == 0 )
+        {
+            value = "https://{$conf.s3_domain|escape:'javascript'}/" + value;
+        }
+        else if ( value == "" )
+        {
+            value = "https://www.placehold.it/200x150/EFEFEF/AAAAAA&text={$dict.LABEL_no_image|escape:'url'|escape:'javascript'}";
+        }
+        else if ( value.indexOf(":") < 0 )
+        {
+            value = "{$sets.paths.app_from_doc|escape}/file/" + value;
+        }
+        window.open( value );
+    } );
+
+    {* TinyMCE *}
+    tinyMCE.init( {
+        allow_script_urls: true,    {* Workaround for decodeURIComponent in TinyMCE *}
+        content_css: "{$sets['paths']['app_from_doc']|escape:'javascript'}/node_modules/bootstrap/dist/css/bootstrap.css,{$sets['paths']['app_from_doc']|escape:'javascript'}/node_modules/@fortawesome/fontawesome-free/css/all.css,{$sets['paths']['app_from_doc']|escape:'javascript'}/file/template/1/css/content.css",
+        document_base_url: "{$sets.paths.server_url|escape:'javascript'}{$sets.paths.app_from_doc|escape:'javascript'}/",
+        file_picker_callback: function( callback, value, meta ) {
+            var w = window,
+                d = document,
+                e = d.documentElement,
+                g = d.getElementsByTagName("body")[0],
+                x = w.innerWidth || e.clientWidth || g.clientWidth,
+                y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+            var types = { file: 0, image: 1, media: 3 };
+
+            tinyMCE.activeEditor.windowManager.openUrl( {
+                url: "{$sets.paths.app_from_doc|escape:'html'}/module/file_admin/dialog.php?" + $.param( {
+                    root: "{$module_folder|escape:'javascript'}/{$smarty.get.entity|escape:'javascript'}/",
+                    field_id: $( ".tox-browse-url" ).closest( ".tox-form__controls-h-stack" ).prev().attr( "for" ),
+                    lang: "en_EN",
+                    type: types[meta.filetype]
+                } ),
+                height: y * 0.8,
+                title: "Filemanager",
+                width: x * 0.8
+            } );
+        },
+        image_advtab: true,
+        plugins: "advlist anchor autolink charmap code fullscreen hr image link media nonbreaking searchreplace table visualchars visualblocks",
+        selector: ".tinymce",
+        style_formats: [
+            { title: "On blue bar", block: "h1", classes: "on_blue_bar" },
+            { title: "Paragraph list", selector: "ol,ul", classes: "para-list" },
+            { title: "No border table", selector: "table", classes: "noborder" },
+            { title: "Border table", selector: "table", classes: "withborder" },
+            { title: "h1", block: "h1" },
+            { title: "h2", block: "h2" },
+            { title: "h3", block: "h3" }
+        ],
+        toolbar: "undo redo | styleselect | bold italic | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+        verify_css_classes: false,
+        verify_html: false
+    } );
+
+    {* Show / hide locale fields *}
+    var change_locale_selects = edit_form.find( "select[name=change_locale]" ).change( function() {
+        change_locale_selects.val( this.value );
+        var change_locales = $( ".edit_change_locale" );
+        change_locales.addClass( "d-none" );
+        change_locales.filter( ".edit_change_locale_" + this.value.replace("/", "_") ).removeClass( "d-none" );
+    } );
+    $( "label[for^=edit_change_locale_]" ).prepend( "<i class='icon-globe'></i> " )
+
+    {* Select locales *}
+    var edit_locales = $( ".edit_locale" ).click( function() {
+        edit_locale_toggle.prop( "checked", edit_locales.length == $(".edit_locale:checked").length );
+    } );
+    var edit_locale_toggle = $( "#edit_locale_toggle ").click( function() {
+        edit_locales.prop( "checked", this.checked );
+    } );
+    $( "#edit_locale_continue" ).click( function() {
+        $( "#edit_locale_modal" ).modal( "hide" );
+    } );
+
+    {* Initiate visible chosens *}
+    function initiate_chosens()
+    {
+        edit_form.find( ".tab-pane.active .chosen-select-tab:visible" ).chosen();
+    }
+    initiate_chosens();
+
+    {* Show / hide tabs *}
+    edit_form.find( "a[data-toggle=tab]" ).on( "shown", function() {
+        initiate_chosens();
+    } );
+} )();
+</script>

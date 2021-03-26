@@ -1,0 +1,204 @@
+{$response.content}
+
+{foreach from=$extra_wraps key=path item=type}
+    {if $type=="css"}
+        <link type="text/css" charset="utf-8" rel="stylesheet" href="{$path|escape:'html'}" />
+    {/if}
+{/foreach}
+
+{* TinyMCE *}
+<script type="text/javascript" src="{$sets.paths.app_from_doc|escape:'html'}/module/admin/lib/jquery.formSubmitPanel.js"></script>
+<script type="text/javascript" src="{$sets.paths.app_from_doc|escape:'html'}/node_modules/tinymce/tinymce.min.js"></script>
+<script type="text/javascript" src="{$sets.paths.app_from_doc|escape:'html'}/module/admin/lib/tinymce/avaMediaSelector/plugin.js"></script>
+<script type="text/javascript">
+    var avaMediaSelectorSettings = {
+        'url1': '',
+        'url2': ''
+    };
+    function uniqueId() {
+        var UID = Date.now();
+
+        return (UID++).toString(36);
+    }
+
+    var previewContentBlock = function(root) {
+        this.root = null;
+        this.prefix = 'previewContentBlock';
+        this.UI = {
+            'form': $('<form action="{$sets.paths['app_from_doc']|escape:"javascript"}/'
+                    + '{$request.locale|escape:"javascript"}/admin/webpage/?op=edit_quick" method="POST"'
+                    + ' class="preview_edit_form"></form>'),
+            'editor': $('<div class="' + this.prefix + '-editor"></div>').hide(),
+            'container': $('<div class="' + this.prefix + '-container"></div>'),
+            'controls': $('<ul class="' + this.prefix + '-controls"></ul>').hide(),
+            'submitBtn': $('<button class="submit" name="submit">{$dict.ACTION_submit|escape:'javascript'}</button>'),
+            'cancelBtn': $('<button class="cancel" name="cancel">{$dict.ACTION_cancel|escape:'javascript'}</button>'),
+            'editBtn': $('<button class="edit" name="edit">{$dict.ACTION_edit|escape:'javascript'}</button>')
+        };
+        this.editor = null;
+
+        this.init(root);
+    };
+
+    previewContentBlock.prototype = {
+        'init': function(root) {
+            var me = this;
+            this.root = root;
+
+            this.UI.submitBtn.appendTo(this.UI.controls);
+            this.UI.cancelBtn.appendTo(this.UI.controls);
+            this.root.wrapInner(this.UI.container);
+            this.UI.container = this.root.find('> .' + this.prefix + '-container');
+            this.root.append(this.UI.editBtn);
+            this.root.append(this.UI.editor);
+            this.root.append(this.UI.controls);
+
+            this.UI.editBtn.bind('click', function(){
+                me.showEditor();
+            });
+
+            this.UI.cancelBtn.bind('click', function(e){
+                e.preventDefault();
+                me.hideEditor();
+            });
+
+        },
+        'showEditor': function() {
+            var me = this;
+            var h = this.UI.container.height();
+            var w = this.UI.container.width();
+            this.UI.container.hide();
+            this.UI.editBtn.hide();
+
+            if(this.editor == null) {
+                this.UI.editor.css({
+                    'width': w,
+                    'height': h
+                }).addClass('loading').show();
+
+                // get content from website dynamically
+                $.ajax({
+                    'url': '{$sets.paths['app_from_doc']|escape:"javascript"}/{$request.locale|escape:"javascript"}/admin/webpage/',
+                    'data': {
+                        'p': me.root.attr('data-platform'),
+                        'l': me.root.attr('data-locale'),
+                        'v': me.root.attr('data-version'),
+                        'id': me.root.attr('data-id'),
+                        's': me.root.attr('data-section'),
+                        'op': 'edit_quick'
+                    },
+                    'type': 'get',
+                    'success': function(ajax) {
+                        if(ajax.result == "success") {
+                            var data = ajax.data;
+                            for (var n in data) {
+                                if(data.hasOwnProperty(n) && $.inArray(n, ['content']) < 0) {
+                                    me.UI.form.append($('<input type="hidden" name="' + n + '" value="' + data[n] + '" />'));
+                                }
+                            }
+
+                            var uid = uniqueId();
+
+                            var ta = $('<textarea name="content" id="' + uid + '" class="visualEditor"></textarea>');
+                            ta.html((data.content['content'].replace(/&/g, "&amp;")
+                                    .replace(/</g, "&lt;")
+                                    .replace(/>/g, "&gt;")
+                                    .replace(/"/g, "&quot;")
+                                    .replace(/'/g, "&#039;")));
+                            ta.css({
+                                'width': w,
+                                'height': h
+                            });
+
+                            me.UI.form.append(ta);
+                            me.UI.editor.append(me.UI.form);
+
+                            avaMediaSelectorSettings.url1 = "{$sets.paths.app_from_doc|escape:'javascript'}/module/file_admin/ajaxfilemanager.php?editor=tinymce&language={$request.locale|escape:'javascript'}&subfolder=share";
+                            avaMediaSelectorSettings.url2 = "{$sets.paths.app_from_doc|escape:'javascript'}/module/file_admin/ajaxfilemanager.php?editor=tinymce&language={$request.locale|escape:'javascript'}&subfolder=" + encodeURIComponent('page/temp/' + data.temp_folder) + "&webpage_id=" + encodeURIComponent(data.webpage_id);
+
+                            me.editor = tinymce.createEditor(uid, {
+                                selector: "textarea.visualEditor",
+                                document_base_url: "{$sets.paths.server_url|escape:'javascript'}{$sets.paths.app_from_doc|escape:'javascript'}/",
+                                extended_valid_elements: "button[type],iframe[frameborder|height|longdesc|name|scrolling|src|width],style[type],script[type|src]",
+                                fix_list_elements: true,
+                                fix_table_elements: true,
+                                verify_html : false,
+                                verify_css_classes: false,
+                                valid_children : "+body[style]",
+                                visual: true,
+
+                                {* UI elements *}
+                                plugins: ["hr,advlist,anchor,autolink,charmap,code,contextmenu",
+                                    "fullscreen,image,legacyoutput,link,media,nonbreaking",
+                                    "paste,spellchecker,table,textcolor,visualchars,visualblocks,wordcount",
+                                    "avaMediaSelector"],
+                                image_advtab: true,
+                                toolbar1: 'bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | subscript superscript | table',
+                                toolbar2: 'fontselect fontsizeselect | forecolor backcolor | hr link anchor | undo redo',
+                                toolbar3: 'cut copy paste | image media | charmap spellchecker | visualblocks visualchars | fullscreen code',
+                                fontsize_formats: "8px 10px 12px 14px 18px 24px 36px"
+
+                                {*
+                                menu: {
+                                file: {title: 'File', items: 'newdocument'},
+                                edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'},
+                                insert: {title: 'Insert', items: '|'},
+                                view: {title: 'View', items: 'visualaid'},
+                                format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'},
+                                table: {title: 'Table'},
+                                tools: {title: 'Tools'}
+                                }
+                                *}
+
+                            });
+
+                            me.UI.controls.show();
+                            me.UI.form.append(me.UI.controls);
+
+                            me.editor.render();
+                            new form_submit_panel(me.UI.form);
+
+                            $(window).bind('unload', function() {
+                                $(window).trigger('leaveWpEdit');
+                            });
+
+                            $(window).bind('leaveWpEdit', function(){
+                                $.ajax({
+                                    'url': '{$sets.paths['app_from_doc']|escape:"javascript"}/'
+                                            + '{$request.locale|escape:"javascript"}/admin/webpage/',
+                                    'data': {
+                                        'op': 'unlock',
+                                        'id': data.webpage_id,
+                                        'temp_folder': data.temp_folder
+                                    }
+                                });
+                            });
+                        }
+                    }
+                });
+            } else {
+                this.UI.controls.show();
+                this.UI.form.show();
+                this.UI.editor.show();
+            }
+
+        },
+        'hideEditor': function() {
+            this.UI.controls.hide();
+            this.UI.form.hide();
+            this.UI.editor.hide();
+            this.UI.container.show();
+            this.UI.editBtn.show();
+        }
+
+    };
+
+    (function($){
+        // remove quick edit from preview
+        //var content_area = $('.editable_content');
+
+        //for( var i = 0; i < content_area.length; i++ ) {
+        //    new previewContentBlock($(content_area[i]));
+        //}
+    })(jQuery);
+</script>

@@ -1,0 +1,128 @@
+<div class="row">
+  <div class="col-12 col-lg-9">
+    <div class="row">
+      <div class="col-12 col-lg-4">
+        <i class="icon-globe"></i><label for="locale-fields-block-switch" style="display:inline;margin-left:5px;">{$dict.LABEL_lanugage|escape}</label>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <select id="locale-fields-block-switch" name="locale-fields-block-switch" class="form-control">
+          {html_options options=$dict.SET_accessible_locales selected=$default_locale}
+        </select>
+      </div>
+    </div>
+
+    <br>
+
+    {foreach from=$dict.SET_accessible_locales key=locale item=locale_text}
+      <div class="snippet-fields-block" id="{$locale|replace:'/':'-'}-snippet-fields-block">
+      {foreach $data[$locale]['group_paras'] as $k=>$para_value}
+      {assign var='j' value=$k+1}
+      {assign var='caption_index' value='caption'|cat:$j}
+        <div class="parameter_group">
+          <div class="row">
+            <div class="col-12">
+              <ul class="actions">
+                <li><button type="button" name="parameter_group_add[]" class="btn btn-small"><i class="icon-plus"></i></button></li>
+                <li><button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <div class="row select_change_toggle">
+                <div class="col-12">
+                  <dl class="input-field text-field row edit">
+                    <dt class="col-12 col-lg-4"><label for="{$locale|replace:'/':'::'}[image{$para_value@iteration}]">{$dict.LABEL_image|escape}</label></dt>
+                    <dd class="col-12 col-lg-8">
+                      <div class="input-group">
+                        <input type="text" id="{$locale|replace:'/':'::'}[image{$para_value@iteration}]" name="{$locale|replace:'/':'::'}[image{$para_value@iteration}]" class="form-control" value="{$para_value.image}" maxlength="255">
+                        <div class="input-group-append">
+                          <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                            <i class="icon-folder-open-alt"></i>
+                            {$dict.ACTION_browse|escape}
+                          </button>
+                        </div>
+                      </div>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              {field_text class="" name="{$locale|cat:'['|cat:$caption_index|cat:']'}" title=$dict.LABEL_caption id="{$locale|cat:'['|cat:$caption_index|cat:']'}" maxlength="255" value="{$para_value.caption}" error=$errors[$locale][$caption_index] view_only=false}
+            </div>
+          </div>
+        </div>
+        {foreachelse}
+        <div class="parameter_group">
+          <div class="row">
+            <div class="col-12">
+              <ul class="actions">
+                <li><button type="button" name="parameter_group_add[]" class="btn btn-small"><i class="icon-plus"></i></button></li>
+                <li><button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <div class="row select_change_toggle">
+                <div class="col-12">
+                  <dl class="input-field text-field row edit">
+                    <dt class="col-12 col-lg-4"><label for="{$locale|replace:'/':'::'}[image1]">{$dict.LABEL_image|escape}</label></dt>
+                    <dd class="col-12 col-lg-8">
+                      <div class="input-group">
+                        <input type="text" id="{$locale|replace:'/':'::'}[image1]" name="{$locale|replace:'/':'::'}[image1]" class="form-control" value="" maxlength="255">
+                        <div class="input-group-append">
+                          <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                            <i class="icon-folder-open-alt"></i>
+                            {$dict.ACTION_browse|escape}
+                          </button>
+                        </div>
+                      </div>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              {field_text class="" name="{$locale|cat:'[caption1]'}" title=$dict.LABEL_caption id="{$locale|cat:'[caption1]'}" maxlength="255" value="" error=$errors[$locale][caption1] view_only=false}
+            </div>
+          </div>
+        </div>
+        {/foreach}
+      </div>
+    {/foreach}
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <h4>{$dict.LABEL_sample_code}</h4>
+    {$dict.MESSAGE_pgwSlider_sample}
+  </div>
+</div>
+
+<div id="edit_file_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{$dict.SET_modules.media_admin|escape}</h5>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <iframe src="about:blank" width="100%" height="500"></iframe>
+      </div>
+    </div>
+  </div>
+</div>

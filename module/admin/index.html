@@ -1,0 +1,120 @@
+{if $user->getId()}
+
+<p style="margin-top: 1em;">{$dict.DESCRIPTION_welcome_user|escape}</p>
+
+<div class="row-fluid">
+{assign var=s_cnt value=0}
+{foreach from=$pb_list item=bp_items}
+    {foreach from=$bp_items item=bp_item}
+    {if ($s_cnt+$bp_item->getSize()) > 12}
+        {assign var=s_cnt value=0}
+        </div>
+        <div class="row-fluid">
+    {/if}
+    {$bp_item->getOutputHtml()}
+    {assign var=s_cnt value=$s_cnt+$bp_item->getSize()}
+    {/foreach}
+{/foreach}
+</div>
+
+<script type="text/javascript">
+$('input.readonly').bind('click', function (e){
+    this.select();
+});
+
+$('.box-list').delegate('.box-list-item', 'click', function(e){
+    if($(this).attr('rel') && $(this).attr('rel') != '') {
+        window.location.href = $(this).attr('rel');
+    }
+});
+</script>
+
+{else}
+
+<div class="{if isset($lightbox) && $lightbox}login-panel{else}wrapper{/if}">
+  <div class="login-body">
+    {if !isset($lightbox) || !$lightbox}
+    <h1><a href="{$sets.paths.app_from_doc|escape}/admin/{$request.locale}/" title="{$dict.APP_title|escape}"><img src="{$sets.paths.app_from_doc|escape}/module/admin/css/avalade-cms-logo.png" ></a></h1>
+    {/if}
+    <p class="text-center">{$conf.app_client|string_format:$dict.FORMAT_licensed_to|escape}</p>
+    <h2 id="login_form_title" style="padding-top: 10px;">{$dict.ACTION_login|escape}</h2>
+
+    <form action="?op=login{if isset($lightbox) && $lightbox}&amp;lbpopup=1{else}{if $_get.redirect_url}&amp;redirect_url={$_get.redirect_url|escape:'url'}{/if}{/if}"
+      method="POST" class='form-validate' id="login_form" autocomplete="off">
+    {if isset($errors.errorsStack) && count($errors.errorsStack)}
+      <ul class="errorStack errors">
+        {foreach from=$errors.errorsStack item=error_text}
+        <li class="error">
+          <span>
+            {$error_text|escape}
+          </span>
+        </li>
+        {/foreach}
+      </ul>
+      {/if}
+
+      <div class="control-group">
+        <div class="email controls">
+          {field_text type="text" name="username" title={$dict.LABEL_username|escape} id="username" maxlength="255" error=$errors.username placeholder=true class="" data-rule-required="true"}
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="pw controls">
+          {field_text type="password" name="password" title={$dict.LABEL_password|escape} id="password" maxlength="255" error=$errors.password placeholder=true class="" data-rule-required="true"}
+        </div>
+      </div>
+
+      <div class="submit">
+        <input type="hidden" name="sid" value="{session_id()|password_hash:$smarty.const.PASSWORD_BCRYPT|escape}">
+        <input type="submit" value="{$dict.ACTION_login|escape}" class='btn btn-primary'>
+      </div>
+    </form>
+
+    <div style="margin:15px 30px 0; color: #666;">{$dict.LABEL_best_view|escape}</div>
+      {if !isset($lightbox) || !$lightbox}
+      <div class="forget">
+      <a href="?op=forget_password&amp;redirect_url={if $_get.redirect_url}{$_get.redirect_url|escape:'url'}{else}{$_server.REQUEST_URI|escape:'url'}{/if}"><span>{$dict.ACTION_forget_password|escape}</span></a>
+      </div>
+      {/if}
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    new form_submit_panel($(".login-body #login_form"));
+});
+</script>
+
+{if isset($lightbox) && $lightbox}
+<script type="text/javascript">
+$('.login-panel form').bind('submit', function(e) {
+    e.preventDefault();
+}).bind('ajaxSuccess', function(e, data){
+    if(data.result == "success") {
+        $('.ajaxException').modal('hide');
+    }
+});
+
+$('.login-panel .form-validate').each(function(){
+    var id = $(this).attr('id');
+    $("#"+id).validate({
+        errorElement:'span',
+        errorClass: 'help-block error',
+        errorPlacement:function(error, element){
+            element.parents('.controls').append(error);
+        },
+        highlight: function(label) {
+            $(label).closest('.control-group').removeClass('error success').addClass('error');
+        },
+        success: function(label) {
+            label.addClass('valid').closest('.control-group').removeClass('error success').addClass('success');
+        }
+    });
+});
+</script>
+{/if}
+
+
+{/if}

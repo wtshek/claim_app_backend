@@ -1,0 +1,16 @@
+Promotion(s) approved for {$dict.APP_title|escape:'html'}
+
+<p>Hi,</p>
+
+<p>
+    Following promotion(s) has been approved by {$user.user_name|escape:'html'} &lt;<a href="mailto:{$user.email|escape:'html'}">{$user.email|escape:'html'}</a>&gt;. You may review the page with <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/admin/{$request.locale}/offer/">{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/admin/{$request.locale}/offer/</a>
+</p>
+
+<p>Here are the promotions:</p>
+{foreach from=$data.offers item=offer}
+    <h3>{$offer.id|escape:'html'}&nbdsp;--&nbdsp;{$offer.title|escape:'html'}</h3>
+{/foreach}
+
+<p>Regards,</p>
+
+<p>{$conf.mailer_name|escape:'html'}</p>

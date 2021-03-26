@@ -1,0 +1,135 @@
+<div class="row">
+  <div class="col-12 col-lg-9">
+    <div class="row">
+      <div class="col-12">
+        {field_text class="" name="general_para_value[redirect_alias]" title=$dict.LABEL_redirect_alias id="general_para_value[redirect_alias]" maxlength="255" value=$data['general_para_value']['redirect_alias'] error=$errors['general_para_value']['redirect_alias'] view_only=false}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 col-lg-4">
+        <i class="icon-globe"></i><label for="locale-fields-block-switch" style="display:inline;margin-left:5px;">{$dict.LABEL_lanugage|escape}</label>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <select id="locale-fields-block-switch" name="locale-fields-block-switch" class="form-control">
+          {html_options options=$dict.SET_accessible_locales selected=$default_locale}
+        </select>
+      </div>
+    </div>
+
+    <br>
+
+    {foreach from=$dict.SET_accessible_locales key=locale item=locale_text}
+    <div class="snippet-fields-block" id="{$locale|replace:'/':'-'}-snippet-fields-block">
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_title]" title=$dict.LABEL_title id="$locale[LABEL_title]" maxlength="255" value=$data[$locale]['LABEL_title'] error=$errors[$locale]['LABEL_title'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_first_name]" title=$dict.LABEL_first_name id="$locale[LABEL_first_name]" maxlength="255" value=$data[$locale]['LABEL_first_name'] error=$errors[$locale]['LABEL_first_name'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_last_name]" title=$dict.LABEL_last_name id="$locale[LABEL_last_name]" maxlength="255" value=$data[$locale]['LABEL_last_name'] error=$errors[$locale]['LABEL_last_name'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+	      {field_text class="" name="$locale[LABEL_email]" title=$dict.LABEL_email id="$locale[LABEL_email]" maxlength="255" value=$data[$locale]['LABEL_email'] error=$errors[$locale]['LABEL_email'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_phone]" title=$dict.LABEL_phone id="$locale[LABEL_phone]" maxlength="255" value=$data[$locale]['LABEL_phone'] error=$errors[$locale]['LABEL_phone'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_address]" title=$dict.LABEL_address id="$locale[LABEL_address]" maxlength="255" value=$data[$locale]['LABEL_address'] error=$errors[$locale]['LABEL_address'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_city]" title=$dict.LABEL_city id="$locale[LABEL_city]" maxlength="255" value=$data[$locale]['LABEL_city'] error=$errors[$locale]['LABEL_city'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_zip_code]" title=$dict.LABEL_zip_code id="$locale[LABEL_zip_code]" maxlength="255" value=$data[$locale]['LABEL_zip_code'] error=$errors[$locale]['LABEL_zip_code'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_country]" title=$dict.LABEL_country id="$locale[LABEL_country]" maxlength="255" value=$data[$locale]['LABEL_country'] error=$errors[$locale]['LABEL_country'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_submit]" title=$dict.LABEL_submit id="$locale[LABEL_submit]" maxlength="255" value=$data[$locale]['LABEL_submit'] error=$errors[$locale]['LABEL_submit'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[ERROR_title_blank]" title=$dict.ERROR_title_blank id="$locale[ERROR_title_blank]" maxlength="255" value=$data[$locale]['ERROR_title_blank'] error=$errors[$locale]['ERROR_title_blank'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[ERROR_first_name_blank]" title=$dict.ERROR_first_name_blank id="$locale[ERROR_first_name_blank]" maxlength="255" value=$data[$locale]['ERROR_first_name_blank'] error=$errors[$locale]['ERROR_first_name_blank'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[ERROR_last_name_blank]" title=$dict.ERROR_last_name_blank id="$locale[ERROR_last_name_blank]" maxlength="255" value=$data[$locale]['ERROR_last_name_blank'] error=$errors[$locale]['ERROR_last_name_blank'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[ERROR_email_blank]" title=$dict.ERROR_email_blank id="$locale[ERROR_email_blank]" maxlength="255" value=$data[$locale]['ERROR_email_blank'] error=$errors[$locale]['ERROR_email_blank'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[ERROR_email_invalid]" title=$dict.ERROR_email_invalid id="$locale[ERROR_email_invalid]" maxlength="255" value=$data[$locale]['ERROR_email_invalid'] error=$errors[$locale]['ERROR_email_invalid'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[ERROR_country_blank]" title=$dict.ERROR_country_blank id="$locale[ERROR_country_blank]" maxlength="255" value=$data[$locale]['ERROR_country_blank'] error=$errors[$locale]['ERROR_country_blank'] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[ERROR_country_invalid]" title=$dict.ERROR_country_invalid id="$locale[ERROR_country_invalid]" maxlength="255" value=$data[$locale]['ERROR_country_invalid'] error=$errors[$locale]['ERROR_country_invalid'] view_only=false}
+        </div>
+      </div>
+    </div>
+    {/foreach}
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <h4>{$dict.LABEL_sample_code|escape}</h4>
+
+    {$dict.MESSAGE_enews_signup_form_sample}
+  </div>
+</div>

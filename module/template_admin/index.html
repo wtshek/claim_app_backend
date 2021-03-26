@@ -1,0 +1,200 @@
+<form name="edit_template_form" id="edit_template_form" action="./" method="POST" >
+  <div class="box dialog-{$_get.type|escape} box-bordered box-color">
+    <div class="box-title">
+      <h3>
+        <i class="icon-file-alt"></i>
+        {$title|escape}
+      </h3>
+
+      <ul class="actions">
+        <li>
+          <div class="dropdown">
+            {if $preview_templates|@count > 0}
+            <a href="#" class='dropdown-toggle preview' data-toggle="dropdown">
+              <i class="icon-eye-open"></i>
+              {$dict.ACTION_preview|escape}
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-right">
+              {foreach from=$preview_templates item=template}
+              <li>
+                <a name="preview" href="#" rel="{$template.template_id|escape}">{$template.template_name|escape}</a>
+              </li>
+              {/foreach}
+            </ul>
+            {/if}
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="box-content">
+      {if $templates[$selected_template]['templates_used']}
+      <dl class="input-field view row">
+        <dt class="col-12 col-lg-3">{$dict.LABEL_active_templates_relay|escape}</dt>
+        <dd class="col-12 col-lg-9">{$templates[$selected_template]['templates_used']|escape}</dd>
+      </dl>
+      {/if}
+
+      <dl class="input-field view row">
+        <dt class="col-12 col-lg-3">{$dict.LABEL_template_path|escape}</dt>
+        <dd class="col-12 col-lg-9">{$templates[$selected_template]['r_path']|escape}</dd>
+      </dl>
+
+      {if $templates[$selected_template]['platform']}
+      <dl class="input-field view row">
+        <dt class="col-12 col-lg-3">{$dict.LABEL_platform|escape}</dt>
+        <dd class="col-12 col-lg-9">{$dict['SET_webpage_page_types'][$templates[$selected_template]['platform']]|escape}</dd>
+      </dl>
+
+      {/if}
+      <div class="row">
+        <div class="col-12">
+          <dl class="row input-field">
+            <dt class="col-12 col-lg-3">
+              <label for="template_list">{$dict.LABEL_select_template|escape}</label>
+            </dt>
+
+            <dd class="col-12 col-lg-9">
+              <select name="template_list" id="template_list" class="form-control">
+                {html_options options=$template_list selected=$selected_template}
+              </select>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12 input-field" id="template_content_wrapper">
+          <textarea name="template_content" id="template_content">{$template_content|escape}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions_container" id="template_actions">
+      <ul class="actions">
+        <li>
+          <button type="submit" name="action-submit" class="btn btn-primary">
+            <i class="icon-save"></i>
+            {$dict.ACTION_save|escape}</button>
+        </li>
+
+        <li>
+          <button type="button" name="action-cancel" class="btn btn-primary">
+            <i class="icon-remove-circle"></i>
+            {$dict.ACTION_cancel|escape}</button>
+        </li>
+      </ul>
+    </div>
+
+    <input type="hidden" name="selected_template" value="{$selected_template|escape}" />
+    <input type="hidden" name="preview_locale" value="{$templates[$selected_template].locale|escape}" />
+  </div>
+</form>
+
+<script>
+(function($){
+    $('#template_list').bind('change', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        window.location.href = '?tpl=' + $(this).val();
+    });
+
+    CodeMirror.defaults = $.extend(CodeMirror.defaults, {
+        lineNumbers: true,
+        mode: '{$templates[$selected_template]["mode"]}'
+        /*mode: 'text/x-smarty'*/
+    });
+
+    var t = $('#template_content');
+    var cm = CodeMirror.fromTextArea(t[0]);
+
+    cm.setSize('100%', 500);
+
+    var pr = $('#main').outerWidth() - $('#main > .container-fluid').width();
+    pr -=  $('#main > .container-fluid > .row').offset().left - $('#main > .container-fluid').offset().left;
+
+    var resize = function(e) {
+        if(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        var minH = 300;
+        var minW = 500;
+
+        var h = $(window).height();
+        //var w = $(window).width();
+
+        var wrapper = $(cm.getWrapperElement());
+
+        var p = wrapper.offset();
+        var hSiblings = [$('#template_actions'), $('#footer')];
+        var h2 = h - p.top;
+        //var w2 = w - p.left - pr;
+
+        for(var i = 0; i < hSiblings.length; i++) {
+            h2 -= $(hSiblings[i]).outerHeight(true);
+        }
+
+        h2 -= 50;
+
+        //w = Math.floor(w2 < minW ? minW : w2) - 1;
+        h = Math.floor(h2 < minH ? minH : h2);
+        cm.setSize('100%', h);
+
+    };
+    $(window).bind('resize', resize);
+
+    resize();
+
+    var valid = true;
+    var form = $('form');
+    var preview_el = $('<input type="hidden" name="preview_template_id" value="" />');
+
+    form[0].valid = function() {
+        return false;
+    };
+
+    form.bind('submit', function(e){
+        valid = true;
+        form.attr('target', '_top');
+        preview_el.detach();
+        if(!confirm("{$dict.CONFIRM_submit_continue|escape}")) {
+            valid = false;
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            e.preventDefault();
+
+            cm.save();
+        }
+    });
+
+    new form_submit_panel(form);
+
+    $('*[name="action-cancel"]').bind('click', function(e){
+        e.preventDefault();
+        window.location.reload();
+    });
+
+    $('*[name="preview"]').bind('click', function(e){
+        e.preventDefault();
+
+        form.prop('target', '_blank');
+        preview_el.val($(this).attr('rel')).appendTo(form);
+
+        form[0].submit();
+    });
+
+    $("#edit_communication_send").click( function() {
+        var recipient_email = window.prompt( "{$dict.PROMPT_recipient_email|escape:'javascript'}", "{$user->getEmail()|escape:'javascript'}" )
+        if ( recipient_email != null )
+        {
+            form[0].elements["recipient_email"].value = recipient_email;
+            form[0].submit();
+        }
+        return false;
+    } );
+})(jQuery);
+</script>

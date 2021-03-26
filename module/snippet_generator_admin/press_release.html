@@ -1,0 +1,101 @@
+<div class="row">
+  <div class="col-12 col-lg-9">
+    <div class="row">
+      <div class="col-12 col-lg-4">
+        <i class="icon-globe"></i><label for="locale-fields-block-switch" style="display:inline;margin-left:5px;">{$dict.LABEL_lanugage|escape}</label>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <select id="locale-fields-block-switch" name="locale-fields-block-switch" class="form-control">
+          {html_options options=$dict.SET_accessible_locales selected=$default_locale}
+        </select>
+      </div>
+    </div>
+
+    <br>
+
+    {foreach from=$dict.SET_accessible_locales key=locale item=locale_text}
+    <div class="snippet-fields-block" id="{$locale|replace:'/':'-'}-snippet-fields-block">
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_date]" title=$dict.LABEL_date id="$locale[LABEL_date]" maxlength="255" value=$data[$locale]['LABEL_date'] error=$errors[$locale][LABEL_date] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_view_more_press_releases]" title=$dict.LABEL_view_more_press_releases id="$locale[LABEL_view_more_press_releases]" maxlength="255" value=$data[$locale]['LABEL_view_more_press_releases'] error=$errors[$locale][LABEL_view_more_press_releases] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_download_pdf]" title=$dict.LABEL_download_pdf id="$locale[LABEL_download_pdf]" maxlength="255" value=$data[$locale]['LABEL_download_pdf'] error=$errors[$locale][LABEL_download_pdf] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_press_contact_title]" title=$dict.LABEL_press_contact_title id="$locale[LABEL_press_contact_title]" maxlength="255" value=$data[$locale]['LABEL_press_contact_title'] error=$errors[$locale][LABEL_press_contact_title] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[MESSAGE_press_contact_details]">{$dict.LABEL_press_contact_details|escape}</label></dt>
+            <dd class="col-8">
+              <div>
+                <textarea name="{$locale|replace:'/':'::'}[MESSAGE_press_contact_details]" id="{$locale|replace:'/':'::'}[MESSAGE_press_contact_details]" class="visualSnippetEditor" style="height:300px;">{$data[$locale]['MESSAGE_press_contact_details']}</textarea>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_reservations_and_enquires_title]" title=$dict.LABEL_reservations_and_enquires_title id="$locale[LABEL_reservations_and_enquires_title]" maxlength="255" value=$data[$locale]['LABEL_reservations_and_enquires_title'] error=$errors[$locale][LABEL_reservations_and_enquires_title] view_only=false}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[MESSAGE_dining_reservations_and_enquires_details]">{$dict.LABEL_dining_reservations_and_enquires_details|escape}</label></dt>
+            <dd class="col-8">
+              <div>
+                <textarea name="{$locale|replace:'/':'::'}[MESSAGE_dining_reservations_and_enquires_details]" id="{$locale|replace:'/':'::'}[MESSAGE_dining_reservations_and_enquires_details]" class="visualSnippetEditor" style="height:300px;">{$data[$locale]['MESSAGE_dining_reservations_and_enquires_details']}</textarea>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[MESSAGE_room_reservations_and_enquires_details]">{$dict.LABEL_room_reservations_and_enquires_details|escape}</label></dt>
+            <dd class="col-8">
+              <div>
+                <textarea name="{$locale|replace:'/':'::'}[MESSAGE_room_reservations_and_enquires_details]" id="{$locale|replace:'/':'::'}[MESSAGE_room_reservations_and_enquires_details]" class="visualSnippetEditor" style="height:300px;">{$data[$locale]['MESSAGE_room_reservations_and_enquires_details']}</textarea>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_photo_albums_title]" title=$dict.LABEL_photo_albums_title id="$locale[LABEL_photo_albums_title]" maxlength="255" value=$data[$locale]['LABEL_photo_albums_title'] error=$errors[$locale][LABEL_photo_albums_title] view_only=false}
+        </div>
+      </div>
+    </div>
+    {/foreach}
+  </div>
+
+  <div class="col-12 col-lg-3">
+    <h4>{$dict.LABEL_sample_code}</h4>
+    {$dict.MESSAGE_press_release_sample}
+  </div>
+</div>

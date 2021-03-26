@@ -1,0 +1,93 @@
+<form id="finder_form" method="GET" accept-charset="UTF-8" action="">
+  <div class="row">
+    <div class="col-12">
+      <div class="box">
+        <div class="box-title">
+          <h3><i class="icon-search"></i>{$dict.LABEL_log_finder|escape}</h3>
+
+          <ul class="actions">
+            <li>
+              <a href="#" class="btn btn-mini content-slideUp"><i class="icon-angle-down"></i></a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="box-content nopadding">
+          <div class="box-content">
+            <div class="row">
+              <!--div class="col-6">
+                {field_text class="text_input" name="keyword" title=$dict.LABEL_keyword id="keyword" maxlength="255" value=$_get.keyword error=null view_only=false placeholder=true}
+              </div-->
+
+              <div class="col-12 col-lg-6">
+                {field_text class="text_input" ratio="3:9" name="vanity_url" title=$dict.LABEL_vanity_url id="vanity_url" value=$_get.vanity_url error=null view_only=false placeholder=false}
+              </div>
+
+              <div class="col-12 col-lg-6">
+                {field_text class="text_input" ratio="3:9" name="redirect_to" title=$dict.LABEL_redirect_to id="redirect_to" value=$_get.redirect_to error=null view_only=false placeholder=false}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                {field_select class="select_chosen" ratio="3:9" name="visitor_country" title=$dict.LABEL_visitor_country id="visitor_country" options=$dict.SET_iso_country_codes selected=$_get.visitor_country error=null has_empty=true}
+              </div>
+
+              <div class="col-12 col-lg-6">
+                {field_text class="text_input" ratio="3:9" name="visitor_ip" title=$dict.LABEL_visitor_ip id="visitor_ip" value=$_get.visitor_ip error=null view_only=false placeholder=false}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                {field_calendar ratio="3:9" name="start_date" id="start_date" title=$dict.LABEL_start_date  value=$_get.start_date showsTime=false}
+              </div>
+
+              <div class="col-12 col-lg-6">
+                {field_calendar ratio="3:9" name="end_date" id="end_date" title=$dict.LABEL_end_date  value=$_get.end_date showsTime=false}
+              </div>
+            </div>
+          </div>
+
+          <div class="box-actions">
+            <div class="row">
+              <div class="col-12">
+                <div class="form_actions">
+                  <ul>
+                    <li>
+                      <button name="submit" class="btn">
+                        <i class="icon-search"></i>
+                        {$dict.ACTION_find|escape}</button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="spacer">&nbsp;</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="box box-bordered box-color">
+      <div class="box-title">
+        <h3><i class="icon-reorder"></i>{$dict.LABEL_logs|escape}</h3>
+      </div>
+
+      <div class="box-content nopadding">
+        {$list.content}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$('.select_chosen').chosen({
+    placeholder_text_single: "{$dict.LABEL_select_a_country|escape}"
+});
+</script>

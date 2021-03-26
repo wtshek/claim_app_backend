@@ -1,0 +1,272 @@
+{$response.content}
+
+<style type="text/css">
+    #preview-info-box a {
+        color: #FFF;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+    #preview-info-box {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        background: rgba(54, 142, 224, 0.8);
+        box-shadow: 2px 2px 6px 2px rgba(0,0,0,0.5);
+        color: #FFF;
+        font-size: 1em;
+        line-height: 1.8em;
+        z-index: 9999;
+    }
+
+    #preview-info-box .items {
+    }
+
+    #preview-info-box .items .data-items {
+        padding: 10px;
+    }
+
+    #preview-info-box dl, #preview-info-box dl dt, #preview-info-box dl dd {
+        padding: 0;
+        margin: 0;
+    }
+    #preview-info-box dl.preview-info-item {
+        overflow: hidden;
+    }
+
+    #preview-info-box dl.preview-info-item dt, #preview-info-box dl.preview-info-item dd {
+        float: left;
+    }
+
+    #preview-info-box dl.preview-info-item dt {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #f6f680;
+    }
+
+    #preview-info-box dl.preview-info-item dd {
+        margin-left: 1em;
+    }
+
+    #preview-info-box dl.preview-info-action {
+        font-size: 1.2em;
+        line-height: 1.5em;
+        text-align: center;
+    }
+
+    #preview-info-box dl.preview-info-action.switch-platform {
+        background: #E1E1E1; /* Old browsers */
+        /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2M0YzRjNCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlMWUxZTEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+        background: -moz-linear-gradient(top,  rgba(196,196,196,1) 0%, rgba(225,225,225,1) 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(196,196,196,1)), color-stop(100%,rgba(225,225,225,1))); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  rgba(196,196,196,1) 0%,rgba(225,225,225,1) 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  rgba(196,196,196,1) 0%,rgba(225,225,225,1) 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  rgba(196,196,196,1) 0%,rgba(225,225,225,1) 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  rgba(196,196,196,1) 0%,rgba(225,225,225,1) 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c4c4c4', endColorstr='#e1e1e1',GradientType=0 ); /* IE6-8 */
+
+        border-top: 1px solid #CCC;
+        padding: 0.5em 0;
+        color: #003366;
+    }
+
+    #preview-info-box dl.preview-info-action a {
+        font-size: 1.5em;
+        color: #003366;
+    }
+
+    #preview-info-box dl.preview-info-action.toggle-open {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        display: block;
+        top: -7px;
+        right: -7px;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    #preview-info-box dl.preview-info-action.toggle-open dd {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    #preview-info-box dl.preview-info-action.toggle-open a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: url('{$sets.paths["app_from_doc"]|escape:'html'}/module/admin/css/icon_collapse_expand.png') transparent no-repeat 50% 0;
+        text-indent: -9999px;
+    }
+
+    #preview-info-box.closed dl.preview-info-action.toggle-open a {
+        background-position: 50% 100%;
+    }
+</style>
+
+
+<div id="preview-info-box">
+    <div class="items">
+        <div class="data-items">
+            <dl class="preview-info-item">
+                <dt>{$dict.LABEL_webpage_id|escape:'html'}: </dt>
+                <dd>{$pg->getId()|escape:'html'}</dd>
+            </dl>
+            <dl class="preview-info-item">
+                <dt>{$dict.LABEL_platforms|escape:'html'}: </dt>
+                <dd>
+                    {foreach from=$available_platforms item=available_platform name=available_platforms}
+                        <span>{$dict['SET_webpage_page_types'][$available_platform]|escape:'html'}</span>{if !$smarty.foreach.available_platforms.last}, {/if}
+                    {/foreach}
+                </dd>
+            </dl>
+            <dl class="preview-info-item">
+                <dt>{$dict.LABEL_path|escape:'html'}: </dt>
+                <dd>{$pg->getRelativeUrl()|escape:'html'}</dd>
+            </dl>
+            <dl class="preview-info-item">
+                <dt>{$dict.LABEL_version|escape:'html'}: </dt>
+                <dd>{$pg->getVisualVersion($request.locale)|escape:'html'}.{$pg->getMinorVersion()|escape:'html'}</dd>
+            </dl>
+            <dl class="preview-info-item">
+                <dt>{$dict.LABEL_status|escape:'html'}: </dt>
+                <dd>{$dict['SET_webpage_statuses'][$pg->getStatus()]|escape:'html'}</dd>
+            </dl>
+            <dl class="preview-info-item">
+                <dt>{$dict.LABEL_public_accessible_roles|escape:'html'}: </dt>
+                <dd>
+                    {foreach from=$public_accessible_roles item=public_role name=public_accessible_roles}
+                        <span>{if $user->hasRights('role_admin', Right::VIEW)}<a href="{$sets.paths['app_from_doc']|escape:'html'}/admin/{$request.locale|escape:'html'}/role/?op=view&id={$public_role->getId()|escape:'html'}" title="{$public_role->getName()|escape:'html'}">{/if}
+                            {$public_role->getName()|escape:'html'}
+                            {if $user->hasRights('role_admin', Right::VIEW)}</a>{/if}</span>{if !$smarty.foreach.public_accessible_roles.last}, {/if}
+                    {/foreach}
+                </dd>
+            </dl>
+        </div>
+        {if $alternate_platforms|@count}
+            <dl class="preview-info-action switch-platform">
+                <dd>
+                    {sprintf($dict.ACTION_switch_platform, $dict['SET_webpage_page_types'][$alternate_platforms[0]['platform']], $alternate_platforms[0]['path'])}
+                </dd>
+            </dl>
+        {/if}
+        <dl class="preview-info-action toggle-open">
+            <dd>
+                <a href="#">X</a>
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var toggleBox = function(root, ctrl) {
+        this.root = null;
+        this.ctrl = null;
+        this.width = 0;
+        this.height = 0;
+        this.status = 'closed';
+        this.duration = 500;
+        this.init(root, ctrl);
+    };
+
+    toggleBox.prototype = {
+        'init': function(root, ctrl) {
+            var me = this;
+            this.root = root;
+            this.ctrl = ctrl;
+
+            var fn = function() {
+                me.refineSize();
+            }
+
+            this.ctrl.css({
+                'display': 'none'
+            });
+
+            $(window).bind('load', function(){
+                fn();
+                $(window).unbind('load', fn);
+                me.ctrl.css({
+                    'display': 'block'
+                });
+            });
+
+            this.refineSize();
+
+            this.ctrl.bind('click', function(e){
+                e.preventDefault();
+                me.toggle();
+            });
+
+            this.status = 'opened';
+            this.root.addClass(this.status);
+        },
+        'refineSize': function() {
+            var o = this.root.css('overflow');
+
+            this.root.css({
+                'overflow': 'hidden'
+            });
+            this.root.find('> .items').css({
+                'width': 'auto',
+                'height': 'auto'
+            });
+
+            this.width = this.root[0].scrollWidth;
+            this.height = this.root[0].scrollHeight;
+            this.root.css({
+                'overflow': o
+            });
+        },
+        'toggle': function() {
+            var it = this.root.find('> .items');
+            var me = this;
+
+            if(this.status == 'closed') {
+                var newStatus = 'opened';
+                var d = {
+                    'width': this.width,
+                    'height': this.height
+                };
+            } else {
+                var newStatus = 'closed';
+                var d = {
+                    'width': 0,
+                    'height': 0
+                };
+
+                it.css({
+                    'width': it.width(),
+                    'height': it.height()
+                });
+            }
+
+            this.root.animate({
+                'width': d.width,
+                'height': d.height
+            }, {
+                'duration': this.duration,
+                'complete': function(){
+                    if(me.status == 'opened') {
+                        it.css({
+                            'width': 'auto',
+                            'height': 'auto'
+                        });
+                    } else {
+                        it.css({
+                            'width': '100%',
+                            'height': '100%'
+                        });
+                    }
+                }
+            });
+
+            this.root.removeClass(this.status);
+            this.status = newStatus;
+            this.root.addClass(newStatus);
+        }
+    }
+
+    new toggleBox($('#preview-info-box'), $('#preview-info-box .toggle-open a'));
+</script>

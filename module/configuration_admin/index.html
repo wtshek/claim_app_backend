@@ -1,0 +1,649 @@
+<div class="row">
+  <div class="col-12">
+    <div class="box box-bordered box-color">
+      <div class="box-title">
+        <h3><i class="icon-cogs"></i>{$dict.LABEL_configurations|escape}</h3>
+
+        <ul class="actions">
+          <li>
+            <button type="button" class="btn btn-mini content-slideUp">
+              <i class="icon-angle-down"></i>
+            </button>
+          </li>
+        </ul>
+
+        <nav>
+          <div class="nav nav-tabs" id="systems-tab" role="tablist">
+            <a class="nav-item nav-link active" id="app-tab" data-toggle="tab" href="#app" role="tab" aria-controls="app" aria-selected="true">{$dict.APP_title|escape}</a>
+          </div>
+        </nav>
+      </div>
+
+      <div class="box-content nopadding">
+        <div class="tab-content" id="systems-tabContent">
+          <div class="tab-pane fade show active" id="app">
+            <form id="edit_form" method="POST" accept-charset="UTF-8" action="?op=index">
+              <nav>
+                <div class="nav nav-tabs tabs-inline tabs-top" id="app-tab" role="tablist">
+                  <a class="nav-item nav-link active" id="general-conf-tab" data-toggle="tab" href="#general-conf" role="tab" aria-controls="general-conf" aria-selected="true">
+                    {$dict.LABEL_general_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="mailer-conf-tab" data-toggle="tab" href="#mailer-conf" role="tab" aria-controls="mailer-conf" aria-selected="false">
+                    {$dict.LABEL_mailer_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="page-conf-tab" data-toggle="tab" href="#page-conf" role="tab" aria-controls="page-conf" aria-selected="false">
+                    {$dict.LABEL_page_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="webpage-conf-tab" data-toggle="tab" href="#webpage-conf" role="tab" aria-controls="webpage-conf" aria-selected="false">
+                    {$dict.LABEL_webpage_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="locales-conf-tab" data-toggle="tab" href="#locales-conf" role="tab" aria-controls="locales-conf" aria-selected="false">
+                    {$dict.LABEL_locales_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="countries-locale-conf-tab" data-toggle="tab" href="#countries-locale-conf" role="tab" aria-controls="countries-locale-conf" aria-selected="false">
+                    {$dict.LABEL_countries_locale_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="tracking-code-conf-tab" data-toggle="tab" href="#tracking-code-conf" role="tab" aria-controls="tracking-code-conf" aria-selected="false">
+                    {$dict.LABEL_tracking_code_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="aws-conf-tab" data-toggle="tab" href="#aws-conf" role="tab" aria-controls="aws-conf" aria-selected="false">
+                    {$dict.LABEL_aws_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="image-dimension-conf-tab" data-toggle="tab" href="#image-dimension-conf" role="tab" aria-controls="image-dimension-conf" aria-selected="false">
+                    {$dict.LABEL_image_dimension_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="hcaptcha-conf-tab" data-toggle="tab" href="#hcaptcha-conf" role="tab" aria-controls="hcaptcha-conf" aria-selected="false">
+                    {$dict.LABEL_hcaptcha_conf|escape}
+                  </a>
+
+                  <a class="nav-item nav-link" id="misc-conf-tab" data-toggle="tab" href="#misc-conf" role="tab" aria-controls="misc-conf" aria-selected="false">
+                    {$dict.LABEL_misc_conf|escape}
+                  </a>
+                </div>
+              </nav>
+
+              <div class="tab-content" id="app-tabContent">
+                <div class="tab-pane fade padding show active" id="general-conf" role="tabpanel" aria-labelledby="general-conf-tab">
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="default_domain" title=$dict.LABEL_default_domain id="default_domain" maxlength="255" value=$conf.default_domain error=$errors.default_domain view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="box grey-bordered box-no-color">
+                        <div class="box-title">
+                          <div class="form-inline">
+                            <label for="locale-config-block-switch" class="my-1 mr-2"><i class="icon-globe"></i>&nbsp;{$dict.LABEL_language|escape}</label>
+
+                            <select id="locale-config-block-switch" name="locale-config-block-switch" class="custom-select my-1 mr-sm-2">
+                              {html_options options=$dict.SET_accessible_locales selected=$user->getPreferredLocale()}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="box-content">
+                          {foreach from=$dict.SET_accessible_locales key=locale item=locale_text}
+                          <div class="locale-config-block" id="{$locale|replace:'/':'-'}-locale-config-block">
+                            <div class="row">
+                              <div class="col-12 col-lg-6">
+                                {field_text ratio="4:8" class="" type="text" name="{$locale}_site_name" title=$dict.LABEL_site_name id="{$locale}_site_name" maxlength="255" value=$conf_locales[$locale]['site_name'] view_only=false}
+                              </div>
+                            </div>
+
+                            <div class="row">
+                              <div class="col-12 col-lg-6">
+                                {field_textarea ratio="2:10" class="visualEditorSimple" name="{$locale}_footer_static_content" title=$dict.LABEL_footer_static_content id="{$locale}_footer_static_content" value=$conf_locales[$locale]['footer_static_content'] style="height:200px;" view_only=false}
+                              </div>
+                            </div>
+                          </div>
+                          {/foreach}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane fade padding" id="mailer-conf" role="tabpanel" aria-labelledby="mailer-conf-tab">
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="mailer_name" title=$dict.LABEL_name id="mailer_name" maxlength="255" value=$conf.mailer_name error=$errors.mailer_name view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="email" name="mailer_email" title=$dict.LABEL_email id="mailer_email" maxlength="255" value=$conf.mailer_email error=$errors.mailer_email view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="mailer_smtp_host" title=$dict.LABEL_smtp_host id="mailer_smtp_host" maxlength="255" value=$conf.mailer_smtp_host error=$errors.mailer_smtp_host view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="mailer_smtp_port" title=$dict.LABEL_smtp_port id="mailer_smtp_port" maxlength="255" value=$conf.mailer_smtp_port error=$errors.mailer_smtp_port view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_select name="mailer_smtp_secure" title=$dict.LABEL_smtp_secure options=$dict.SET_smtp_secures id="mailer_smtp_secure" selected=$conf.mailer_smtp_secure error=$errors.mailer_smtp_secure view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_radio ratio="4:8" class="" name="mailer_smtp_auth" title=$dict.LABEL_smtp_auth id="mailer_smtp_auth" options=$dict.SET_bool selected=$conf.mailer_smtp_auth error=$errors.mailer_smtp_auth view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="mailer_smtp_username" title=$dict.LABEL_smtp_username id="mailer_smtp_username" maxlength="255" value=$conf.mailer_smtp_username error=$errors.mailer_smtp_username view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="password" name="mailer_smtp_password" title=$dict.LABEL_smtp_password id="mailer_smtp_password" maxlength="255" value=$conf.mailer_smtp_password error=$errors.mailer_smtp_password view_only=false}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane fade padding" id="page-conf" role="tabpanel" aria-labelledby="page-conf-tab">
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_radio ratio="4:8" class="" name="page_enabled" title=$dict.LABEL_enabled id="page_enabled" options=$dict.SET_bool selected=$conf.page_enabled error=$errors.page_enabled view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_radio ratio="4:8" class="" name="page_sortable" title=$dict.LABEL_sortable id="page_sortable" options=$dict.SET_bool selected=$conf.page_sortable error=$errors.page_sortable view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="page_size" title=$dict.LABEL_size id="page_size" maxlength="255" value=$conf.page_size error=$errors.page_size view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="page_limit" title=$dict.LABEL_limit id="page_limit" maxlength="255" value=$conf.page_limit error=$errors.page_limit view_only=false}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane fade padding" id="webpage-conf" role="tabpanel" aria-labelledby="webpage-conf-tab">
+                  <div class="row">
+                    <div class="col-12 col-lg-4">
+                      <h4>{$dict.LABEL_404_webpage|escape}</h4>
+
+                      <div class="webpage-tree" data-platform="desktop">
+                        {$site_tree.404_webpage_id.desktop}
+                        <input type="hidden" name="404_webpage_id" value="{$conf.404_webpage_id}" />
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-lg-4">
+                      <h4>{$dict.LABEL_footer_webpage|escape}</h4>
+
+                      <div class="webpage-tree" data-platform="desktop">
+                        {$site_tree.footer_webpage_id.desktop}
+                        <input type="hidden" name="footer_webpage_id" value="{$conf.footer_webpage_id}" />
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-lg-4">
+                      <h4>{$dict.LABEL_offer_webpage|escape}</h4>
+
+                      <div class="webpage-tree" data-platform="desktop">
+                        {$site_tree.offer_webpage_id.desktop}
+                        <input type="hidden" name="offer_webpage_id" value="{$conf.offer_webpage_id}" />
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-lg-4">
+                      <h4>{$dict.LABEL_login_webpage|escape}</h4>
+
+                      <div class="webpage-tree" data-platform="desktop">
+                        {$site_tree.login_webpage_id.desktop}
+                        <input type="hidden" name="login_webpage_id" value="{$conf.login_webpage_id}" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane fade padding" id="locales-conf" role="tabpanel" aria-labelledby="locales-conf-tab">
+                  <div class="row">
+                    <div class="col-2">
+                      {field_text ratio="12:-1" class="" type="text" name="alias_label" title=$dict.LABEL_language_alias id=""}
+                    </div>
+
+                    <div class="col-5">
+                      {field_text ratio="12:-1" class="" type="text" name="name_label" title=$dict.LABEL_language_name id=""}
+                    </div>
+
+                    <div class="col-2">
+                      {field_text ratio="12:-1" class="" type="text" name="default_label" title=$dict.LABEL_language_default id=""}
+                    </div>
+
+                    <div class="col-2">
+                      {field_text ratio="12:-1" class="" type="text" name="alias_label" title=$dict.LABEL_language_order id=""}
+                    </div>
+
+                    <div class="col-1">
+                      <dl class="input-field text-field row edit" name="add" class="col-12">
+                        <dd class="col-12">
+                          <div>
+                            <ul class="actions">
+                              <li><button type="button" name="language_add" class="btn btn-small"><i class="icon-plus"></i></button></li>
+                            </ul>
+                          </div>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+
+                  {foreach from=$locales key=k item=locale}
+                  <div class="row">
+                    <div class="col-2">
+                      {field_text ratio="0:12" class="" type="text" name="language_alias[]" title="" id="language_alias_$k" error=$errors["language_alias_$k"] maxlength="45" value=$locale.alias view_only=false}
+                      {field_text ratio="0:12" class="" type="hidden" name="language_id[]" title="" id="language_id_$k" maxlength="255" value=$locale.id view_only=false}
+                    </div>
+
+                    <div class="col-5">
+                      {field_text ratio="0:12" class="" type="text" name="language_name[]" title="" id="language_name_$k" error=$errors[$k]['name'] maxlength="255" value=$locale.name view_only=false}
+                    </div>
+
+                    <div class="col-2">
+                      {field_radio ratio="0:12" class="" name="language_default" title="" id="language_default_$k" error=$errors.language_default value=$locale.default options=$dict.SET_default_lan selected=$locale.default view_only=false}
+                      {field_text ratio="0:12" class="" type="hidden" name="language_default_value[]" title="" id="language_default_value_$k" maxlength="255" value=$locale.default view_only=false}
+                    </div>
+
+                    <div class="col-2">
+                      {field_text ratio="0:12" class="" type="text" name="language_order[]" title="" id="language_order_$k" maxlength="255" value=$locale.order_index view_only=false}
+                    </div>
+
+                    <div class="col-1">
+                      <dl class="input-field text-field row edit" name="remove_button">
+                        <dd class="col-12">
+                          <div>
+                            <ul class="actions">
+                              <li><button type="button" name="language_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+                            </ul>
+                          </div>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                  {/foreach}
+                </div>
+
+                <div class="tab-pane fade padding" id="countries-locale-conf" aria-labelledby="countries-locale-conf-tab">
+                  <div id="countries-locale-accordion">
+                    {foreach from=$countries_list key=first_letter item=iso_code_country name=icc}
+                    <div class="card">
+                      <div class="card-header" id="countries-locale-header-{$first_letter}">
+                        <h2 class="mb-0">
+                          <button type="button" class="btn btn-link {if !$smarty.foreach.icc.first}collapsed{/if}"
+                            data-toggle="collapse" data-target="#countries-locale-collapse-{$first_letter}" aria-expanded="true" aria-controls="countries-locale-collapse-{$first_letter}">
+                            {$first_letter}
+                          </button>
+                        </h2>
+                      </div>
+
+                      <div id="countries-locale-collapse-{$first_letter}" class="collapse {if $smarty.foreach.icc.first}show{/if}"
+                        aria-labelledby="countries-locale-header-{$first_letter}" data-parent="#countries-locale-accordion">
+                        <div class="card-body">
+                          {foreach from=$iso_code_country key=iso_code item=country_name}
+                            <div class="row">
+                              <div class="col-12 col-lg-6">
+                                {field_select ratio="4:8" class="chosen-default-locale" name="country_default_language[]" title=$country_name id="country_default_language_$iso_code" error=$errors["country_default_language_$iso_code"] options=$dict.SET_accessible_locales selected=$country_default_locales[$iso_code] has_empty=true view_only=false}
+                                {field_text ratio="0:12" class="" type="hidden" name="iso_code[]" title="" id="iso_code_$iso_code" maxlength="2" value=$iso_code view_only=false}
+                              </div>
+                            </div>
+                          {/foreach}
+                        </div>
+                      </div>
+                    </div>
+                    {/foreach}
+                  </div>
+
+                  <!--div class="row">
+                    <div class="col-12 col-lg-6">
+                      <div id="en_locale" style="height: 150px; width: 150px; border: 1px solid #333;"></div>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      <h4>{$dict.LABEL_countries_pool|escape}</h4>
+                      <div class="geo-countries-pool">
+                        <ul>
+                          {foreach from=$dict.SET_iso_country_codes key=iso_code item=country_name}
+                            <li data-country_code="{$iso_code}">
+                              <a href="#" class="btn btn-green">
+                                <i class="icon-plane"></i>&nbsp;{$country_name|escape}
+                              </a>
+                            </li>
+                          {/foreach}
+                          <div class="clear-both"></div>
+                        </ul>
+                      </div>
+                    </div>
+                  </div-->
+                </div>
+                <!--script>
+                  (function(){
+                    $('.geo-countries-pool ul li').draggable({
+                      cursor: "move"，
+                      helper: "clone",
+                      stop: function(event, ui){
+
+                      }
+                    });
+                    $('#en_locale').droppable({
+                      accept: ".geo-countries-pool ul li"
+                    });
+                  })();
+                </script-->
+
+                <div class="tab-pane padding" id="tracking-code-conf" aria-labelledby="tracking-code-conf-tab">
+                  <div class="form-inline">
+                    <label for="locale-tracking-code-block-switch" class="my-1 mr-2"><i class="icon-globe"></i>&nbsp;{$dict.LABEL_language|escape}</label>
+
+                    <select id="locale-tracking-code-block-switch" name="locale-tracking-code-block-switch" class="custom-select my-1 mr-sm-2">
+                      {html_options options=$dict.SET_accessible_locales selected=$user->getPreferredLocale()}
+                    </select>
+                  </div>
+
+                  <div>&nbsp;</div>
+
+                  {foreach from=$dict.SET_accessible_locales key=locale item=locale_text}
+                  <div class="locale-tracking-code-block" id="{$locale|replace:'/':'-'}-locale-tracking-code-block">
+                    <h4>{$dict.LABEL_header_tracking|escape}</h4>
+
+                    <div class="row">
+                      <div class="col-12">
+                        {field_textarea ratio="0:12" class="" name="{$locale}_tracking_code_header" title="" id="{$locale}_tracking_code_header" value=$tracking_code_header[$locale] style="height:200px;" view_only=false}
+                      </div>
+                    </div>
+
+                    <h4>{$dict.LABEL_footer_tracking|escape}</h4>
+
+                    <div class="row">
+                      <div class="col-12">
+                        {field_textarea ratio="0:12" class="" name="{$locale}_tracking_code" title="" id="{$locale}_tracking_code" value=$tracking_code[$locale] style="height:200px;" view_only=false}
+                      </div>
+                    </div>
+                  </div>
+                  {/foreach}
+                </div>
+
+                <div class="tab-pane padding" id="aws-conf" aria-labelledby="aws-conf-tab">
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_radio ratio="4:8" class="" name="aws_enabled" title=$dict.LABEL_enabled id="aws_enabled" options=$dict.SET_bool selected=$conf.aws_enabled error=$errors.aws_enabled view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" name="aws_access_key" type="text" title=$dict.LABEL_aws_access_key id="aws_access_key" value=$conf.aws_access_key error=$errors.aws_access_key view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" name="aws_secret_key" type="password" title=$dict.LABEL_aws_secret_key id="aws_secret_key" value=$conf.aws_secret_key error=$errors.aws_secret_key view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_select name="s3_region" title=$dict.LABEL_s3_region options=$dict.SET_aws_regions id="s3_region" selected=$conf.s3_region error=$errors.s3_region view_only=false has_empty=true}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" name="s3_bucket" type="text" title=$dict.LABEL_s3_bucket id="s3_bucket" value=$conf.s3_bucket error=$errors.s3_bucket view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" name="s3_domain" type="text" title=$dict.LABEL_s3_domain id="s3_domain" value=$conf.s3_domain error=$errors.s3_domain view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" name="cloudfront_domain" type="text" title=$dict.LABEL_cloudfront_domain id="cloudfront_domain" value=$conf.cloudfront_domain error=$errors.cloudfront_domain view_only=false}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane padding" id="image-dimension-conf" aria-labelledby="image-dimension-conf-tab">
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_textarea ratio="4:8" class="" type="text" name="banner_image_dimension_xs" title=$dict.LABEL_banner_image_dimension_xs id="banner_image_dimension_xs" value=$conf.banner_image_dimension_xs error=$errors.banner_image_dimension_xs view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_textarea ratio="4:8" class="" type="text" name="banner_image_dimension_md" title=$dict.LABEL_banner_image_dimension_md id="banner_image_dimension_md" value=$conf.banner_image_dimension_md error=$errors.banner_image_dimension_md view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_textarea ratio="4:8" class="" type="text" name="banner_image_dimension_xl" title=$dict.LABEL_banner_image_dimension_xl id="banner_image_dimension_xl" value=$conf.banner_image_dimension_xl error=$errors.banner_image_dimension_xl view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_textarea ratio="4:8" class="" type="text" name="offer_image_dimension" title=$dict.LABEL_offer_image_dimension id="offer_image_dimension" value=$conf.offer_image_dimension error=$errors.offer_image_dimension view_only=false}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane padding" id="hcaptcha-conf" aria-labelledby="hcaptcha-conf-tab">
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" name="hcaptcha_sitekey" type="text" title=$dict.LABEL_hcaptcha_sitekey id="hcaptcha_sitekey" value=$conf.hcaptcha_sitekey error=$errors.hcaptcha_sitekey view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" name="hcaptcha_secret" type="password" title=$dict.LABEL_hcaptcha_secret id="hcaptcha_secret" value=$conf.hcaptcha_secret error=$errors.hcaptcha_secret view_only=false}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane padding" id="misc-conf" aria-labelledby="misc-conf-tab">
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_select ratio="4:8" class="" name="timezone" has_empty=true title=$dict.LABEL_timezone options=$dict.SET_timezones id="timezone" selected=$conf.timezone error=$errors.timezone view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="dialog_timeout" title=$dict.LABEL_dialog_timeout id="dialog_timeout" maxlength="255" value=$conf.dialog_timeout error=$errors.dialog_timeout view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="user_session_timer" title=$dict.LABEL_user_session_timer id="user_session_timer" maxlength="255" value=$conf.user_session_timer error=$errors.user_session_timer view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="page_session_timer" title=$dict.LABEL_page_session_timer id="page_session_timer" maxlength="255" value=$conf.page_session_timer error=$errors.page_session_timer view_only=false}
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-lg-6">
+                      {field_select ratio="4:8" class="" name="spreadsheet_type" has_empty=true title=$dict.LABEL_spreadsheet_type options=$dict.SET_spreadsheet_types id="spreadsheet_type" selected=$conf.spreadsheet_type error=null view_only=false}
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                      {field_text ratio="4:8" class="" type="text" name="webpage_n_month_before" title=$dict.LABEL_webpage_n_month_before id="webpage_n_month_before" maxlength="255" value=$conf.webpage_n_month_before error=$errors.webpage_n_month_before view_only=false}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form_actions">
+                <ul>
+                  <li>
+                    <button type="submit" name="submit" class="btn btn-primary">
+                      <i class="icon-save"></i>
+                      {$dict.ACTION_save|escape}</button>
+                  </li>
+                </ul>
+              </div>
+            </form>
+          </div>
+
+          {* Subsystems *}
+          {foreach $subsystems as $subsystem => $src}
+          <div class="tab-pane" id="system-{$subsystem|escape}">
+            <iframe src="{$src|escape}" width="100%" height="400" frameborder="0" style="display: block"></iframe>
+          </div>
+          {/foreach}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+    $('.chosen-default-locale').chosen({
+        width: '100%'
+    });
+
+    var switchLocaleBlock = function(config_locale, switcher){
+        if(config_locale == null)
+        {
+            config_locale = new Array;
+            $('select[id$="-block-switch"]').each(function(index){
+                config_locale.push($(this).val());
+            });
+        }
+
+        if(switcher == null)
+        {
+            switcher = new Array;
+            $('select[id$="-block-switch"]').each(function(index){
+                switcher.push($(this).attr('id'));
+            });
+        }
+
+        if(config_locale != null && switcher != null)
+        {
+            for(var i=0; i<switcher.length; i++)
+            {
+                var switcher_surfix = '-switch';
+                var block_name = switcher[i].substring(0, switcher[i].length-switcher_surfix.length);
+                $('.'+block_name).hide();
+                $('#'+config_locale[i]+'-'+block_name).show();
+            }
+        }
+    }
+
+    switchLocaleBlock(null, null);
+    $('#locale-config-block-switch, #locale-tracking-code-block-switch').bind('change', function(e){
+        switchLocaleBlock([$(this).val()], [$(this).attr('id')]);
+    });
+
+    var t = $('.webpage-tree');
+    for(var i = 0; i < t.length; i++) {
+        (function(){
+            var tree = $(t[i]);
+            var p = tree.attr('data-platform');
+
+            tree.fancytree({
+                checkbox: "radio",
+                selectMode: 1,
+                click: function(event, data) {
+                    if(data.targetType == "icon" || data.targetType == "title")
+                    {
+                        data.node.setSelected(!data.node.isSelected());
+                    }
+                },
+                select: function(event, data) {
+                    tree.find("input").val(data.node.key);
+                },
+                lazyLoad: function(event, data) {
+                    data.result = $.getJSON("./", {
+                        "op": "get_webpage_nodes",
+                        "ajax": 1,
+                        "disable_root": true,
+                        "platform": p,
+                        "parent": data.node.key
+                    });
+                }
+            });
+        })();
+    }
+
+    var add_row = function(){
+        var parent = $("#locales-conf");
+        var timestamp = new Date().getTime();
+        parent.children().last().clone(true).appendTo(parent);
+        var row_added = parent.children().last();
+        row_added.find("input[type='text'], input[type='hidden']").each(function(index){
+            var id=$(this).attr('id');
+            $(this).attr('id', id+'_'+timestamp);
+            $(this).val('');
+        });
+        row_added.find("input[type='radio']").each(function(index){
+            var id=$(this).attr('id');
+            $(this).attr('id', id+'_'+timestamp);
+            $(this).removeAttr('checked').val(0);
+        });
+    };
+
+    var del_row = function(_this){
+        var parent = $("#locales-conf");
+        if(parent.children().length>2)
+        {
+            var row_del = _this.closest("div.row");
+            row_del.remove();
+        }
+    };
+
+    $("button[name='language_add']").bind('click', function(e){
+        add_row();
+    });
+    $("button[name^='language_remove']").bind('click', function(e){
+        del_row($(this));
+    });
+    $("#locales-conf input[type='radio']").bind('click', function(){
+        $(this).val(1).attr('checked', 'checked').closest('dl.radio-field').next().find('input').val(1);
+        $("#locales-conf input[type='radio']").not(":checked").val(0).removeAttr('checked').closest('dl.radio-field').next().find('input').val(0);
+    });
+
+    new form_submit_panel($("form"));
+
+    {* Subsystems *}
+    var iframes = $( "div[id^=system-] > iframe" ).attr( "scrolling", "no" );
+    $( window ).on( "message", function(e) {
+        iframes.each( function(i, iframe) {
+            iframe = $( iframe );
+            if ( iframe.is(":visible") && iframe[0].contentWindow == e.originalEvent.source )
+            {
+                var data = e.originalEvent.data;
+
+                if ( data.type == "height" )
+                {
+                    iframe.attr( "height", data.height );
+                    try
+                    {
+                        iframe.contents().scrollTop( 0 );
+                    }
+                    catch ( e )
+                    {
+                    }
+                }
+            }
+        } );
+    } );
+})();
+</script>

@@ -1,0 +1,112 @@
+<div class="row">
+    <div class="col-12">
+        <div class="box box-bordered box-color">
+            <div class="box-title">
+                <h3><i class="icon-reorder"></i>{$dict.SET_operations.view|escape}</h3>
+                <ul class="actions">
+                    <li>
+                        <a href="{$_get.referer_url|escape}" class="btn btn-mini content-remove"><i class="icon-remove"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="box-content">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <div class="row">
+                            <div class="col-12 col-lg-4"><span class="title">{$dict.LABEL_type|escape}</span></div>
+                            <div class="col-12 col-lg-8 even line-padding">{$dict.SET_log_types[$data.log.type]|escape}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-4"><span class="title">{$dict.LABEL_date|escape}</span></div>
+                            <div class="col-12 col-lg-8 odd line-padding">{$data.log.date|escape}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-4"><span class="title">{$dict.LABEL_time|escape}</span></div>
+                            <div class="col-12 col-lg-8 even line-padding">{$data.log.time|escape}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-4"><span class="title">{$dict.LABEL_locale|escape}</span></div>
+                            <div class="col-12 col-lg-8 odd line-padding">{$sets.locales[$data.log.locale]|escape}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-4"><span class="title">{$dict.LABEL_module|escape}</span></div>
+                            <div class="col-12 col-lg-8 even line-padding">{$dict.SET_modules[$data.log.module]|escape}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-4"><span class="title">{$dict.LABEL_ip_address|escape}</span></div>
+                            <div class="col-12 col-lg-8 odd line-padding">{if $data.log.ip_address}
+                                    <a href="https://www.whois.com/whois/{$data.log.ip_address|escape:'url'}" target="_blank">
+                                        {$data.log.ip_address|escape}
+                                    </a>
+                                {else}
+                                    &nbsp;
+                                {/if}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div><span class="title">{$dict.LABEL_description|escape}</span></div>
+                        <div>{$data.log.description|escape|nl2br}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-2">
+                        <span class="title">{$dict.LABEL_file_path|escape}</span>
+                    </div>
+                    <div class="col-12 col-lg-10 even line-padding">
+                        {$data.log.file_path|escape}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-2">
+                        <span class="title">{$dict.LABEL_line_number|escape}</span>
+                    </div>
+                    <div class="col-12 col-lg-10 odd line-padding">
+                        {$data.log.line_number|escape}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-2">
+                        <span class="title">{$dict.LABEL_user_agent|escape}</span>
+                    </div>
+                    <div class="col-12 col-lg-10 even line-padding">
+                        {if $data.log.user_agent}
+                            <a href="http://gs.statcounter.com/detect?useragent={$data.log.user_agent|escape:'url'}" target="_blank">
+                                {$data.log.user_agent|escape}
+                            </a>
+                        {else}
+                            &nbsp;
+                        {/if}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-2">
+                        <span class="title">{$dict.LABEL_referer_uri|escape}</span>
+                    </div>
+                    <div class="col-12 col-lg-10 odd line-padding">
+                        {if $data.log.referer_uri}
+                            <a href="{$data.log.referer_uri|escape}" target="_blank">
+                                {$data.log.referer_uri|escape}
+                            </a>
+                        {else}
+                            &nbsp;
+                        {/if}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-2">
+                        <span class="title">{$dict.LABEL_request_uri|escape}</span>
+                    </div>
+                    <div class="col-12 col-lg-10 even line-padding">
+                        {if $data.log.request_uri}
+                            <a href="{$data.log.request_uri|escape}" target="_blank">
+                                {$data.log.request_uri|escape}
+                            </a>
+                        {else}
+                            &nbsp;
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

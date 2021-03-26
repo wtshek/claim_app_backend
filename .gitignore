@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+file/cache/*.*
+file/gallery/**/*.*
+file/media_center/**/*.*
+file/offer/**/*.*
+file/webpage/**/*.*
+module/file_admin/meta/**
+module/file_admin/thumbs/**
+node_modules/**
+vendor/**

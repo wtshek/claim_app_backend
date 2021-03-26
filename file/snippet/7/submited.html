@@ -1,0 +1,8 @@
+{if $code ==1}
+    <p>{$proposal_dict.LABEL_thank_you|escape:'html'}</p>
+    <p>{$proposal_dict.MESSAGE_request_sent|escape:'html'}</p>
+{elseif $code ==2}
+    <p>{$proposal_dict.MESSAGE_request_not_sent|escape:'html'}</p>
+{elseif $code ==3 }
+    <p>{$proposal_dict.MESSAGE_request_error|escape:'html'}</p>
+{/if}

@@ -1,0 +1,653 @@
+<div class="row">
+  <div class="col-12">
+    <div class="box box-bordered box-color">
+      <div class="box-title">
+        <h3><i class="icon-cogs"></i>{$dict.LABEL_vanity_urls|escape}</h3>
+
+        <ul class="actions">
+          <li>
+            <button type="button" class="btn btn-mini content-slideUp">
+              <i class="icon-angle-down"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="box-content">
+        <form id="edit_form" method="POST" accept-charset="UTF-8" action="?op=index">
+          <div class="row">
+            <div class="col-2">
+              {field_text ratio="12:-1" class="" type="text" name="alias_label" title=$dict.LABEL_vanity_from id=""}
+            </div>
+
+            <div class="col-2">
+              {field_text ratio="12:-1" class="" type="text" name="redirect_to_label" title=$dict.LABEL_redirect_to id=""}
+            </div>
+
+            <div class="col-2">
+              {field_text ratio="12:-1" class="" type="text" name="description_label" title=$dict.LABEL_description id=""}
+            </div>
+
+            <div class="col-2">
+              {field_text ratio="12:-1" class="" type="text" name="start_date_label" title=$dict.LABEL_start_date id=""}
+            </div>
+
+            <div class="col-2">
+              {field_text ratio="12:-1" class="" type="text" name="end_date_label" title=$dict.LABEL_end_date id=""}
+            </div>
+
+            <div class="col-1">
+              {field_text ratio="12:-1" class="" type="text" name="active_label" title=$dict.LABEL_active id=""}
+            </div>
+
+            <div class="col-1">
+              {if $user->hasRights('vanity_url_admin', Right::CREATE)}
+              <ul class="actions">
+                <li><button type="button" name="vanity_url_add" class="btn btn-small"><i class="icon-plus"></i></button></li>
+              </ul>
+              {/if}
+            </div>
+          </div>
+
+          <div id="standard_empty_row" style="display: none;">
+            <div class="row">
+              <div class="col-2">
+                <div class="edit_mode">
+                  {field_text ratio="0:12" class="" type="text" name="vanity_url_alias[]" title="" id="" error=$errors["vanity_url_alias"] maxlength="50" value="" view_only=false}
+                </div>
+                {field_text ratio="0:12" class="" type="hidden" name="vanity_url_id[]" title="" id="" maxlength="11" value="" view_only=false}
+                {field_text ratio="0:12" class="" type="hidden" name="record_modified[]" title="" id="" value="0" view_only=false}
+                {field_text ratio="0:12" class="" type="hidden" name="deleted[]" title="" id="" value="0" view_only=false}
+              </div>
+
+              <div class="col-2">
+                <div class="edit_mode">
+                  {*field_text ratio="0:12" class="" type="text" name="redirect_to[]" title="" id="" error=$errors['redirect_to_$k'] maxlength="255" value="" view_only=false*}
+                  {field_text ratio="0:12" class="" type="hidden" name="internal_id[]" title="" id="" value="" view_only=false}
+                  <dl class="input-field text-field row-fluid edit" name="redirect_to[]_input">
+                    <dd class="span12">
+                      <div>
+                        <div class="input-group">
+                          <input id="redirect_to_{$k}" name="redirect_to[]" class="form-control" value="" maxlength="255" type="text">
+                          <div class="input-group-append">
+                            <button type="button" name="internal_webpage_select[]" class="btn btn-primary btn-outline-secondary" data-trigger="0">{$dict.ACTION_select|escape}</button>
+                          </div>
+                        </div>
+                      </div>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+
+              <div class="col-2">
+                <div class="edit_mode">
+                  {field_text ratio="0:12" class="" type="text" name="description[]" title="" id="" error=$errors['description_$k'] maxlength="50" value="" view_only=false}
+                </div>
+              </div>
+
+              <div class="col-2">
+                <div class="edit_mode">
+                  {field_calendar ratio="0:12" class="" type="text" name="start_date[]" title="" id="start_date_" maxlength="255" value="" error=$errors["start_date_$k"] view_only=false}
+                </div>
+              </div>
+
+              <div class="col-2">
+                <div class="edit_mode">
+                  {field_calendar ratio="0:12" class="" type="text" name="end_date[]" title="" id="end_date_" maxlength="255" value="" error=$errors["end_date_$k"] view_only=false}
+                </div>
+              </div>
+
+              <div class="col-1">
+                <div class="edit_mode">
+                  {field_checkbox ratio="0:12" class="" name="active" title="" id="" error=$errors["active_$k"] options=$dict.SET_active_status selected="" view_only=false}
+                </div>
+              </div>
+
+              <div class="col-1">
+                {if $user->hasRights('vanity_url_admin', Right::EDIT)}
+                <ul class="actions">
+                  <li style="margin-left: 0px;">
+                    <button type="button" name="vanity_url_edit[]" class="btn btn-primary" style="font-size:1em;padding: 3px 6px;">
+                      <i class="icon-edit"></i>
+                    </button>
+                  </li>
+                  <li style="margin-left: 0.1em;"><button type="button" name="vanity_url_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+                </ul>
+                {/if}
+              </div>
+            </div>
+          </div>
+
+          {foreach from=$data key=k item=vanity_url}
+          <div class="row vanity_url_records">
+            <div class="col-2">
+              <div class="edit_mode">
+                {field_text ratio="0:12" class="" type="text" name="vanity_url_alias[]" title="" id="vanity_url_alias_$k" error=$errors["vanity_url_alias_$k"] maxlength="50" value=$vanity_url.vanity_url_alias view_only=false}
+              </div>
+
+              <div class="view_mode">
+                {field_text ratio="0:12" class="" type="text" name="view_vanity_url_alias[]" title="" id="view_vanity_url_alias_$k" error=$errors["vanity_url_alias_$k"] maxlength="50" value=$vanity_url.vanity_url_alias view_only=true}
+              </div>
+
+              {field_text ratio="0:12" class="" type="hidden" name="vanity_url_id[]" title="" id="vanity_url_id_$k" maxlength="11" value=$k view_only=false}
+              {field_text ratio="0:12" class="" type="hidden" name="record_modified[]" title="" id="record_modified_$k" value="0" view_only=false}
+              {field_text ratio="0:12" class="" type="hidden" name="deleted[]" title="" id="deleted_$k" value="0" view_only=false}
+            </div>
+
+            <div class="col-2">
+              <div class="edit_mode">
+                {*field_text ratio="0:12" class="" type="text" name="redirect_to[]" title="" id="redirect_to_$k" error=$errors['redirect_to_$k'] maxlength="255" value=$vanity_url.redirect_to view_only=false*}
+                {field_text ratio="0:12" class="" type="hidden" name="internal_id[]" title="" id="internal_id_$k" error=$errors['redirect_to_id_$k'] value=$vanity_url.redirect_to_id view_only=false}
+                <dl class="input-field text-field row-fluid edit" name="redirect_to[]_input">
+                  <dd class="span12">
+                    <div>
+                      <div class="input-group">
+                        <input id="redirect_to_{$k}" name="redirect_to[]" class="form-control" value="{$vanity_url.redirect_to|escape}" maxlength="255" type="text">
+                        <div class="input-group-append">
+                          <button type="button" name="internal_webpage_select[]" class="btn btn-primary btn-outline-secondary" data-trigger="0">{$dict.ACTION_select|escape}</button>
+                        </div>
+                      </div>
+                    </div>
+                  </dd>
+                </dl>
+              </div>
+
+              <div class="view_mode view_redirect_to">
+                  {field_text ratio="0:12" class="" type="text" name="view_redirect_to[]" title="" id="view_redirect_to_$k" error=$errors['redirect_to_$k'] maxlength="255" value=$vanity_url.redirect_to view_only=true}
+              </div>
+            </div>
+
+            <div class="col-2">
+              <div class="edit_mode">
+                {field_text ratio="0:12" class="" type="text" name="description[]" title="" id="description_$k" error=$errors['description_$k'] maxlength="50" value=$vanity_url.description view_only=false}
+              </div>
+
+              <div class="view_mode">
+                {field_text ratio="0:12" class="" type="text" name="view_description[]" title="" id="view_description_$k" error=$errors['description_$k'] maxlength="50" value=$vanity_url.description view_only=true}
+              </div>
+            </div>
+
+            <div class="col-2">
+              <div class="edit_mode">
+                {field_calendar ratio="0:12" class="" type="text" name="start_date[]" title="" id="start_date_$k" maxlength="255" value=$vanity_url.start_date error=$errors["start_date_$k"] view_only=false}
+              </div>
+
+              <div class="view_mode">
+                {field_calendar ratio="0:12" class="" type="text" name="view_start_date[]" title="" id="view_start_date_$k" maxlength="255" value=$vanity_url.start_date error=$errors["start_date_$k"] view_only=true}
+              </div>
+            </div>
+
+            <div class="col-2">
+              <div class="edit_mode">
+                {field_calendar ratio="0:12" class="" type="text" name="end_date[]" title="" id="end_date_$k" maxlength="255" value=$vanity_url.end_date error=$errors["end_date_$k"] view_only=false}
+              </div>
+
+              <div class="view_mode">
+                {field_calendar ratio="0:12" class="" type="text" name="view_end_date[]" title="" id="view_end_date_$k" maxlength="255" value=$vanity_url.end_date error=$errors["end_date_$k"] view_only=true}
+              </div>
+            </div>
+
+            <div class="col-1">
+              <div class="edit_mode">
+                {field_checkbox ratio="0:12" class="" name="active" title="" id="active_$k" error=$errors["active_$k"] options=$dict.SET_active_status selected=$vanity_url.active view_only=false}
+              </div>
+
+              <div class="view_mode">
+                {field_text ratio="0:12" class="" name="view_active" title="" id="view_active_$k" error=$errors["active_$k"] value=$dict.SET_active_status_view[$vanity_url.active] view_only=true}
+              </div>
+            </div>
+
+            <div class="col-1">
+              {if $user->hasRights('vanity_url_admin', Right::EDIT)}
+              <ul class="actions">
+                <li style="margin-left: 0px;">
+                  <button type="button" name="vanity_url_edit[]" class="btn btn-primary" style="font-size:1em;padding: 3px 6px;">
+                    <i class="icon-edit"></i>
+                  </button>
+                </li>
+                <li style="margin-left: 0.1em;"><button type="button" name="vanity_url_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+              </ul>
+              {/if}   
+            </div>
+          </div>
+          {/foreach}
+        </form>
+        
+        <div class="datatable-summary row">
+          {*if count($data)*}
+          <div class="record-summary span4">
+            <span>{$summary.formatted_record_count}</span>
+          </div>
+          {*/if*}
+          <div class="datatable-pagination span8">
+            <ul>
+              {assign var=page_count value=$pages|@count}
+              {if $summary.page_count > 1}
+              {*{$dict.LABEL_page}*}
+              {if $summary.page_index > 0}
+              <li><a href="?op=index&amp;{$summary.id|escape}_page=0"
+                 title="1">|&lt;</a></li>
+              {/if}
+              {if $summary.page_index > 1}
+              <li><a href="?op=index&amp;{$summary.id|escape}_page={$summary.page_index-1}"
+                 title="{$summary.page_index}">&lt;</a></li>
+              {/if}
+              {foreach item=page_index from=$pages}
+              <li><a class="{if $summary.page_index == $page_index}current{/if}" href="?op=index&amp;{$summary.id|escape}_page={$page_index}"
+                 title="{$page_index+1}">{$page_index+1}</a></li>
+              {/foreach}
+              {if $summary.page_index < $summary.page_count-2}
+              <li><a href="?op=index&amp;{$summary.id|escape}_page={$summary.page_index+1}"
+                 title="{$summary.page_index+2}">&gt;</a></li>
+              {/if}
+              {if $summary.page_index < $summary.page_count-1}
+              <li><a href="?op=index&amp;{$summary.id|escape}_page={$summary.page_count-1}"
+                 title="{$summary.page_count}">&gt;|</a></li>
+              {/if}
+              {/if}
+            </ul>
+          </div>
+        </div>
+        
+        {if $user->hasRights('vanity_url_admin', Right::EDIT) || $user->hasRights('vanity_url_admin', Right::CREATE)}
+        <div class="form_actions">
+          <ul>
+            <li>
+              <button type="submit" name="submit" class="btn btn-primary">
+                <i class="icon-save"></i>
+                {$dict.ACTION_save|escape}</button>
+            </li>
+          </ul>
+        </div>
+        {/if}
+
+        {* Modal *}
+        <div class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true" data-platform="desktop">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">{$dict.LABEL_internal_page|escape}</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              <div class="modal-body">
+                <div class="webpage-tree"></div>
+              </div>
+
+              <div class="modal-footer">
+                <input type="hidden" value="" name="modal_webpage_id"/>
+                <input type="hidden" value="" name="modal_text"/>
+                <button type="button" class="btn btn-primary" name="modal_submit" id="modal_submit">{$dict.ACTION_select|escape}</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{$dict.ACTION_close|escape}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+    {* Workaround for the bug that calendar not hidden after changing value *}
+    $( document ).on( "change.datetimepicker", "div.input-group.date", function(e) {
+        $( e.target ).datetimepicker( 'hide' );
+    } );
+
+    $( document ).on( "click", "button[name^=internal_webpage_select]", function(e) {
+        e.preventDefault();
+        $(e.target).attr('data-trigger', '1');
+        var root = $(this).closest('.box-content');
+        root = root[root.length-1];
+        var target = $(root).find('.modal');
+        target.modal();
+    });
+        
+    $("#modal_submit").bind('click', function(e){
+        e.preventDefault();
+        
+        var _trigger_button = null;
+        $('button[name^=internal_webpage_select]').each(function(index){
+            if($(this).attr('data-trigger') == 1)
+                _trigger_button = $(this);
+        });
+        var _root = _trigger_button.closest('.row');
+        var _redirect_to = _root.find('input[name="redirect_to[]"]');
+        var _internal_id = _root.find('input[name="internal_id[]"]');
+        _redirect_to.val($('input[name="modal_text"]').val());
+        _internal_id.val($('input[name="modal_webpage_id"]').val());
+        
+        _root.find('input[name^="record_modified"]').val('1');
+        
+        $('.modal').modal('hide');
+    });
+
+    $('.box-content .modal').on('show.bs.modal', function(e){
+        var t = $(this);
+        var to_load = t.data('loaded') == undefined || !$(this).data('loaded');
+        var p = t.attr('data-platform');
+        var w = $(this).find('.modal-footer');
+        var tn;
+
+        if(to_load) {
+            t.data('loaded', true);
+            tn = t.find('.webpage-tree').fancytree({
+                source: $.ajax({
+                    url: "./",
+                    data: {
+                        'op': 'get_webpage_nodes',
+                        'ajax': 1,
+                        'platform': p
+                    }
+                }),
+                activate: function(event, data) {
+                    var key_field = w.find('input[name="modal_webpage_id"]');
+                    var text_field = w.find('input[name="modal_text"]');
+                    
+                    key_field.val(data.node.key);
+                    text_field.val(data.node.title);
+                },
+                lazyLoad: function(event, data) {
+                    data.result = $.getJSON("./", {
+                        "op": "get_webpage_nodes",
+                        "ajax": 1,
+                        "disable_root": true,
+                        "platform": p,
+                        "parent": data.node.key
+                    });
+                },
+                init: function(event, data) {
+                    t.data('loaded', false);
+                }
+            });
+            /*
+            tn = t.find('.webpage-tree').dynatree({
+                title: "",
+                fx: {
+                    height: "toggle",
+                    duration: 200
+                },
+                'imagePath': "{$sets.paths['app_from_doc']|escape:'javascript'}/images/",
+                activeVisible: true,
+                autoFocus: false, // Set focus to first child, when expanding or lazy-loading.
+                initAjax: {
+                    url: "./",
+                    data: {
+                        'op': 'get_webpage_nodes',
+                        'ajax': 1,
+                        'platform': p
+                    }
+                },
+                onActivate: function(node) {
+                    var key_field = w.find('input[name="modal_webpage_id"]');
+                    var text_field = w.find('input[name="modal_text"]');
+                    
+                    key_field.val(node.data.key);
+                    text_field.val(node.data.title);
+                },
+                onLazyRead: function(node){
+                    $.ajax({
+                        url: "./",
+                        data: {
+                            'op': 'get_webpage_nodes',
+                            'ajax': 1,
+                            'platform': p,
+                            'parent': node.data.key
+                        },
+                        'success': function(json, status, ajax) {
+                            if(json.result != undefined && json.result == "session_timeout") {
+                                node.resetLazy();
+                                t.data('loaded', false);
+                            } else if(json.length) {
+                                node.addChild(json, null);
+                            } else {
+                                node.data.children = [];
+                                node.data.expand = false;
+                                node.data.isLazy = false;
+                                node.render();
+                            }
+                        }
+                    });
+                },
+                'onPostInit': function(){
+                    t.data('loaded', false);
+                }
+            });
+            */
+        }
+    });
+    
+    $('input[name="redirect_to[]"]').bind('change', function(e){
+        var _root = $(this).closest('.vanity_url_records');
+        var _internal_id = _root.find('input[name="internal_id[]"]');
+        _internal_id.val('');
+        _root.find('input[name^="record_modified"]').val('1');
+    });
+
+    var add_row = function(){
+        var parent = $("#edit_form");
+        var standard_row = $('#standard_empty_row').children().clone(false);
+        var timestamp = new Date();
+        var timestamp = timestamp.getTime();
+        // dynamic bind calendar to start date, end_date fields
+        standard_row.find('input[name^="start_date"]').parent().attr('id', 'start_date_'+timestamp);
+        standard_row.find('input[name^="start_date"]').next().data('target', '#start_date_'+timestamp);
+        standard_row.find('input[name^="end_date"]').parent().attr('id', 'end_date_'+timestamp);
+        standard_row.find('input[name^="end_date"]').next().data('target', '#end_date_'+timestamp);
+        standard_row.addClass('vanity_url_records').appendTo(parent).show();
+        $( '#start_date_'+timestamp+', #end_date_'+timestamp ).datetimepicker( {
+            format: "YYYY-MM-DD HH:mm:ss",
+            useCurrent: false
+        } );
+    };
+
+    var del_row = function(_this){
+        var sure_to_del = window.confirm("{$dict.MESSAGE_confirm_to_delete|escape}");
+        if(sure_to_del)
+        {
+            var row_del = _this.closest("div.row");
+            var del_data = {
+                'ajax': 1,
+                'id': row_del.find('input[name^="vanity_url_id"]').val()
+            };
+               if(row_del.find('input[name^="vanity_url_id"]').val()>0)
+               {
+                   $.ajax({
+                    'url': '?op=delete',
+                    'type': 'POST',
+                    'cache': false,
+                    'async': true,
+                    'data': del_data,
+                    'success': function(json, status, ajax) {
+                        if(json.result == "success")
+                        {
+                            row_del.hide();
+                            row_del.find('input[name^=record_modified]').val(1);
+                            row_del.find('input[name^=deleted]').val(1);
+                        }
+                    }
+                });
+               }
+            else
+            {
+                row_del.hide();
+                row_del.find('input[name^=record_modified]').val(1);
+                row_del.find('input[name^=deleted]').val(1);
+            }
+        }
+    };
+
+    $("button[name='vanity_url_add']").bind('click', function(e){
+        add_row();
+    });
+    $("button[name^='vanity_url_remove']").bind('click', function(e){
+        del_row($(this));
+    });
+
+    $('.edit_mode').hide();
+    $('#standard_empty_row .edit_mode').show();
+    
+    $('button[name^="vanity_url_edit"]').bind('click', function(e){
+        e.preventDefault();
+        var this_row = $(this).closest('.row');
+        this_row.find('.view_mode').hide();
+        this_row.find('.edit_mode').show();
+    });
+    //new form_submit_panel($("form"));
+    $('#standard_empty_row').nextAll().find('input').bind('change', function(e){
+        $(this).closest('.vanity_url_records').find('input[name^="record_modified"]').val('1');
+    });
+/**************************To Test***********************************/
+    $('button[name="submit"]').bind('click', function(e){
+        var data = {
+            'ajax': 1
+        };
+        var data_fields = ['vanity_url_alias', 'vanity_url_id', 'record_modified', 'deleted', 'redirect_to', 'start_date', 'end_date', 'description', 'internal_id'];
+        for(var i=0; i<data_fields.length; i++)
+        {
+            var field_name = data_fields[i]+'[]';
+            data[data_fields[i]] = [];
+            // index=0 are the fields in #standard_empty_row
+            $('input[name="'+field_name+'"]').each(function(index){
+                if(index>0)
+                    data[data_fields[i]].push($(this).val());
+            });
+        }
+        data['active'] = [];
+        // index=0 are the fields in #standard_empty_row
+        $('input[name="active[]"]').each(function(index){
+            if(index>0)
+            {
+                if($(this).prop('checked'))
+                    data['active'].push(1);
+                else
+                    data['active'].push(0);
+            }            
+        });
+
+        e.preventDefault();
+        $.ajax({
+            'url': $('form').attr('action'),
+            'type': $('form').attr('method'),
+            'cache': false,
+            'async': true,
+            'data': data,
+            'beforeSend': function() {
+                $('form').find('.hasErrors').removeClass('hasErrors');
+                $('form').find('.hasError').removeClass('hasError');
+                $('form').find('button').prop('disabled', true);
+                $('form').find('.error').remove();
+            },
+            'error': function(ajax, text, err) {
+                
+            },
+            'complete': function(ajax, status) {
+                if(!ajax.redirect)
+                    $('form').find('button').prop('disabled', false);
+            },
+            'success': function(json, status, ajax) {
+                if(json.result == "session_timeout") {
+
+                } else if(json.result == "error") {
+                    var first_element = null;
+                    var errors = json.errors;
+                    for(var n in errors) {
+                        if(errors.hasOwnProperty(n)) {
+                            var matches = n.match(/([a-zA-Z_]+)(\d+)/);
+                            var match_name = matches[1];
+                            match_name = match_name.substr(0, match_name.length-1);
+                            var match_index = matches[2];
+                            var target = $('form .vanity_url_records:eq('+match_index+')').find('input[name^="' + match_name + '"],select[name^="' + match_name + '"],textarea[name^="' + match_name + '"]');
+                            for(var i = 0; i < errors[n].length; i++) {
+                                var parent;        
+                                if(target.length > 0) {
+                                    if(first_element == null)
+                                        first_element = target;
+        
+                                    switch($(target[0]).prop("tagName").toLowerCase()) {
+                                        case "input":
+                                            var t = $(target[0]).attr('type');
+                                            if(t == "radio") {
+                                                parent = $(target[0]).parentsUntil(".radio-field", "dd").last();
+                                            } else if(t == "checkbox") {
+                                                parent = $(target[0]).parentsUntil(".checkbox-field", "dd").last();
+                                            } else {
+                                                parent = $(target[0]).parent().parent();
+                                            }
+                                            break;
+                                        case "select":
+                                        default:
+                                            parent = $(target[0]).parent();
+                                            break;
+                                    }
+                                }
+                                
+                                var this_html = {
+                                    'ul': '<li class="error"></li>',
+            'others': '<div class="error"></div>'
+                                };
+                                var type = parent.hasClass('errors') && this_html[parent.prop("tagName").toLowerCase()] != undefined ? parent.prop("tagName").toLowerCase() : "others";
+                                var this_el = $(this_html[type]).append('<span>' + errors[n][i] + '</span>');
+                                //parent.prepend(this_el);
+                                parent.append(this_el);
+                    
+                                if(type == 'others') {
+                                    // try to find its dl , if no dl could be found, use the current one instead
+                                    var tmp = parent;
+                                    var maxPCount = 5; //maximum 5 level
+                                    var i = 0;
+                                    do {
+                                        tmp = tmp.parent();                
+                                        if(tmp.prop("tagName").toLowerCase() == 'dl' || tmp.hasClass('input-field')) {
+                                            parent = tmp;
+                                            break;
+                                        }
+                                    } while(tmp != null && i++ < maxPCount);
+                                
+                                    parent.addClass('hasError');
+                                }
+                            }
+                        }
+                    }
+
+                    // get inner tab boxes
+                    var tabs = $('.tabs-box .tab-content .tab-pane');
+                    var errorFilter = null;
+                    for(var i = 0; i < tabs.length; i++) {
+                        var tab = $(tabs[i]);
+                        if(tab.find('.hasError').length > 0) {
+                            var pos = tab.prevAll('.tab-pane').length;
+                            var root = tab.parentsUntil('.tabs-box').parent()[0];
+        
+                            $(root).addClass('hasErrors').find('.tabs li:eq(' + pos + ')').addClass('hasErrors');
+                            if(errorFilter == null) {
+                                errorFilter = $(root).find('.tabs li:eq(' + pos + ') a');
+                                errorFilter.tab('show');
+                            }
+                            $(tab).addClass('hasErrors');
+                        }
+                   }
+                } else if(json.result == "confirm") {
+                    if ( window.confirm(json.message) ) {
+                        $('form').attr( "action", json.action );
+                        $('form').submit();
+                    }
+                } else if(json.redirect != undefined && json.redirect != "") {
+                    if(json.target != undefined && json.target == "_blank") {
+                        window.open(json.redirect, "admin_preview");
+                    } else {
+                        $(window).unbind('leaveWpEdit');
+                        window.location.href = json.redirect;
+                    }
+                } else {
+                    $('form').trigger('ajaxSuccess', [json]);
+                }
+            }
+        });
+    });
+})();
+</script>

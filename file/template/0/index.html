@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html class="no-js" lang="{$request.locale}" dir="{$response.direction}">
+  <head>
+    <!-- Metadata -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="{$response.mimetype}{if $response.charset}; charset={$response.charset}{/if}">
+    <meta http-equiv="Content-Language" content="{$request.locale}">
+    <meta http-equiv="imagetoolbar" content="no">
+    <meta name="robots" content="{if $data.mode == 'view'}index,follow{else}noindex,nofollow{/if}">
+    <meta name="keywords" content="{$pg->getKeywords($request.locale)}">
+    <meta name="description" content="{$pg->getDescription($request.locale)}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <base href="{$sets.paths.server_url|escape}{$sets.paths.app_from_doc|escape}/">
+    <title>{$conf_locales["site_name$conf_platform"]|escape} - {$response.title|escape}</title>
+
+    <!-- Preload web fonts -->
+    <link rel="preload" href="node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Load Bootstrap CSS synchronously -->
+    <link type="text/css" charset="utf-8" rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+    <!-- Load other CSS asynchronously -->
+    {capture "href"}
+    {if $sets.paths.app_from_doc}
+    b={$sets.paths.app_from_doc|substr:1|escape}&amp;f=
+    {else}
+    f=
+    {/if}
+    node_modules/@fortawesome/fontawesome-free/css/all.css,
+    node_modules/ekko-lightbox/dist/ekko-lightbox.css,
+    {*node_modules/jquery-date-range-picker/dist/daterangepicker.min.css,*}
+    node_modules/justifiedGallery/dist/css/justifiedGallery.css,
+    node_modules/pgwslideshow/pgwslideshow.css,
+    file/template/{$base_template_id}/css/content.css
+    {/capture}
+    {if strpos($smarty.server.HTTP_USER_AGENT, 'MSIE') === FALSE && strpos($smarty.server.HTTP_USER_AGENT, 'Trident') === FALSE}
+    <link type="text/css" charset="utf-8" rel="preload" href="vendor/mrclay/minify/?{$smarty.capture.href|strip:''}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link type="text/css" charset="utf-8" rel="stylesheet" href="vendor/mrclay/minify/?{$smarty.capture.href|strip:''}"></noscript>
+    {else}
+    <link type="text/css" charset="utf-8" rel="stylesheet" href="vendor/mrclay/minify/?{$smarty.capture.href|strip:''}">
+    {/if}
+
+    <!-- hCaptcha -->
+    {* https://docs.hcaptcha.com/configuration *}
+    {* https://docs.hcaptcha.com/languages *}
+    {$hl = $request.locale}
+    {if $hl == 'zh-hans'}
+    {$hl = 'zh-CN'}
+    {elseif $hl == 'zh-hant'}
+    {$hl = 'zh-TW'}
+    {/if}
+    <script src="https://hcaptcha.com/1/api.js?hl={$hl|escape}" async defer></script>
+
+    <!-- Header tracking code -->
+    {if $load_header_tracing_script}
+    {$header_tracing_script}
+    {/if}
+
+    <!-- Mimic $( document ).ready -->
+    <script>
+    window.$ = function( element ) {
+        return element;
+    };
+    window.readyCallables = new Array();
+    HTMLDocument.prototype.ready = function( fn ) {
+        window.readyCallables.push( fn );
+    };
+    </script>
+  </head>
+
+  <body class="locale_{$request.locale} {$bodyClass}">
+    {$response.content}
+
+    <!-- Footer tracking code -->
+    {if $load_tracing_script}
+    {$tracing_script}
+    {/if}
+
+    <!-- Load JS asynchronously -->
+    {capture "src"}
+    {if $sets.paths.app_from_doc}
+    b={$sets.paths.app_from_doc|substr:1|escape}&amp;f=
+    {else}
+    f=
+    {/if}
+    node_modules/css-vars-ponyfill/dist/css-vars-ponyfill.min.js,
+    node_modules/jquery/dist/jquery.js,
+    node_modules/bootstrap/dist/js/bootstrap.bundle.js,
+    node_modules/ekko-lightbox/dist/ekko-lightbox.js,
+    {*node_modules/moment/min/moment-with-locales.js,
+    node_modules/jquery-date-range-picker/dist/jquery.daterangepicker.min.js,*}
+    node_modules/js-cookie/src/js.cookie.js,
+    node_modules/justifiedGallery/dist/js/jquery.justifiedGallery.js,
+    node_modules/pgwslideshow/pgwslideshow.js,
+    file/template/{$base_template_id}/js/custom.js
+    {/capture}
+    <script>
+    (function () {
+        var callables = window.readyCallables;
+
+        // Delete objects for mimicking $( document ).ready
+        delete window.$;
+        delete window.readyCallables;
+        delete HTMLDocument.prototype.ready;
+
+        // Add script to head and call functions added via $( document ).ready
+        var script = document.createElement( "script" );
+        script.onload = function() {
+            $.each( callables, function() {
+                this.call();
+            } );
+
+            // Client-side support for CSS custom properties (aka "CSS variables") in legacy browsers
+            cssVars( {
+            } );
+        };
+        script.src = "vendor/mrclay/minify/?{$smarty.capture.src|strip:''|escape:'javascript'}";
+        document.head.appendChild( script );
+    })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,159 @@
+<form id="finder_form" method="GET" accept-charset="UTF-8" action="">
+  <div class="row">
+    <div class="col-12">
+      <div class="box">
+        <div class="box-title">
+          <h3><i class="icon-search"></i>{$dict.LABEL_user_finder|escape}</h3>
+          <ul class="actions">
+            <li>
+              <a href="#" class="btn btn-mini content-slideUp"><i class="icon-angle-down"></i></a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="box-content nopadding">
+          <div class="box-content">
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                {field_text class="text_input" name="keyword" title=$dict.LABEL_keyword id="keyword" maxlength="255" value=$_get.keyword error=null view_only=false placeholder=true}
+              </div>
+
+              <div class="col-12 col-lg-6">
+                {field_radio ratio="3:9" name="enabled" title=$dict.LABEL_enabled id="enabled" options=$enabled_sets selected=$_get.enabled error=$errors.enabled}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                <dl class="input-field row">
+                  <dt class="col-12 col-lg-3">
+                    <label for="start_created_date">{$dict.LABEL_created_date|escape}</label>
+                  </dt>
+
+                  <dd class="col-12 col-lg-9">
+                    <div class="input-group">
+                      <div class="form-control border-0 p-0">
+                        {capture "calendar"}
+                        {field_calendar id="start_created_date" name="start_created_date" placeholder=TRUE title=$dict.LABEL_from value=$smarty.get.start_created_date}
+                        {/capture}
+                        {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+                      </div>
+
+                      <div class="input-group-prepend input-group-append">
+                        <div class="input-group-text bg-white border-white">&ndash;</div>
+                      </div>
+
+                      <div class="form-control border-0 p-0">
+                        {capture "calendar"}
+                        {field_calendar id="end_created_date" name="end_created_date" placeholder=TRUE title=$dict.LABEL_from value=$smarty.get.end_created_date}
+                        {/capture}
+                        {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+                      </div>
+                    </div>
+                  </dd>
+                </dl>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <dl class="input-field row">
+                  <dt class="col-12 col-lg-3">
+                    <label for="start_updated_date">{$dict.LABEL_updated_date|escape}</label>
+                  </dt>
+
+                  <dd class="col-12 col-lg-9">
+                    <div class="input-group">
+                      <div class="form-control border-0 p-0">
+                        {capture "calendar"}
+                        {field_calendar id="start_updated_date" name="start_updated_date" placeholder=TRUE title=$dict.LABEL_from value=$smarty.get.start_updated_date}
+                        {/capture}
+                        {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+                      </div>
+
+                      <div class="input-group-prepend input-group-append">
+                        <div class="input-group-text bg-white border-white">&ndash;</div>
+                      </div>
+
+                      <div class="form-control border-0 p-0">
+                        {capture "calendar"}
+                        {field_calendar id="end_updated_date" name="end_updated_date" placeholder=TRUE title=$dict.LABEL_from value=$smarty.get.end_updated_date}
+                        {/capture}
+                        {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+                      </div>
+                    </div>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-lg-6">
+              	{field_select ratio="3:9" name="user_language[]" id="user_languages" title=$dict.LABEL_accessible_languages class="chosen-select" options=$dict.SET_accessible_locales selected=$_get.user_language multiple=true}
+              </div>
+            </div>
+          </div>
+
+          <div class="box-actions">
+            <div class="row">
+              <div class="col-12">
+                <div class="form_actions">
+                  <ul>
+                    <li>
+                      <input type="hidden" name="t" value="{$smarty.get.t|escape}">
+                      <button name="submit" class="btn">
+                        <i class="icon-search"></i>
+                        {$dict.ACTION_find|escape}</button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="spacer">&nbsp;</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="box box-bordered box-color">
+      <div class="box-title">
+        <h3><i class="icon-reorder"></i>{$dict.LABEL_user_list|escape}</h3>
+      </div>
+
+      <div class="box-content nopadding">
+        <nav>
+          <div class="nav nav-tabs tabs-inline tabs-top" id="log-tab" role="tablist">
+            <a class="nav-item nav-link active" id="{$list.summary.id|escape}-tab" data-toggle="tab" href="#{$list.summary.id|escape}" role="tab" aria-controls="{$list.summary.id|escape}" aria-selected="true">
+              {$dict.LABEL_all|escape} ({$list.summary.record_count})
+            </a>
+
+            {foreach item=type_list from=$type_lists}
+            <a class="nav-item nav-link" id="{$type_list.summary.id|escape}-tab" data-toggle="tab" href="#{$type_list.summary.id|escape}" role="tab" aria-controls="{$type_list.summary.id|escape}" aria-selected="false">
+              {$type_list.name|escape} ({$type_list.summary.record_count})
+            </a>
+            {/foreach}
+          </div>
+        </nav>
+
+        <div class="tab-content nopadding tab-content-inline tab-content-bottom" id="log-tabContent">
+          <div class="tab-pane active" id="{$list.summary.id|escape}">{$list.content}</div>
+
+          {foreach item=type_list from=$type_lists}
+          <div class="tab-pane" id="{$type_list.summary.id|escape}">{$type_list.content}</div>
+          {/foreach}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+    $('.chosen-select').chosen({
+        disable_search_threshold: 10
+    });
+})();
+</script>

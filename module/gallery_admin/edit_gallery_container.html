@@ -1,0 +1,65 @@
+{$response.content}
+
+<script>
+(function() {
+    var edit_form = $( "#edit_form" );
+    var gallery_tag_ids = $( "#edit_gallery_container_tags" );
+    var image_container = $( "<div class='ui-sortable-figures'>" ).sortable();
+
+    {* Add image container *}
+    $( "#edit-images" ).append(
+        $( "<div>{$dict.DESCRIPTION_change_order|escape|escape:'javascript'}</div>" ),
+        $( "<div>&nbsp;</div>" ),
+        image_container
+    );
+
+    {* Change images on tag change *}
+    $( "#edit_gallery_container_tags" ).change( function() {
+        {* Get images *}
+        $.ajax( {
+            url: ".",
+            data: {
+                "entity": "gallery_container",
+                "op": "get_gallery_container_images",
+                "id": {$data.base_table.id},
+                "gallery_tag_ids[]": gallery_tag_ids.val(),
+                "gallery_image_ids[]": edit_form.find( "input[name='gallery_image_ids[]']" ).map( function() {
+                    return this.value;
+                } ).get()
+            },
+            success: function( response ) {
+                image_container.empty();
+                $.each( response, function(id, image) {
+                    {* Get image src *}
+                    var src = image;
+                    if ( {$conf.aws_enabled|intval} && src.indexOf("{$module_folder|escape:'javascript'}/") == 0 )
+                    {
+                        src = "https://{$conf.s3_domain|escape:'javascript'}/" + src;
+                    }
+                    else if ( src.indexOf(":") < 0 )
+                    {
+                        src = "{$sets.paths.app_from_doc|escape}/file/" + src;
+                    }
+
+                    {* Add image to image container *}
+                    var figure = $( "<figure class='figure' style='cursor: move'>" ).attr( "title", image );
+                    figure.append( $("<img alt='' class='figure-img img-fluid'>").attr("src", src) );
+                    figure.append( $("<figcaption class='figure-caption'>").text(image.split("/").reverse()[0]) );
+                    figure.append( $("<input type='hidden' name='gallery_image_ids[]'>").attr("value", parseInt(id, 10)) );
+                    image_container.append( figure );
+                } );
+            }
+        } );
+    } ).change();
+
+    {* Shortcode *}
+    {if $data.base_table.id}
+    edit_form.find( "dl[name=status_input]" ).after( $(
+        "<dl class='input-field text-field row view'>"
+            + "<dt class='col-3'>{$dict.LABEL_shortcode|escape|escape:'javascript'}</dt>"
+            + "<dd class='col-9'><div class='input-text view'><span>{ldelim}{ldelim}gallery id={$data.base_table.id}{rdelim}{rdelim}</span></div></dd>"
+            + "</dl>"
+    ) );
+    {/if}
+} )();
+</script>

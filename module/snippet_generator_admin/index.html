@@ -1,0 +1,135 @@
+<div class="row">
+  <div class="col-12">
+    <form id="finder_form" method="GET" accept-charset="UTF-8" action="">
+      <div class="box">
+        <div class="box-title">
+          <h3><i class="icon-search"></i>{$dict.LABEL_snippet_finder|escape}</h3>
+          <ul class="actions">
+            <li>
+              <a href="#" class="btn btn-mini content-slideUp"><i class="icon-angle-down"></i></a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="box-content nopadding">
+          <div class="box-content">
+            <div class="row">
+              <div class="col-12 col-md-6">
+                {field_text class="text_input" name="keyword" title=$dict.LABEL_keyword id="keyword" maxlength="255" value=$_get.keyword error=null view_only=false placeholder=false}
+              </div>
+
+              <div class="col-12 col-md-6">
+                {field_text class="text_input" name="content_block_id" title=$dict.LABEL_id_display id="content_block_id" maxlength="10" value=$_get.content_block_id error=null view_only=false placeholder=false}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-md-6">
+                {field_text class="text_input" name="name" title=$dict.LABEL_snippet_name id="name" maxlength="255" value=$_get.name error=null view_only=false placeholder=false}
+              </div>
+
+              <div class="col-12 col-md-6">
+                {field_text class="text_input" name="webpage_id" title=$dict.LABEL_webpage_id id="webpage_id" maxlength="10" value=$_get.webpage_id error=null view_only=false placeholder=false}
+              </div>
+            </div>
+          </div>
+
+          <div class="box-actions">
+            <div class="row">
+              <div class="col-12">
+                <div class="form_actions">
+                  <ul>
+                    <li>
+                      <input type="hidden" name="bare" value="{$smarty.get.bare|escape}">
+                      <button type="button" name="submit" class="btn">
+                        <i class="icon-search"></i>
+                        {$dict.ACTION_find|escape}</button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="spacer">&nbsp;</div>
+
+<div class="row">
+  <div class="col-12">
+    <a href="?bare={$smarty.get.bare|escape:'url'}&amp;op=edit&amp;referer_url=%3F{$smarty.get|http_build_query|escape:'url'}" class="btn primary-btn">
+      <i class="icon-file"></i>
+      {$dict.LABEL_new_snippet|escape}
+    </a>
+  </div>
+</div>
+
+<div class="spacer">&nbsp;</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="box box-bordered box-color">
+      <div class="box-title">
+        <h3><i class="icon-reorder"></i>{$dict.LABEL_snippets|escape}</h3>
+      </div>
+
+      <div class="box-content nopadding">
+        <nav>
+          <div class="nav nav-tabs tabs-inline tabs-top" id="snippet-tab" role="tablist">
+            <a class="nav-item nav-link active" id="{$list.summary.id|escape}-tab" data-toggle="tab" href="#{$list.summary.id|escape}" role="tab" aria-controls="{$list.summary.id|escape}" aria-selected="true">
+              {$dict.LABEL_all|escape} ({$list.summary.record_count})
+            </a>
+
+            {foreach item=type_list from=$type_lists}
+            <a class="nav-item nav-link" id="{$type_list.summary.id|escape}-tab" data-toggle="tab" href="#{$type_list.summary.id|escape}" role="tab" aria-controls="{$type_list.summary.id|escape}" aria-selected="false">
+              {$type_list.name|escape} ({$type_list.summary.record_count})
+            </a>
+            {/foreach}
+          </div>
+        </nav>
+
+        <div class="tab-content nopadding tab-content-inline tab-content-bottom" id="snippet-tabContent">
+          <div class="tab-pane active" id="{$list.summary.id|escape}">{$list.content}</div>
+
+          {foreach item=type_list from=$type_lists}
+          <div class="tab-pane" id="{$type_list.summary.id|escape}">{$type_list.content}</div>
+          {/foreach}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+    {* Insert avaContentBlock to TinyMCE *}
+    var selects = $( ".dataTable .buttonset > a[href*='#']" );
+    if ( window.parent.tinymce && window.parent.tinymce.activeEditor ) {
+        var editor = window.parent.tinymce.activeEditor;
+        selects.click( function() {
+            var id = this.href.split("#")[1];
+            var text = $(this).closest("tr").children("td:nth-child(2)").text().trim();
+            var selectedNode = editor.selection.getNode();
+            if ( selectedNode.nodeName == "AVACONTENTBLOCK" ) {
+                selectedNode.setAttribute( "id", id );
+                selectedNode.textContent = text;
+            }
+            else {
+                editor.insertContent( $("<div>").append(
+                    $( "<avacontentblock>", {
+                        id: id
+                    } ).text( text )
+                ).html() );
+            }
+            editor.windowManager.close( window );
+            return false;
+        } );
+    }
+    else {
+        selects.remove();
+    }
+} )();
+</script>

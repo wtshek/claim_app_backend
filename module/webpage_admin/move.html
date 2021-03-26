@@ -1,0 +1,173 @@
+<style>
+label {
+    font-size: 1.2em;
+
+}
+.header-row .box-title h3 {
+    line-height: 1em;
+    position: absolute;
+    bottom: 0;
+    font-size: 1.8em;
+}
+.header-row .box-title {
+    position: relative;
+}
+</style>
+
+<form id="move_form" method="POST" accept-charset="UTF-8" action="?op=move&amp;id={$data.webpage.id}{if $_get.dr}&amp;dr={$_get.dr|escape:'url'}{/if}">
+  <div class="container-fluid nopadding">
+    <div class="row header-row">
+      <div class="box col-12">
+        <div class="box-title">
+          <h3>
+            <i class="icon-reply"></i>
+            <b>{$dict.ACTION_move|escape}</b>&nbsp;{$data.webpage.webpage_title|escape}
+          </h3>
+
+          <div class="form_actions">
+            <ul>
+              <li>
+                <button type="submit" name="submit" class="btn btn-primary">
+                  <i class="icon-save"></i>
+                  {$dict.ACTION_submit|escape}</button>
+              </li>
+              <li>
+                <button type="reset" name="cancel" class="btn btn-primary">
+                  <i class="icon-reply"></i>
+                  {$dict.ACTION_cancel|escape}</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="box-content nopadding">
+          <p style="margin-top: 1em;">{$dict.DESCRIPTION_move|escape}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      {foreach from=$site_tree key=platform item=tree}
+      <div class="{if $site_tree|@count == 1}col-12{else}col-6{/if} box box-color box-bordered">
+        <div class="box-title">
+          <h3>
+            <i class="icon-{$platform|escape}"></i>
+            {$dict["LABEL_$platform"]|escape}
+          </h3>
+        </div>
+
+        <div class="box-content">
+          <div class="webpage-tree" data-platform="{$platform|escape}">
+            {$tree}
+            <input type="hidden" name="parent[{$platform|escape:html}]" value="" />
+          </div>
+        </div>
+      </div>
+      {/foreach}
+    </div>
+  </div>
+</form>
+
+<script>
+$(document).ready(function(){
+    var t = $('.webpage-tree');
+    for(var i = 0; i < t.length; i++) {
+        (function(){
+            var tree = $(t[i]);
+            var p = tree.attr('data-platform');
+
+            tree.fancytree({
+                checkbox: "radio",
+                selectMode: 1,
+                click: function(event, data) {
+                    if(data.targetType == "icon" || data.targetType == "title")
+                    {
+                        data.node.setSelected(!data.node.isSelected());
+                    }
+                },
+                select: function(event, data) {
+                    tree.find("input").val(data.node.key);
+                },
+                lazyLoad: function(event, data) {
+                    data.result = $.getJSON("./", {
+                        "op": "get_webpage_nodes",
+                        "ajax": 1,
+                        "disable_root": {$data.webpage.id|escape:'javascript'},
+                        "platform": p,
+                        "parent": data.node.key
+                    });
+                },
+                init: function(event, data) {
+                    data.tree.getNodeByKey("{$data.webpage.id|escape:'javascript'}").getParent().setSelected(true);
+                }
+            });
+
+            /*
+            tree.dynatree({
+                title: "",
+                fx: {
+                    height: "toggle",
+                    duration: 200
+                },
+                activeVisible: true,
+                checkbox: true,
+                classNames: {
+                    checkbox: "dynatree-radio"
+                },
+                selectMode: 1,
+                autoFocus: false, // Set focus to first child, when expanding or lazy-loading.
+                onClick: function(node, e) {
+                    e.preventDefault();
+                },
+                onSelect: function(flag, node) {
+                    tree.find('input[name^=parent]').val(node.data.key);
+                },
+                onActivate: function(node) {
+                    node.toggleSelect(1);
+                },
+                onLazyRead: function(node){
+                    $.ajax({
+                        url: "./",
+                        data: {
+                            'op': 'get_webpage_nodes',
+                            'ajax': 1,
+                            'disable_root': {$data.webpage.id|escape:'javascript'},
+                            'platform': p,
+                            'parent': node.data.key
+                        },
+                        'success': function(json, status, ajax) {
+                            if(json.result != undefined && json.result == "session_timeout") {
+                                node.resetLazy();
+                                t.data('loaded', false);
+                            } else {
+                                node.addChild(json, null);
+                                if(node.data.unselectable) {
+                                    var children = node.getChildren();
+                                    for( var i = 0; i < children.length; i++ ) {
+                                        children[i].data.unselectable = true;
+                                        children[i].data.hideCheckbox = true;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                'onPostInit': function(){
+                    this.getNodeByKey("{$data.webpage.id|escape:'javascript'}").getParent().select(1);
+                    t.data('loaded', false);
+                },
+                cookieId: "webpage-tree-move-" + i,
+                idPrefix: "webpage-tree-move-"
+            });
+            */
+        })();
+    }
+
+    new form_submit_panel($('form'));
+    $('form').delegate('button[name="cancel"]', 'click', function(e){
+        e.preventDefault();
+
+        window.location.href = "{$reference_url|escape:'javascript'}";
+    });
+});
+</script>

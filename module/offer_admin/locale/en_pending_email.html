@@ -1,0 +1,32 @@
+Pending approval for {$dict.APP_title|escape:'html'}
+<p>Hi,</p>
+
+<p>
+  A promotion is
+  recently
+  {if $p_action == "edit"}
+  edited
+  {elseif $p_action == "delete"}
+  deleted
+  {elseif $p_action == "undelete"}
+  undeleted
+  {/if}
+  by {$user->getFirstname()|escape:'html'} &lt;<a href="mailto:{$user->getEmail()|escape:'html'}">{$user->getEmail()|escape:'html'}</a>&gt;.
+</p>
+
+<p>
+  To approve or view details, please visit the following URL:
+<p>
+  {foreach from=$data.promotions item=promotion}
+<h3>{$promotion.title|escape:'html'}</h3>
+<ul>
+    <li>
+        <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/admin/{$request.locale}/promotion/?op=edit&id={$promotion.id|escape:'url'}">
+            {$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/admin/{$request.locale}/promotion/?op=edit&id={$promotion.id|escape:'url'}
+        </a>
+    </li>
+</ul>
+  {/foreach}
+
+<p>Regards,</p>
+<p>{$conf.mailer_name|escape:'html'}</p>

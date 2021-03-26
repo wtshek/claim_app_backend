@@ -1,0 +1,195 @@
+{* Offer details *}
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-7 col-lg-8 order-2 order-md-1">
+      <p>
+        {if $offer_detail.video_url}
+        <a data-video-url="{$offer_detail.video_url|escape}">
+        {/if}
+          {capture "src"}{strip}
+          {if $conf.aws_enabled && strpos($offer_detail.img_url, 'offer/') === 0}
+          https://{$conf.cloudfront_domain}/
+          {elseif strpos($offer_detail.img_url, ':') === FALSE}
+          file/
+          {/if}
+          {$offer_detail.img_url}
+          {/strip}{/capture}
+          <img class="img-fluid" src="{$smarty.capture.src|escape}">
+        {if $offer_detail.video_url}
+        </a>
+        {/if}
+      </p>
+
+      {$offer_detail.content}
+
+      <p>
+        <a href="{$offer_url|escape}"><i class="fas fa-chevron-left"></i> {$dict.LABEL_more_offers|escape}</a>
+      </p>
+    </div>
+
+    <div class="col-12 col-md-5 col-lg-4 order-1 order-md-2">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="card-content">
+            {if $offer_detail.period_from}
+            <span class="small">{$dict.LABEL_period_from|escape}</span>
+            <p class="offer-date">{if $requested_locale === 'en'}{$offer_detail.period_from|date_format:'%B %e, %Y'}{elseif $requested_locale === 'zh-hans'}{$offer_detail.period_from|date_format:'%Y 年 %-m 月 %e 日'}{/if}</p>
+            {/if}
+
+            {if $offer_detail.period_to}
+            <span class="small">{$dict.LABEL_period_to|escape}</span>
+            <p class="offer-date">{if $requested_locale === 'en'}{$offer_detail.period_to|date_format:'%B %e, %Y'}{elseif $requested_locale === 'zh-hans'}{$offer_detail.period_to|date_format:'%Y 年 %-m 月 %e 日'}{/if}</p>
+            {/if}
+
+            {*if count($offer_detail.dinings.0.menus) > 0 || count($offer_detail.menus) > 0*}
+            {if count($offer_detail.menus) > 0}
+            <span class="small">{$dict.LABEL_menus_title|escape}</span>
+            {*foreach $offer_detail.dinings.0.menus as $menu}
+            <p>
+              <a class="mt-1" href="{if $conf.aws_enabled}https://{$conf.cloudfront_domain|escape}/{else}file/{/if}{$menu.file|escape}" target="_blank"><i class="fas fa-book-open"></i> {$menu.name|escape}</a>
+            </p>
+            {/foreach*}
+            {foreach $offer_detail.menus as $menu}
+            <p>
+              <a class="mt-1" href="{if $conf.aws_enabled}https://{$conf.cloudfront_domain|escape}/{else}file/{/if}{$menu.file|escape}" target="_blank"><i class="fas fa-book-open"></i> {$menu.name|escape}</a>
+            </p>
+            {/foreach}
+            {/if}
+
+            {if $offer_detail.action_url}
+            <div class="mt-3 text-center">
+              <a href="{$offer_detail.action_url|escape}" class="btn btn-primary {if $offer_detail.track_ctc}ctc{/if}" title="offer-{$offer_detail.category_str}-book" target="{$offer_detail.action_url_target|escape}" data-report-group="{$offer_detail.report_group|escape}" data-report-label="Offers">{$offer_detail.action_text|escape}</a>
+            </div>
+            {/if}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{* Video modal *}
+<div id="video_modal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.LABEL_close|escape}">
+      <span aria-hidden="true">&times;</span>
+    </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe frameborder="0" height="720" src="about:blank" width="1280"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready( function() {
+    {* Video modal *}
+    var video_modal = $( "#video_modal" ).on( "hide.bs.modal", function() {
+        video_iframe.attr( "src", "about:blank" );
+    } );
+    var video_iframe = video_modal.find( "iframe" );
+    var video_title = video_modal.find( ".modal-title" );
+
+    $( "a[data-video-url]" ).click( function() {
+        var link = $( this );
+        video_iframe.attr( "src", link.data("video-url") );
+        video_title.text( link.closest(".card").find("h3").text() );
+        video_modal.modal();
+        return false;
+    } );
+} );
+</script>
+
+<!-- Reservation Snippet -->
+<!--div>
+  <div class="col-md-4 col-sm-6 text-center ame">
+    <h3>{$dict.TEXT_reservations}</h3>
+    <div class="ame-img">
+      <div class="input-group nav_reserve_field">
+        <input type="text" class="form-control" placeholder="{$dict.TEXT_check_in}" aria-describedby="basic-addon2" value="" name="ame_checkin" id="ame_checkin"/>
+      </div>
+      <div class="input-group nav_reserve_field date">
+         <input type="text" class="form-control" placeholder="{$dict.TEXT_check_out}" aria-describedby="basic-addon2" value="" name="ame_checkout" id="ame_checkout"/>
+      </div>
+      <br>
+    </div>
+    <div class="ame-img">
+      <select name="ame_rooms" id="ame_rooms" class="reserv-select-chosen">
+        <option value=''></option>
+        <option value='1'>1</option>
+        <option value='2'>2</option>
+        <option value='3'>3</option>
+        <option value='4'>4</option>
+      </select>
+      <select name="ame_adults" id="ame_adults" class="reserv-select-chosen">
+        <option value=''></option>
+        <option value='1'>1</option>
+        <option value='2'>2</option>
+        <option value='3'>3</option>
+      </select>
+      <br>
+    </div>
+    <a href="#" class="btn navbar-btn btn-sm btn-primary res-box-btn reserve puli_reserve" id="ame_reserve_btn">{$dict.TEXT_reserve}</a>
+    <a class="tlink" href="{$dict.URL_amend_booking}" target="_blank">{$dict.TEXT_amend_booking}<i class="glyphicon glyphicon-menu-right"></i></a>
+    <br><br><br>
+</div-->
+
+<script>
+$(document).ready( function() {
+    $( "#HeaderTitle" ).hide();
+} );
+/*
+$(document).ready( function() {
+    $('#ame_rooms').chosen({
+        width: '134px',
+        disable_search_threshold: 10,
+        placeholder_text_single: "{$dict.TEXT_no_of_room}"
+    });
+    $('#ame_adults').chosen({
+        width: '134px',
+        disable_search_threshold: 10,
+        placeholder_text_single: "{$dict.TEXT_no_of_adult}"
+    });
+
+    $('#ame_reserve_btn').bind('click', function(e){
+        e.preventDefault();
+        var checkInDate = $('#ame_checkin').val();
+        var checkOutDate = $('#ame_checkout').val();
+        var noOfAdult = Math.max($("#ame_adults").val(), 0);
+
+        var checkin_array = checkInDate.split('-');
+        var checkout_array = checkOutDate.split('-');
+
+        // validation
+        if(checkInDate == '')
+        {
+            alert("Please select check in date!");
+        }
+        else if(checkOutDate == '')
+        {
+            alert("Please select check out date");
+        }
+        else if(checkInDate !='' && checkOutDate!='')
+        {
+            var checkin = new Date(checkin_array[0], checkin_array[1]-1, checkin_array[2]);
+            var checkout = new Date(checkout_array[0], checkout_array[1]-1, checkout_array[2]);
+
+            if(checkin>checkout)
+                alert("Please select valid date range!");
+            else
+            {
+                window.open('https://www.yourreservation.net/tb3/index.cfm?bf=HLLW2812&arrivalDate='+checkInDate+'&departureDate='+checkOutDate+'&adults='+noOfAdult, '_blank');
+            }
+        }
+    });
+} );
+*/
+</script>

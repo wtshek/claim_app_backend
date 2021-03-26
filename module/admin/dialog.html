@@ -1,0 +1,67 @@
+<div class="box dialog-{$_get.type|escape} box-bordered box-color">
+  <div class="box-title">
+    <h3>
+      <i class="{$icon|escape}"></i>
+      {$dict.SET_dialog_types[$_get.type]|escape}
+    </h3>
+  </div>
+
+  <div class="box-content">
+    <p>
+      {if $_get.text}
+          {$_get.text|escape|nl2br}
+      {else}
+          {if isset($dict[$_get.code])}
+              {$dict[$_get.code]|escape|nl2br}
+          {else}
+              {$_get.code|escape}
+          {/if}
+      {/if}
+    </p>
+  </div>
+
+  {if $actions|@count}
+  <div class="actions_container">
+    <ul class="actions">
+      {foreach from=$actions item=action}
+      <li>
+        <a href="{$action.href|escape}" class="btn btn-primary"{if $action.target} target="{$action.target|escape}"{/if}>
+          {if $action.icon}
+          <i class="{$action.icon|escape}"></i>
+          {/if}
+          {$action.title|escape}
+        </a>
+      </li>
+      {/foreach}
+    </ul>
+  </div>
+  {/if}
+</div>
+
+{if $actions|@count}
+<script>
+(function() {
+    var timeout_seconds = {$conf.dialog_timeout};
+
+    var default_action = $('.actions_container .actions li a').first();
+    var timer_el = $('<span class="timer"></span>');
+
+    default_action.append(timer_el);
+
+    var update_timer_text = function() {
+        timer_el.html("(" + timeout_seconds + ")");
+    }
+
+    var interval_id = window.setInterval( function() {
+        timeout_seconds--;
+        if ( timeout_seconds == 0 ) {
+            window.clearInterval( interval_id );
+            window.location.href = default_action.attr('href');
+        }
+        update_timer_text();
+    }, 1000 );
+
+    update_timer_text();
+} )();
+</script>
+{/if}

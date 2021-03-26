@@ -1,0 +1,33 @@
+<div class="row">
+  <div class="col-12 col-lg-9">
+    <div class="row">
+      <div class="col-12">
+        {field_text class="" name="general_para_value[level]" title=$dict.LABEL_level id="general_para_value[level]" maxlength="2" value=$data['general_para_value']['level'] error=$errors['general_para_value']['level'] view_only=false}
+      </div>
+    </div>
+    <div class="row" style="display:none;">
+      <div class="col-12 col-lg-4">
+        <i class="icon-globe"></i><label for="locale-fields-block-switch" style="display:inline;margin-left:5px;">{$dict.LABEL_lanugage|escape}</label>
+      </div>
+      <div class="col-12 col-lg-8">
+        <select id="locale-fields-block-switch" name="locale-fields-block-switch">
+          {html_options options=$dict.SET_accessible_locales selected=$default_locale}
+        </select>
+      </div>
+    </div>
+    <br>
+    {foreach from=$dict.SET_accessible_locales key=locale item=locale_text}
+    <!--div class="snippet-fields-block" id="{$locale|replace:'/':'-'}-snippet-fields-block">
+      <div class="row">
+        <div class="col-12">
+          {field_text class="" name="$locale[LABEL_press_release_year_filter]" title=$dict.LABEL_press_release_year_filter id="$locale[LABEL_press_release_year_filter]" maxlength="255" value=$data[$locale]['LABEL_press_release_year_filter'] error=$errors[$locale][LABEL_press_release_year_filter] view_only=false}
+        </div>
+      </div>
+    </div-->
+    {/foreach}
+  </div>
+  <div class="col-12 col-lg-3">
+    <h4>{$dict.LABEL_sample_code}</h4>
+    {$dict.MESSAGE_child_pages_sample}
+  </div>
+</div>

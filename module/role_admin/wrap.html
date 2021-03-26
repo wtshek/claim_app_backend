@@ -1,0 +1,182 @@
+<div class="container-fluid nopadding role-content-wrapper">
+  <div class="row">
+    <aside class="col-12 col-lg-3 aside-left">
+      <div class="admin-tree box box-color box-bordered">
+        <div class="box-title">
+          <h3>{$dict.TITLE_admin_roles|escape}</h3>
+          {if $user->hasRights($m->module, Right::CREATE)}
+          <ul class="actions">
+            <li>
+              <a class="btn btn-primary" href="?op=edit" name="admin-role-new-btn">
+                 <i class="icon-plus-sign"></i>
+                 {$dict.ACTION_new|escape}
+              </a>
+            </li>
+          </ul>
+          {/if}
+        </div>
+
+        <div class="box-content">
+          <div id="admin-role-tree">
+            {$admin_tree}
+          </div>
+        </div>
+      </div>
+
+      {*
+      <div class="public-tree box box-color box-bordered">
+        <div class="box-title">
+          <h3>{$dict.TITLE_public_roles|escape}</h3>
+          {if $user->hasRights($m->module, Right::CREATE)}
+            <ul class="actions">
+              <li>
+                <a class="btn btn-primary" href="?op=edit&t=public" name="public-role-new-btn">
+                  <i class="icon-plus-sign"></i>
+                  {$dict.ACTION_new|escape}
+                </a>
+              </li>
+            </ul>
+          {/if}
+        </div>
+
+        <div class="box-content">
+          <div id="public-role-tree">
+            {$public_tree}
+          </div>
+        </div>
+      </div>
+      *}
+    </aside>
+
+    <section class="col-12 col-lg-9 main-section box box-color box-bordered">
+      <form action="?{http_build_query($_get)}" method="POST">
+        <div class="box-title">
+          <h3>{if $data.role.type=="public"}{$dict.TITLE_public_role_info|escape}{else}{$dict.TITLE_admin_role_info|escape}{/if}</h3>
+
+          {if $actions|@count > 0}
+          <ul class="actions">
+            {*{foreach from=$actions item=btn}*}
+            {*<li>*}
+              {*{if isset($btn.href)}*}
+                {*<a class="btn btn-primary" href="{$btn.href|escape}">*}
+                  {*{if $btn.icon}<i class="icon-{$btn.icon|escape}"></i>{/if}*}
+                  {*{if $btn.text}{$btn.text|escape}{/if}*}
+                {*</a>*}
+              {*{else}*}
+                {*<button class="btn btn-primary"{if $btn.type} type="{$btn.type|escape}"{/if}>*}
+                  {*{if $btn.icon}<i class="icon-{$btn.icon|escape}"></i>{/if}*}
+                  {*{if $btn.text}{$btn.text|escape}{/if}*}
+                {*</button>*}
+              {*{/if}*}
+            {*</li>*}
+            {*{/foreach}*}
+
+            <li>
+              <button type="button" class="btn btn-mini content-slideUp">
+                <i class="icon-angle-down"></i>
+              </button>
+            </li>
+          </ul>
+          {/if}
+        </div>
+
+        <div class="box-content nopadding">
+          <div class="container-fluid nopadding">
+            {$main_content}
+          </div>
+        </div>
+
+        {if $actions|@count > 0}
+        <div class="actions_container">
+          <ul class="actions">
+            {foreach from=$actions item=btn}
+              <li>
+                {if isset($btn.href)}
+                <a class="btn btn-primary"{if $btn.name} name="{$btn.name|escape}"{/if} href="{$btn.href|escape}">
+                  {if $btn.icon}<i class="icon-{$btn.icon|escape}"></i>{/if}
+                  {if $btn.text}{$btn.text|escape}{/if}
+                </a>
+                {else}
+                <button class="btn btn-primary"{if $btn.name} name="{$btn.name|escape}"{/if}{if $btn.type} type="{$btn.type|escape}"{/if}>
+                  {if $btn.icon}<i class="icon-{$btn.icon|escape}"></i>{/if}
+                  {if $btn.text}{$btn.text|escape}{/if}
+                </button>
+                {/if}
+              </li>
+            {/foreach}
+          </ul>
+        </div>
+        {/if}
+      </form>
+    </section>
+  </div>
+</div>
+
+<script>
+var tree_types = ['admin', 'public'];
+var nodeTree = {
+};
+$(document).ready(function(){
+    for(var i = 0; i < tree_types.length; i++) {
+        (function() {
+            var tname = tree_types[i];
+
+            nodeTree[tname] = $("#" + tname + "-role-tree").fancytree({
+                {if !$admin_tree}
+                source: $.ajax({
+                    url: "./",
+                    data: {
+                        'op': 'get_' + tname + '_nodes',
+                        'ajax': 1
+                        {if $_get.id}, 'target': {$_get.id|escape:'javascript'}{/if}
+                    }
+                }),
+                {/if}
+                {if $smarty.get.id}
+                init: function(event, data) {
+                    var node = data.tree.getNodeByKey("{$smarty.get.id|escape:'javascript'}");
+                    if(node)
+                    {
+                        node.setActive(true, {
+                            noEvents: true
+                        });
+                    }
+                },
+                {/if}
+                activate: function(event, data) {
+                    window.location.href = data.node.data.href;
+                },
+                lazyLoad: function(event, data) {
+                    data.result = $.getJSON("./", {
+                        "op": 'get_' + tname + '_nodes',
+                        "ajax": 1,
+                        "parent": data.node.key
+                    });
+                }
+            });
+        })();
+    }
+});
+
+$('*[name="action-cancel"]').bind('click', function(e){
+    e.preventDefault();
+    window.location.href = '?op=view&id={$data.role.id|escape:"javascript"}' ;
+});
+
+/*
+$('*[name$="-role-new-btn"]').bind('click', function(e){
+    e.preventDefault();
+
+    var n = $(this).attr('name');
+    var t = n.replace('-role-new-btn', '');
+    var url = $(this).attr('href');
+
+    var n = nodeTree[t].dynatree("getActiveNode");
+    if(n) {
+        url = url + '&parent_id='+ n.data.key;
+    }
+
+    window.location.href = url;
+});
+*/
+</script>

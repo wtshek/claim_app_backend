@@ -1,0 +1,67 @@
+{* Booking mask *}
+<div id="booking-mask" class="d-none d-md-block col-md-10">
+  <div class="booking-mask">
+    <form class="booking-mask px-4 py-3">
+      <div class="form-row" id="BookingMask">
+        <div class="form-group mb-xl-0 col-md-6 col-xl-3">
+          <label for="BookingMaskCheckIn">{$dict.LABEL_check_in|escape}:</label>
+          <input type="text" class="form-control check-in" id="BookingMaskCheckIn" placeholder="{$dict.LABEL_check_in|escape}">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+
+        <div class="form-group mb-xl-0 col-md-6 col-xl-3">
+          <label for="BookingMaskCheckOut">{$dict.LABEL_check_out|escape}:</label>
+          <input type="text" class="form-control check-out" id="BookingMaskCheckOut" placeholder="{$dict.LABEL_check_out|escape}">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+
+        <div class="form-group mb-xl-0 col-md-6 col-xl-3">
+          <label for="NoofGuests">{$dict.LABEL_number_of_guests|escape}:</label>
+          <select class="form-control" id="NoofGuests">
+            <option>1</option>
+            <option selected="selected">2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary mb-xl-0 col-md-6 col-xl-3" type="submit">{$dict.LABEL_check_availability|escape}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{* Mobile booking mask *}
+<section id="mobile-booking-mask" class="px-0 py-3 p-md-0 light-gray-bg">
+  <div class="booking-mask mobile d-md-none container">
+    <form class="booking-mask">
+      <div class="form-row" id="mobileBookingMask">
+        <div class="form-group col-6">
+          <label for="mobileBookingMaskCheckIn">{$dict.LABEL_check_in|escape}:</label>
+          <input type="text" class="form-control check-in" id="mobileBookingMaskCheckIn" placeholder="{$dict.LABEL_check_in|escape}">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+
+        <div class="form-group col-6">
+          <label for="mobileBookingMaskCheckOut">{$dict.LABEL_check_out|escape}:</label>
+          <input type="text" class="form-control check-out" id="mobileBookingMaskCheckOut" placeholder="{$dict.LABEL_check_out|escape}">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="mobileNoofGuests">{$dict.LABEL_number_of_guests|escape}:</label>
+        <select class="form-control" id="mobileNoofGuests">
+          <option>1</option>
+          <option selected="selected">2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary w-100" type="submit">{$dict.LABEL_check_availability|escape}</button>
+    </form>
+  </div>
+</section>

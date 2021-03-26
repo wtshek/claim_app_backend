@@ -1,0 +1,13 @@
+<div class="container thank-you">
+<div class="row" style="min-height: 38vh; margin-top: 70px;">
+<div class="col-md-8 col-md-offset-2">
+{if $code ==1}
+    <div class="section"><p>{$contact_dict.MESSAGE_request_sent|escape:'html'}</p></div>
+{elseif $code ==2}
+    <div class="section"><p>{$contact_dict.MESSAGE_request_not_sent|escape:'html'}</p></div>
+{elseif $code ==3 }
+    <div class="section"><p>{$contact_dict.MESSAGE_request_error|escape:'html'}</p></div>
+{/if}
+</div>
+</div>
+</div>

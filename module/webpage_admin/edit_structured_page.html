@@ -1,0 +1,943 @@
+{foreach from=$dict.SET_content_types key=content_type item=contents}
+<div class="tab-pane fade padding {if $contents@first}show active{/if}" id="setting-{$content_type|escape}" role="tabpanel" aria-labelledby="setting-{$content_type|escape}-tab" data-tab-type="{$content_type|escape}">
+  <div class="alias_fields {$content_type|escape}">
+    {if !$root_page}
+    <dl class="row input-field">
+      <dt class="col-3">
+        <label>{$dict.LABEL_parent_page|escape}</label>
+      </dt>
+
+      <dd class="col-9" id="{$content_type|escape}_path">
+        <div class="webpage_parent_input">
+          {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+          <div class="input-select view" class="line-height:30px;">
+            <span>{$data.webpage[$content_type].webpage_parent_text|escape}</span>
+          </div>
+          {/if}
+
+          <div {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)} style="display:none;"{/if}>
+            <input type="text" name="webpage_parent_text[{$content_type|escape}]" id="{$content_type|escape}_webpage_parent_text" value="{$data.webpage[$content_type].webpage_parent_text|escape}" class="form-control" />
+            <input type="hidden" name="webpage_parent_id[{$content_type|escape}]" id="{$content_type|escape}_webpage_parent_id" value="{$data.webpage[$content_type].webpage_parent_id|escape}" />
+            <input type="hidden" name="webpage_parent_path[{$content_type|escape}]" id="{$content_type|escape}_webpage_parent_path" value="{$data.webpage[$content_type].webpage_parent_path|escape}" />
+            <button type="button" id="{$content_type|escape}_parent_select" class="btn btn-primary">{$dict.ACTION_select|escape}</button>
+          </div>
+
+          {if isset($errors["webpage_parent_text[$content_type]"])}
+          <div class="error">
+            <span>{$errors["webpage_parent_text[$content_type]"][0]}</span>
+          </div>
+          {/if}
+        </div>
+      </dd>
+    </dl>
+
+    {field_text ratio="3:9" placeholder="{$dict.DESCRIPTION_alias_placeholder|escape}" name="alias[{$content_type|escape}]" title=$dict.LABEL_alias id="`$content_type`_alias" error=$errors["alias[$content_type]"] value=$data.webpage[$content_type]['alias'] view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+    {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+    <div style="display:none;">
+      {field_text ratio="3:9" placeholder="{$dict.DESCRIPTION_alias_placeholder|escape}" name="alias[{$content_type|escape}]" title=$dict.LABEL_alias id="`$content_type`_alias" error=$errors["alias[$content_type]"] value=$data.webpage[$content_type]['alias'] view_only=$viewOnly}
+    </div>
+    {/if}
+    {/if}
+
+    <dl class="row">
+      <dt class="col-3">
+        <label>{$dict.LABEL_path|escape}</label>
+      </dt>
+
+      <dd class="col-9" id="{$content_type|escape}_path_field">{$data.webpage[$content_type]['path']|escape}</dd>
+    </dl>
+
+    {* Modal *}
+    {if !$root_page}
+    <div class="modal hide fade parent_page_modal" tabindex="-1" role="dialog" aria-hidden="true" data-platform="{$content_type|escape}">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{$dict.LABEL_parent_page|escape}</h5>
+
+            <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="webpage-tree"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {/if}
+  </div>
+
+  {field_radio ratio="3:9" name="shown_in_menu[$content_type]" title=$dict.LABEL_shown_in_menu id="`$content_type`_shown_in_menu" options=$dict.SET_shown_in_menu selected=$data.webpage[$content_type]['shown_in_menu'] error=$errors.shown_in_menu view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+  {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+  <div style="display:none;">
+    {field_radio ratio="3:9" name="shown_in_menu[$content_type]" title=$dict.LABEL_shown_in_menu id="`$content_type`_shown_in_menu" options=$dict.SET_shown_in_menu selected=$data.webpage[$content_type]['shown_in_menu'] error=$errors.shown_in_menu view_only=$viewOnly}
+  </div>
+  {/if}
+
+  {field_radio ratio="3:9" name="shown_in_sitemap[$content_type]" title=$dict.LABEL_shown_in_sitemap id="`$content_type`_shown_in_sitemap" options=$dict.SET_shown_in_sitemap selected=$data.webpage[$content_type]['shown_in_sitemap'] error=$errors.shown_in_sitemap view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)) default="1"}
+  {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+  <div style="display:none;">
+    {field_radio ratio="3:9" name="shown_in_sitemap[$content_type]" title=$dict.LABEL_shown_in_sitemap id="`$content_type`_shown_in_sitemap" options=$dict.SET_shown_in_sitemap selected=$data.webpage[$content_type]['shown_in_sitemap'] error=$errors.shown_in_sitemap view_only=$viewOnly default="1"}
+  </div>
+  {/if}
+
+  <div style="display:none;">
+  {field_radio ratio="3:9" name="submenu_shown[$content_type]" title=$dict.LABEL_submenu id="`$content_type`_shown_in_submenu" options=$dict.SET_shown_in_submenu selected=$data.webpage[$content_type]['submenu_shown'] error=$errors.submenu_shown view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+  {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+  <div style="display:none;">
+    {field_radio ratio="3:9" name="submenu_shown[$content_type]" title=$dict.LABEL_submenu id="`$content_type`_shown_in_submenu" options=$dict.SET_shown_in_submenu selected=$data.webpage[$content_type]['submenu_shown'] error=$errors.submenu_shown view_only=$viewOnly}
+  </div>
+  {/if}
+  </div>
+
+  {*field_radio ratio="3:9" title=$dict.LABEL_template name="template[$content_type]" id="`$content_type`_template" options=$templates[$content_type] selected=$data.webpage[$content_type]['template_id'] error=$errors["template[$locale]"] view_only=!$user->isGlobalUser()}
+  {if !in_array(Right::EDIT, $current_webpage_rights)}
+  <div style="display:none;">
+    {field_radio ratio="3:9" title=$dict.LABEL_template name="template[$content_type]" id="`$content_type`_template" options=$templates[$content_type] selected=$data.webpage[$content_type]['template_id'] error=$errors["template[$locale]"] view_only=$viewOnly}
+  </div>
+  {/if*}
+
+  <div class="row">
+    <div class="col-6">
+      {field_select ratio="6:6" name="child_order_field[$content_type]" title=$dict.LABEL_child_order_field id="`$content_type`_child_order_field" options=$dict.SET_child_order_fields selected=$data.webpage[$content_type]['child_order_field'] view_only=(!in_array(Right::CREATE, $current_webpage_rights)|| (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+      {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+      <div style="display:none;">
+        {field_select ratio="6:6" name="child_order_field[$content_type]" title=$dict.LABEL_child_order_field id="`$content_type`_child_order_field" options=$dict.SET_child_order_fields selected=$data.webpage[$content_type]['child_order_field'] view_only=$viewOnly}
+      </div>
+      {/if}
+    </div>
+
+    <div class="col-6">
+      {field_radio ratio="0:12" name="child_order_direction[$content_type]" id="`$content_type`_child_order_direction" options=$dict.SET_child_order_directions selected=$data.webpage[$content_type]['child_order_direction'] error=$errors["child_order_direction[$content_type]"] view_only=!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale) default=$default_order}
+      {if !in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)}
+      <div style="display:none;">
+        {field_radio ratio="0:12" name="child_order_direction[$content_type]" id="`$content_type`_child_order_direction" options=$dict.SET_child_order_directions selected=$data.webpage[$content_type]['child_order_direction'] error=$errors["child_order_direction[$content_type]"] view_only=$viewOnly default=$default_order}
+      </div>
+      {/if}
+    </div>
+  </div>
+
+  {field_text class="text_input" ratio="3:9" name="order_index[$content_type]" title=$dict.LABEL_order_index id="`$content_type`_order_index" value=$data.webpage[$content_type]['order_index'] error=$errors["order_index[$content_type]"] view_only=(!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale)) placeholder=false default="0"}
+  {if (!in_array(Right::CREATE, $current_webpage_rights) || (!$user->isGlobalUser() && !$data.webpage.is_single_locale))}
+  <div style="display:none;">
+    {field_text class="text_input" ratio="3:9" name="order_index[$content_type]" title=$dict.LABEL_order_index id="`$content_type`_order_index" value=$data.webpage[$content_type]['order_index'] error=$errors["order_index[$content_type]"] view_only=$viewOnly placeholder=false default="0"}
+  </div>
+  {/if}
+</div>
+{/foreach}
+
+{if $id>0}
+{foreach from=$dict.SET_content_types key=content_type item=contents}
+<div class="tab-pane fade padding" id="content-{$content_type|escape}" role="tabpanel" aria-labelledby="content-{$content_type|escape}-tab" data-tab-type="{$content_type|escape}">
+  <div class="form-inline">
+    <label for="locale-content-block-switch" class="my-1 mr-2"><i class="icon-globe"></i>&nbsp;{$dict.LABEL_language|escape}</label>
+
+    <select id="locale-content-block-switch" name="locale-content-block-switch" class="custom-select my-1 mr-sm-2">
+      {foreach from=$dict.SET_accessible_locales key=alias item=name}
+      <option value="{$alias|replace:'/':'-'}" {if $roll_back_locale == ''}{if $data['webpage']['expected_locale'] != ''}{if $data['webpage']['expected_locale']==$alias}selected{/if}{else}{if $default_locale==$alias}selected{/if}{/if}{else}{if $roll_back_locale==$alias}selected{/if}{/if}>{$name}</option>
+      {/foreach}
+    </select>
+  </div>
+
+  {foreach from=$dict.SET_accessible_locales key=locale item=locale_text}
+  <div class="webpage-content-block" id="{$locale|replace:'/':'-'}-webpage-content-block">
+    <input type="hidden" name="block_lan[]" value="{$locale}"/>
+    {if $default_locale != $locale}
+    <div style="width: 100%;margin: 10px 0;">
+      <button type="button" class="btn btn-primary duplicate_default_content">{$dict.ACTION_duplicate_from_global|escape}</button>
+    </div>
+    {/if}
+
+    {if $default_locale_read_only && $default_locale == $locale}
+    {assign var='viewOnly' value=$default_locale_read_only}
+    {/if}
+
+    {field_text class="text_input" name="webpage_title[$locale]" title=$dict.DESCRIPTION_page_title id="webpage_title_$locale" maxlength="255" value=$data.webpage['locales'][$locale].webpage_title error=$errors["webpage_title[$locale]"] view_only=$viewOnly placeholder=true}
+    {field_text class="text_input" name="seo_title[$locale]" title=$dict.DESCRIPTION_seo_title id="seo_title_$locale" maxlength="255" value=$data.webpage['locales'][$locale].seo_title error=$errors["seo_title[$locale]"] view_only=$viewOnly placeholder=true}
+    {*field_text class="text_input" name="headline_title[$locale]" title=$dict.DESCRIPTION_headline_title id="headline_title_$locale" maxlength="255" value=$data.webpage['locales'][$locale].headline_title error=$errors["headline_title[$locale]"] view_only=$viewOnly placeholder=true*}
+
+    <div class="tabs-box platform-locale-contents">
+      <!--div class="tabs-container">
+        <ul class="tabs tabs-inline tabs-top">
+          {foreach from=$dict.SET_content_types key=content_type item=contents}
+            <li class="active" data-tab-type="{$content_type|escape}">
+              <a href="#{$locale|escape}-{$content_type|escape}" data-toggle="tab">
+                <i class="icon-{$content_type|escape}"></i>
+                {$dict["LABEL_`$content_type`_content"]|escape}
+              </a>
+            </li>
+          {/foreach}
+        </ul>
+      </div-->
+      <div class="tab-content tab-content-inline tab-content-bottom">
+        {foreach from=$dict.SET_content_types key=content_type item=contents}
+        <div class="active" id="{$locale|replace:'/':'-'}-{$content_type|escape}" data-tab-type="{$content_type|escape}">
+          {foreach from=$structured_sections key=section_id item=section}
+          <h4 style="margin-top:1.5em;font-weight:400;font-size:1.2em;color:#368ee0;">{$section.section_name}</h4>
+          {if $section.general_fields|@count>0}
+            {foreach from=$section.general_fields key=field_id item=real_field}
+            {assign var="indexed_name" value=$real_field.field_name}
+              {if $real_field.field_type=='image'}
+                <div class="row select_change_toggle">
+                  <div class="col-12">
+                    <dl class="input-field text-field row edit">
+                      <dt class="col-4"><label for="{$locale[$section_id][$real_field.field_name]}">{$real_field.field_label}</label></dt>
+                      <dd class="col-8">
+                        {if $default_locale_read_only && $default_locale == $locale}
+                        <span>{$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$real_field.field_name]}</span>
+                        {else}
+                        <div class="input-group">
+                          <input type="text" id="{$locale|replace:'/':'::'}[{$section_id}][{$real_field.field_name}]" name="{$locale}[{$section_id}][{$real_field.field_name}]" value="{$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$real_field.field_name]}" maxlength="255" class="form-control">
+                          <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                              <i class="icon-folder-open-alt"></i>
+                              {$dict.ACTION_browse|escape}
+                            </button>
+                          </div>
+                        </div>
+                        {/if}
+                        {if $real_field.note_text != ''}
+                        <div class="notes">{$real_field.note_text}</div>
+                        {/if}
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              {elseif $real_field.field_type=='text'}
+                {if $real_field.maxlength>0}
+                  {field_text ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" maxlength=$real_field.maxlength value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors["$real_field.field_name[$locale]"] view_only=$viewOnly placeholder=false}
+                {else}
+                  {field_text ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" maxlength="255" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors["$real_field.field_name[$locale]"] view_only=$viewOnly placeholder=false}
+                {/if}
+              {elseif $real_field.field_type=='select'}
+                {field_select ratio="4:8" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" options=$real_field.options selected=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] view_only=$viewOnly}
+              {elseif $real_field.field_type=='textarea'}
+                {if $real_field.maxlength>0}
+                  {field_textarea ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors["$real_field.field_name[$locale]"] maxlength=$real_field.maxlength view_only=$viewOnly placeholder=false}
+                {else}
+                  {field_textarea ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors["$real_field.field_name[$locale]"] view_only=$viewOnly placeholder=false}
+                {/if}
+              {elseif $real_field.field_type=='htmleditor'}
+                {field_textarea ratio="4:8" class="visualSnippetEditor" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors["$real_field.field_name[$locale]"] view_only=$viewOnly placeholder=false style="height: 350px"}
+              {/if}
+              {if $real_field.note_text != '' && $real_field.field_type!='image'}
+                <dl class="input-field row">
+                  <dt class="col-4">&nbsp;</dt>
+                  <dd class="col-8"><div class="notes">{$real_field.note_text}</div></dd>
+                </dl>
+              {/if}
+              {/foreach}
+            {/if}
+
+            {if $section.fixed_loop>0}
+            {section name=field_loop start=0 loop=$section.fixed_loop step=1}
+            <div class="parameter_group group_{$section.id}">
+            {assign var="field_index" value=$smarty.section.field_loop.index+1}
+              {foreach from=$section.fields key=field_id item=field}
+                {if $field_index==$section.no_of_special_loop && isset($section.fields_to_replace[$field.id])}
+                {assign var="real_field" value=$section.fields_to_replace[$field.id]}
+                {else}
+                {assign var="real_field" value=$field}
+                {/if}
+                {assign var="indexed_name" value=$real_field.field_name|cat:$field_index}
+                {if $real_field.field_type=='image'}
+                  <div class="row select_change_toggle">
+                    <div class="col-12">
+                      <dl class="input-field text-field row edit">
+                        <dt class="col-4"><label for="{$locale[$section_id][indexed_name]|replace:'/':'::'}">{$real_field.field_label}</label></dt>
+                        <dd class="col-8">
+                          {if $default_locale_read_only && $default_locale == $locale}
+                          <span>{$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name]}</span>
+                          {else}
+                          <div class="input-group">
+                            <input type="text" id="{$locale|replace:'/':'::'}[{$section_id}][{$indexed_name}]" name="{$locale}[{$section_id}][{$indexed_name}]" value="{$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name]}" maxlength="255" class="form-control">
+                            <div class="input-group-append">
+                              <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                                <i class="icon-folder-open-alt"></i>
+                                {$dict.ACTION_browse|escape}
+                              </button>
+                            </div>
+                          </div>
+                          {/if}
+                          {if $real_field.note_text != ''}
+                          <div class="notes">{$real_field.note_text}</div>
+                          {/if}
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                {elseif $real_field.field_type=='text'}
+                  {if $real_field.maxlength>0}
+                    {field_text ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" maxlength=$real_field.maxlength value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] view_only=$viewOnly placeholder=false}
+                  {else}
+                    {field_text ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" maxlength="255" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] view_only=$viewOnly placeholder=false}
+                  {/if}
+                {elseif $real_field.field_type=='select'}
+                  {if $real_field.field_name=='case_study_chooser'}
+                  
+                  {elseif $real_field.field_name=='recommend_product_chooser'}
+                  
+                  {elseif $field.field_name=='main_content_snippet_id'}
+                  
+                  {else}
+                    {field_select ratio="4:8" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" options=$real_field.options selected=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] view_only=$viewOnly}
+                  {/if}
+                {elseif $field.field_type=='blank'}
+                {elseif $field.field_type=='textarea'}
+                  {if $field.maxlength>0}
+                    {field_textarea ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] maxlength=$field.maxlength view_only=$viewOnly placeholder=false}
+                  {else}
+                    {field_textarea ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] view_only=$viewOnly placeholder=false}
+                  {/if}
+                {elseif $field.field_type=='htmleditor'}
+                  {field_textarea ratio="4:8" class="visualSnippetEditor" name="$locale[$section_id][$indexed_name]" title=$real_field.field_label id="$locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] view_only=$viewOnly placeholder=false style="height: 350px"}
+                {/if}
+              {/foreach}
+            </div>
+            {/section}
+            {elseif $section.max_loop>0}
+            <div class="snippet-fields-block">
+            {if $max_loop_to_overwrite[$locale]['desktop'][$section_id]==''}
+              {assign var="real_loop" value=1}
+            {else}
+              {assign var="real_loop" value=$max_loop_to_overwrite[$locale]['desktop'][$section_id]}
+            {/if}
+            {section name=field_loop start=0 loop=$real_loop step=1}
+            {assign var="field_index" value=$smarty.section.field_loop.index+1}
+            <div class="parameter_group group_{$section.id}">
+              {if $default_locale_read_only && $default_locale == $locale}
+              {else}
+              <div class="row">
+                <div class="col-12 form_actions">
+                  <ul>
+                    <li><button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="{$section.max_loop}"><i class="icon-plus"></i></button></li>
+                    <li><button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+                  </ul>
+                </div>
+              </div>
+              {/if}
+              {foreach from=$section.fields key=field_id item=field}
+                {assign var="indexed_name" value=$field.field_name|cat:$field_index}
+                {if $field.field_type=='image'}
+                  <div class="row select_change_toggle">
+                    <div class="col-12">
+                      <dl class="input-field text-field row edit">
+                        <dt class="col-4"><label for="{$locale[$section_id][indexed_name]|replace:'/':'::'}">{$field.field_label}</label></dt>
+                        <dd class="col-8">
+                          {if $default_locale_read_only && $default_locale == $locale}
+                          <span>{$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name]}</span>
+                          {else}
+                          <div class="input-group">
+                            <input type="text" id="{$locale|replace:'/':'::'}[{$section_id}][{$indexed_name}]" name="{$locale}[$section_id][{$indexed_name}]" value="{$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name]}" maxlength="255" class="form-control">
+                            <div class="input-group-append">
+                              <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                                <i class="icon-folder-open-alt"></i>
+                                {$dict.ACTION_browse|escape}
+                              </button>
+                            </div>
+                          </div>
+                          {/if}
+                          {if $field.note_text != ''}
+                          <div class="notes">{$field.note_text}</div>
+                          {/if}
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                {elseif $field.field_type=='text'}
+                  {if $field.maxlength>0}
+                    {field_text ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$field.field_label id="$locale[$section_id][$indexed_name]" maxlength=$field.maxlength value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] view_only=$viewOnly placeholder=false}
+                  {else}
+                    {field_text ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$field.field_label id="$locale[$section_id][$indexed_name]" maxlength="255" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] view_only=$viewOnly placeholder=false}
+                  {/if}
+                {elseif $field.field_type=='select'}
+                  {if $field.field_name=='case_study_chooser'}
+                  
+                  {elseif $field.field_name=='recommend_product_chooser'}
+                  
+                  {elseif $field.field_name=='main_content_snippet_id'}
+                  
+                  {else}
+                    {field_select ratio="4:8" name="$locale[$section_id][$indexed_name]" title=$field.field_label id="$locale[$section_id][$indexed_name]" options=$field.options selected=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] view_only=$viewOnly}
+                  {/if}
+                  {if $field.note_text != ''}
+                    <dl class="input-field row">
+                      <dt class="col-4">&nbsp;</dt>
+                      <dd class="col-8"><div class="notes">{$field.note_text}</div></dd>
+                    </dl>
+                  {/if}
+                {elseif $field.field_type=='blank'}
+                {elseif $field.field_type=='textarea'}
+                  {if $field.maxlength>0}
+                    {field_textarea ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$field.field_label id="$locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] maxlength=$field.maxlength view_only=$viewOnly placeholder=false}
+                  {else}
+                    {field_textarea ratio="4:8" class="text_input" name="$locale[$section_id][$indexed_name]" title=$field.field_label id="$locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] view_only=$viewOnly placeholder=false}
+                  {/if}
+                {elseif $field.field_type=='htmleditor'}
+                {assign var="escaped_locale" value=$locale|replace:'/':'::'}
+                  {field_textarea ratio="4:8" class="visualSnippetEditor" name="$locale[$section_id][$indexed_name]" title=$field.field_label id="$escaped_locale[$section_id][$indexed_name]" value=$data['webpage']['locales'][$locale]['desktop']['content'][$section_id][$indexed_name] error=$errors[$locale][$indexed_name] view_only=$viewOnly placeholder=false style="height: 350px"}
+                {/if}
+              {/foreach}
+            </div>
+            {/section}
+            </div>
+            {/if}
+          {/foreach}
+
+          <div class="modal hide fade edit_file_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">{$dict.SET_modules.media_admin|escape}</h5>
+
+                  <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+
+                <div class="modal-body">
+                  <nav>
+                    <div class="nav nav-tabs tabs-inline tabs-top" id="edit-file-{$locale|escape}-tab" role="tablist">
+                      {if $hasShareFolderRight}
+                      <a class="nav-item nav-link active" id="edit-file-{$locale|escape}-shared-tab" data-toggle="tab" href="#edit-file-{$locale|escape}-shared" role="tab" aria-controls="edit-file-{$locale|escape}-shared" aria-selected="true">
+                        {$dict.LABEL_share_files|escape}
+                      </a>
+                      {/if}
+
+                      {if $hasPageFolderRight}
+                      <a class="nav-item nav-link {if !$hasShareFolderRight}active{/if}" id="edit-file-{$locale|escape}-specific-tab" data-toggle="tab" href="#edit-file-{$locale|escape}-specific" role="tab" aria-controls="edit-file-{$locale|escape}-specific" aria-selected="{if !$hasShareFolderRight}true{else}false{/if}">
+                        {$dict.LABEL_page_specific_files|escape}
+                      </a>
+                      {/if}
+                    </div>
+                  </nav>
+
+                  <div class="tab-content" id="edit-file-{$locale|escape}-tabContent">
+                    {if $hasShareFolderRight}
+                    <div class="tab-pane fade padding show active" id="edit-file-{$locale|escape}-shared" role="tabpanel" aria-labelledby="edit-file-{$locale|escape}-shared-tab">
+                      <iframe src="about:blank" width="100%" height="500" class="mediashare"></iframe>
+                    </div>
+                    {/if}
+
+                    {if $hasPageFolderRight}
+                    <div class="tab-pane fade padding {if !$hasShareFolderRight}show active{/if}" id="edit-file-{$locale|escape}-specific" role="tabpanel" aria-labelledby="edit-file-{$locale|escape}-specific-tab">
+                      <iframe src="about:blank" width="100%" height="500" class="pagespecific"></iframe>
+                    </div>
+                    {/if}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/foreach}
+      </div>
+    </div>
+
+    {field_text class="text_input" ratio="2:10" name="seo_keywords[$locale]" title=$dict.LABEL_keywords id="seo_keywords_$locale" value=$data.webpage['locales'][$locale].keywords error=$data["webpage_title_$locale"] view_only=$viewOnly placeholder=false}
+    {field_text class="text_input" ratio="2:10" name="seo_description[$locale]" title=$dict.LABEL_description id="seo_description_$locale" value=$data.webpage['locales'][$locale].description error=$data["webpage_title_$locale"] view_only=$viewOnly placeholder=false}
+
+    <div>
+      <h4 style="margin-top:1.5em;font-weight:400;font-size:1.2em;color:#368ee0;">{$dict.LABEL_publish_attributes|escape}</h4>
+
+      <div class="snippet-fields-block"> 
+        <div class="parameter_group">
+          <dl class="input-field row">
+            <dt class="col-2">{$dict.LABEL_publish_schedule|escape}</dt>
+            <dd class="col-10">
+              <div class="input-group">
+                <input type="hidden" name="publish_schedule[{$locale}]">
+
+                <div class="form-control border-0 p-0">
+                  {capture "calendar"}
+                  {field_calendar name="publish_date[$locale]" id="publish_date_$locale" placeholder=TRUE title=$dict.LABEL_publish_date format="%Y-%m-%d" showsTime=TRUE value=$data.webpage.locales[$locale].publish_date}
+                  {/capture}
+                  {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+                </div>
+
+                <div class="input-group-prepend input-group-append">
+                  <div class="input-group-text bg-white border-white">&ndash;</div>
+                </div>
+
+                <div class="form-control border-0 p-0">
+                  {capture "calendar"}
+                  {field_calendar name="removal_date[$locale]" id="removal_date_$locale" placeholder=TRUE title=$dict.LABEL_to format="%Y-%m-%d" showsTime=TRUE value=$data.webpage.locales[$locale].removal_date}
+                  {/capture}
+                  {$smarty.capture.calendar|replace:'input-field calendar-field':'input-field calendar-field m-0'}
+                </div>
+              </div>
+
+              <div class="notes">{$dict.DESCRIPTION_publish_schedule|escape|nl2br}</div>
+            </dd>
+          </dl>
+          {field_select ratio="2:10" name="status[$locale]" id="status_$locale" title=$dict.LABEL_status options=$dict.SET_webpage_statuses selected=$data.webpage.locales[$locale].status view_only=true}
+        </div>
+      </div>
+    </div>
+    
+    {if $data.webpage.id}
+    <div class="col-12">
+      <ul class="info-list">
+        {if $info.last_update_message}<li class="update_date">{$info.last_update_message}</li>{/if}
+      </ul>
+    </div>
+    {/if}
+  </div>
+  {/foreach}
+</div>
+{/foreach}
+
+<div class="tab-pane fade padding" id="offers-desktop" role="tabpanel" aria-labelledby="offers-desktop-tab" data-tab-type="desktop">
+  <div class="row">
+    <div class="col-12">
+      <h4>{$dict.LABEL_offer_source|escape}</h4>
+    </div>
+  </div>
+
+  {field_radio ratio="0:12" name="offer_source" title="" id="offer_source" options=$dict.SET_offer_sources selected=$data.webpage['offer_source'] error=$errors.shown_in_menu view_only=$viewOnly}
+
+  <div id="specific_offers_panel">
+    <div class="row">
+      <div class="col-5">
+        <h4 style="margin-bottom: 0;line-height: 0.8em;">{$dict.LABEL_page_offers|escape}</h4>
+        <span class="note" style="position: relative; top: 2px;">{$dict.DESCRIPTION_max_offer_num|escape}</span>
+      </div>
+
+      <div class="col-5">
+        <h4>{$dict.LABEL_available_offers|escape}</h4>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-5">
+        <div class="bordered webpage_offers_selector">
+          <div class="wrapper" id="offers-result-droppable">
+            <div class="no-records">{$dict.DESCRIPTION_offers_result|escape}</div>
+          </div>
+        </div>
+
+        <div id="remove_droppables">
+          <div>
+          {$dict.DESCRIPTION_drag_to_remove|escape}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-5">
+        <div class=" bordered webpage_offers_selector">
+          <div class="wrapper" id="offers-draggable-list">
+            {foreach from=$available_offers key=i item=offer}
+              <dl class="offer_item" data-id="{$offer.id|escape}">
+                <dt class="offer_title">
+                  {$offer.title|escape}: #{$offer.id|escape}
+                </dt>
+                {if $offer.offer_started}
+                  {if $offer.end_time}
+                  <dd class="end-date">
+                    ({$dict.LABEL_end_on|escape} {$offer.end_time|escape})
+                  </dd>
+                  {/if}
+                {else}
+                  <dd class="start-date">
+                    ({$dict.LABEL_start_on|escape} {$offer.start_time|escape})
+                  </dd>
+                {/if}
+              </dl>
+            {/foreach}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{/if}
+
+<input type="hidden" name="temp_folder" value="{$data.temp_folder|escape}" />
+
+<script type="text/javascript">
+$(document).ready(function() {
+    if($('select[name$="case_study_chooser][]"]').length>0)
+    {
+        $('select[name$="case_study_chooser][]"]').chosen({
+            disable_search_threshold: 10,
+            max_selected_options: 3,
+            width: '100%'
+        });
+        $('.chosen-choices>li>input').css('width', 'auto');
+    }
+    if($('select[name$="recommend_product_chooser][]"]').length>0)
+    {
+        $('select[name$="recommend_product_chooser][]"]').chosen({
+            disable_search_threshold: 10,
+            max_selected_options: 8,
+            width: '100%'
+        });
+        $('.chosen-choices>li>input').css('width', 'auto');
+    }
+    
+    /* Add number surfix and re-order the index for parameters of in parameters group */
+    var addParameterSurfix = function(init){
+        if(init==undefined)
+            init=false;
+            
+        if($('.parameter_group:has(.form_actions)').length>0)
+        {
+            $('.snippet-fields-block:has(.form_actions)').each(function(index){
+                var sub_groups = [];
+                $(this).find('.parameter_group').each(function(i){
+                    var classstr = $(this).attr('class').replace(' ', '.');
+                    if(sub_groups.indexOf(classstr) == '-1')
+                        sub_groups.push(classstr);
+                });
+
+                for(var k=0; k<sub_groups.length; k++)
+                {
+                    $(this).find('.'+sub_groups[k]).each(function(i){
+                        var j = i+1; //start from 1
+                        $(this).children('.row').each(function(ind){
+                            if($(this).find('input, textarea, select, .visualSnippetEditor').length>0)
+                            {
+                                var input_id = $(this).find('input, textarea, select, .visualSnippetEditor').attr('id');
+                                //window.console.dir(input_id);
+                                var input_id_new = input_id.replace(/([0-9]+\])$/i, j+']');
+                                //window.console.dir(input_id_new);
+                                var input_label = $(this).find('label').html();
+                                if(input_label.match(/([0-9]+\])$/i))
+                                    var input_label_new = input_label.replace(/([0-9]+\])$/i, j+']');
+                                else if(input_label.match(/([0-9]+)$/i))
+                                    var input_label_new = input_label.replace(/([0-9])$/i, j);
+                                else
+                                    var input_label_new = input_label+j;
+                                //$(this).find('label').attr('for', input_id_new).html(input_label_new);
+                                $(this).find('label').attr('for', input_id_new);
+                                $(this).find('input, textarea, select, .visualSnippetEditor').attr('id', input_id_new).attr('name', input_id_new.replace('::', '/'));
+                                
+                                if($(this).find('.visualSnippetEditor').length>0 && !init)
+                                {
+                                    $(this).find('.visualSnippetEditor').each(function(ind){
+                                        var id = $(this).attr('id');
+                                        if($(this).css('display') != 'none')
+                                        {
+                                            //window.console.dir(id);
+                                            tinymce.EditorManager.execCommand('mceAddEditor', true, id);
+                                        }
+                                    });
+                                    avaMediaSelectorSettings.url1 = "{$sets.paths.app_from_doc|escape:'javascript'}/module/file_admin/dialog.php?lang=en_EN&type=-1&root=webpage%2Fshared%2F";
+                                }
+                            }
+                        });
+                    }); 
+                }
+            });
+        }
+    };
+    var removeParameterGroup = function($this){
+        var classstr= $this.closest('.parameter_group').attr('class').replace(' ', '.');
+        if($this.closest('.snippet-fields-block').find('.'+classstr).length>1)
+        {
+            $this.closest('.parameter_group').remove();
+            addParameterSurfix();
+        }
+    };
+    var addParameterGroup = function($this){
+        var target_container = $this.closest('.snippet-fields-block');
+        var classstr= $this.closest('.parameter_group').attr('class').replace(' ', '.');
+        var max_group = $this.data('max');
+        
+        if($this.closest('.snippet-fields-block').find('.'+classstr).length<max_group)
+        {
+            var parameter_group_html = target_container.find('.'+classstr+':eq(0)').clone(true);
+            
+            parameter_group_html.find('.visualSnippetEditor').each(function(ind){
+                var id = $(this).attr('id');
+                if($(this).css('display') == 'none')
+                {
+                    $(this).show();
+                    $(this).prevAll('.mce-tinymce').remove();
+                }
+            });
+            
+            parameter_group_html.insertAfter( target_container.find('.'+classstr+':last') );
+            
+            addParameterSurfix();
+        }
+    };
+    if($('button[name^="parameter_group_add"]').length>0)
+    {
+        $('button[name^="parameter_group_add"]').bind('click', function(e){
+            addParameterGroup($(this));
+        });
+    }
+    if($('button[name^="parameter_group_remove"]').length>0)
+    {
+        $('button[name^="parameter_group_remove"]').bind('click', function(e){
+            removeParameterGroup($(this));
+        });
+    }
+    addParameterSurfix(true);
+    
+    var ToggleSliderType = function(_this){
+        var target_container = _this.closest('.parameter_group');
+        if(_this.val() == 'video')
+        {
+            target_container.find('input[name*="[top_banner_bg_image"]').closest('.select_change_toggle').hide();
+            target_container.find('select[name*="[background_position"]').closest('.select-field').hide();
+
+            target_container.find('input[name*="[mp4videosource"]').closest('.select_change_toggle').show();
+            target_container.find('select[name*="[mp4videosourceformat"]').closest('.select-field').show();
+            target_container.find('input[name*="[webmvideosource"]').closest('.select_change_toggle').show();
+            target_container.find('select[name*="[webmvideosourceformat"]').closest('.select-field').show();
+        }
+        else
+        {
+            target_container.find('input[name*="[top_banner_bg_image"]').closest('.select_change_toggle').show();
+            target_container.find('select[name*="[background_position"]').closest('.select-field').show();
+
+            target_container.find('input[name*="[mp4videosource"]').closest('.select_change_toggle').hide();
+            target_container.find('select[name*="[mp4videosourceformat"]').closest('.select-field').hide();
+            target_container.find('input[name*="[webmvideosource"]').closest('.select_change_toggle').hide();
+            target_container.find('select[name*="[webmvideosourceformat"]').closest('.select-field').hide();
+        }
+    };
+    
+    if($('.parameter_group select[name*="background_type"]').length>0)
+    {
+        $('.parameter_group select[name*="background_type"]').each(function(index){
+            ToggleSliderType($(this));
+            $(this).bind('change', function(e){
+                ToggleSliderType($(this));
+            });
+        });
+    }
+    
+    /* Image Select triggers */
+    if($( ".edit_file_modal" ).length>0 && $( ".edit_file_trigger" ).length>0)
+    {
+        $( ".edit_file_trigger" ).click( function() {
+            var edit_file_modal = $(this).closest('.webpage-content-block').find('.edit_file_modal');
+            var content_locale = $('#locale-content-block-switch').val();
+            var input = $(this).parent().prev();
+            var value = input.val();
+            var field_id = input.attr("id");
+            var root = "webpage/shared/";
+            edit_file_modal.find( "iframe.mediashare" ).attr( "src", "{$sets.paths.app_from_doc|escape}/module/file_admin/dialog.php?" + $.param( {
+                lang: "en_EN",
+                root: root,
+                fldr: value.indexOf(root) == 0 && value != root ? value.substring( 0, value.lastIndexOf("/") + 1 ) : null,
+                field_id: field_id,
+                relative_url: 1
+            } ) );
+            root = "webpage/{$control.editor_media_subfolder|escape:'javascript'}/"+content_locale+"/{if $data.webpage.id != ''}{$data.webpage.id|escape:'javascript'}/{/if}";
+            edit_file_modal.find( "iframe.pagespecific" ).attr( "src", "{$sets.paths.app_from_doc|escape}/module/file_admin/dialog.php?" + $.param( {
+                langCode: "{$request.locale}",
+                root: root,
+                fldr: value.indexOf(root) == 0 && value != root ? value.substring( 0, value.lastIndexOf("/") + 1 ) : null,
+                field_id: field_id,
+                relative_url: 1
+            } ) );
+            edit_file_modal.modal();
+        } );
+    }
+});
+
+$(document).ready(function(){
+    var refresh_offer_source = function() {
+        var selected = $('input[name="offer_source"]:checked').val();
+
+        if(selected == "specific") {
+            $('#specific_offers_panel').show();
+        } else {
+            $('#specific_offers_panel').hide();
+        }
+    }
+
+    $('input[name="offer_source"]').bind('click', function(){
+        refresh_offer_source();
+    });
+
+    $('form').bind('submit', function(){
+        form.additionalData = {
+        };
+
+        var selectedOffers = [];
+        var objs = offers_panel.selected_offers;
+
+        for(var i = 0; i < objs.length; i++) {
+            selectedOffers.push(objs[i].id);
+        }
+
+        if(selectedOffers.length > 0)
+            form.additionalData['selected_offers'] = selectedOffers;
+    });
+
+    var wpOfferPanel = function(selectable_stack, result_stack, remove_element, options) {
+        this.elements = {
+            'selectable': null,
+            'result': null,
+            'remove_btn': null
+        };
+
+        this.available_offers = [];
+        this.selected_offers = [];
+        this.MAX_OFFERS = 6;
+
+        this.options = {
+            'init_preselected_ids': []
+        };
+
+        this.init(selectable_stack, result_stack, remove_element, options);
+    };
+
+    (function($){
+        wpOfferPanel.prototype = {
+            'init': function(selectable_stack, result_stack, remove_element, options) {
+                this.elements.selectable = selectable_stack;
+                this.elements.result = result_stack;
+                this.elements.remove_btn = remove_element;
+                this.scope = "offers";
+                this.activeElement = null;
+
+                var me = this;
+
+                this.available_offers = this.elements.selectable.find('> .offer_item');
+                if(options.init_preselected_ids != undefined) {
+                    this.options.init_preselected_ids = options['init_preselected_ids'];
+                }
+
+                this.available_offers.draggable({
+                    'connectToSortable': this.elements.result,
+                    'addClasses': false,
+                    'cursor': "auto",
+                    'helper': function(e){
+                        var t = $(e.currentTarget);
+                        var clone = t.clone();
+                        clone.css({
+                            'width': t.width()
+                        });
+
+                        return clone;
+                    },
+                    'revert': false,
+                    'scope': this.scope,
+                    'start': function(e, ui) {
+                        me.dragStart.apply(me, [e, ui]);
+                    },
+                    'stop': function(e, ui) {
+                        me.dragStop.apply(me, [e, ui]);
+                    }
+                });
+
+                this.elements.result.sortable({
+                    'addClasses': false,
+                    'revert': false,
+                    'cursor': "auto",
+                    'scope': this.scope,
+                    'items': '> dl',
+                    'placeholder': "sortable-highlighted",
+                    'update': function(e, ui) {
+                        me.refresh();
+                    },
+                    'receive': function(e, ui) {
+                        ui.item.hide();
+                        $(this).find('> dl').css({
+                            'opacity': 1
+                        });
+                    }
+                });
+
+                this.elements.remove_btn.droppable({
+                    'addClasses': false,
+                    'scope': this.scope,
+                    'hoverClass': 'toDelete',
+                    'drop': function(e, ui) {
+                        var id = ui.draggable.attr('data-id');
+                        me.removeFromSelectedOffers(id);
+                    }
+                });
+
+
+                var refreshed = false;
+                for(var i = 0; i < this.options['init_preselected_ids'].length; i++) {
+                    var id = this.options['init_preselected_ids'][i];
+                    // clone the element to selected offers
+                    var item = this.available_offers.filter('[data-id="' + id + '"]').first();
+                    if(item.length == 1) {
+                        var clone = item.clone();
+                        item.hide();
+                        this.elements.result.append(clone);
+                        refreshed = true;
+                    }
+                }
+
+                if(refreshed) {
+                    this.refresh();
+                }
+            },
+            'refresh': function() {
+                this.selected_offers = [];
+
+                var children = this.elements.result.find('> dl');
+                for(var i = 0; i < children.length; i++) {
+                    var child = children[i];
+                    this.selected_offers.push({
+                        'id': $(child).attr('data-id'),
+                        'element': child
+                    });
+                }
+
+                if(i >= this.MAX_OFFERS) {
+                    this.available_offers.draggable('disable');
+                } else {
+                    this.available_offers.draggable('enable');
+                }
+
+                if(i == 0) {
+                    this.elements.result.find('.no-records').css({
+                        'display': 'block'
+                    });
+                } else {
+                    this.elements.result.find('.no-records').css({
+                        'display': 'none'
+                    });
+                }
+            },
+            'dragStart': function(e, ui) {
+                var t = $(e.currentTarget);
+                t.css({
+                    'opacity': 0.5
+                });
+                this.activeElement = t;
+            },
+            'dragStop': function(e, ui) {
+                this.activeElement.css({
+                    'opacity': 1
+                });
+            },
+            'removeFromSelectedOffers': function(id) {
+                var t = this.elements.result.find('> dl[data-id="' + id + '"]');
+                if(t.length > 0) {
+                    t.remove();
+                    this.elements.result.sortable('refresh');
+                    this.refresh();
+                }
+
+                this.available_offers.filter('[data-id="' + id + '"]').css({
+                    'display': 'block'
+                });
+            }
+        };
+    })(jQuery);
+
+    offers_panel = new wpOfferPanel(
+            $('#offers-draggable-list')
+            , $('#offers-result-droppable')
+            , $('#remove_droppables')
+            , {
+                'init_preselected_ids': [{implode(',', $data.webpage.selected_offers)}]
+            });
+
+    refresh_offer_source();
+});
+</script>

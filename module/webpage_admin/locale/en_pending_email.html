@@ -1,0 +1,55 @@
+Pending approval for {$dict.APP_title|escape:'html'}
+<p>Hi,</p>
+
+<p>
+  A web page
+  {if $data.is_child_affected}
+  and its child web pages (if any) are
+  {else}
+  is
+  {/if}
+  recently
+  {if $data.op == 'new'}
+  created
+  {elseif $data.op == 'edit'}
+  edited
+  {elseif $data.op == 'move'}
+  moved
+  {elseif $data.op == 'delete'}
+  deleted
+  {elseif $data.op == 'undelete'}
+  undeleted
+  {/if}
+  by {$user.first_name|escape:'html'} &lt;<a href="mailto:{$user.email|escape:'html'}">{$user.email|escape:'html'}</a>&gt;.
+</p>
+
+<p>
+  To approve or view details, please visit the following URL:
+<p>
+  {foreach from=$data.pages item=page}
+<h3>{$page->getTitle()|escape:'html'}</h3>
+<ul>
+{foreach from=$page->getPlatforms() item=platform}
+    <li><b>({$dict.SET_webpage_page_types[$platform]})</b>:&nbsp;
+        <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/admin/{$request.locale}/webpage/?id={$page->getId()|escape:'url'}&p={$platform|escape:'url'}">
+            {$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/admin/{$request.locale}/webpage/?id={$page->getId()|escape:'url'}&p={$platform|escape:'url'}
+        </a>
+    </li>
+{/foreach}
+</ul>
+  {/foreach}
+{*  {if is_array($data.path)}
+  {foreach from=$data.path key=k item=path name=paths}
+  <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/{$request.locale}/admin/webpage/?{if $k == 'mobile'}mobile_{/if}path={$path|escape:'url'}">
+    {$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/{$request.locale}/admin/webpage/?{if $k == 'mobile'}mobile_{/if}pathpath={$path|escape:'url'}
+  </a> ({$dict.SET_webpage_page_types[$k]|ucfirst}){if !$smarty.foreach.paths.last} / {/if}
+  {/foreach}
+  {else}
+  <a href="{$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/{$request.locale}/admin/webpage/?path={$data.path|escape:'url'}">
+    {$sets.paths.server_url|escape:'html'}{$sets.paths.app_from_doc|escape:'html'}/{$request.locale}/admin/webpage/?path={$data.path|escape:'url'}
+  </a>
+  {/if}*}
+
+<p>Regards,</p>
+
+<p>{$conf.mailer_name|escape:'html'}</p>

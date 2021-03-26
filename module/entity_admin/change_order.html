@@ -1,0 +1,53 @@
+<form id="change_order_form" method="POST" accept-charset="UTF-8"
+  action="?{$smarty.get|http_build_query|escape}">
+  <div class="box box-color box-bordered">
+    <div class="box-title">
+      <h3>
+        <i class="icon-edit"></i>
+        {$response.titles|@end|escape}
+      </h3>
+    </div>
+
+    <div class="box-content">
+      <div>{$dict.DESCRIPTION_change_order|escape}</div>
+      <div>&nbsp;</div>
+
+      <div id="change_order_entities" class="change_order_entities">
+        {foreach $data.entities as $entity}
+        <div class="btn btn-text-left btn-block"
+          style="border-left: 2px solid #368ee0;">
+          <input type="hidden" name="entity_ids[]" value="{$entity.id}">
+          {$entity.name|escape}
+        </div>
+        {/foreach}
+      </div>
+    </div>
+
+    <div class="actions_container">
+      <ul class="actions">
+        {if $data.with_status}
+        <li>
+          <input type="hidden" name="status" value="">
+          <button type="submit" name="status" value="draft" class="btn btn-primary"><i class="icon-pencil"></i> {$dict.ACTION_save_draft|escape}</button>
+        </li>
+        {if $user->hasRights($response.module, Right::APPROVE)}
+        <li><button type="submit" name="status" value="approved" class="btn btn-primary"><i class="icon-save"></i> {$dict.ACTION_approve|escape}</button></li>
+        {else}
+        <li><button type="submit" name="status" value="pending" class="btn btn-primary"><i class="icon-envelope"></i> {$dict.ACTION_send_approve|escape}</button></li>
+        {/if}
+        {else}
+        <li>
+          <button type="submit" class="btn btn-primary"><i class="icon-save"></i> {$dict.ACTION_save|escape}</button>
+        </li>
+        {/if}
+        <li><a href="{$smarty.get.referer_url|escape}" class="btn btn-primary"><i class="icon-remove-circle"></i> {$dict.ACTION_cancel|escape}</button></a>
+      </ul>
+    </div>
+  </div>
+</form>
+
+<script>
+(function() {
+    $( "#change_order_entities" ).sortable().children().css( "cursor", "move" );
+} )();
+</script>

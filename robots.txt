@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /
+Disallow: /conf/
+Disallow: /file/
+Disallow: /include/
+Disallow: /locale/
+Disallow: /module/
+Disallow: /admin/
+Disallow: /preview/
+Sitemap: https://mars.force100.com/sitemap.xml

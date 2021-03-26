@@ -1,0 +1,212 @@
+{field_text ratio="0:12" name="action_url[$locale]" placeholder=$dict.DESCRIPTION_action_url error=$errors["action_url[$locale]"] value=$offer->getActionUrl()->getData($locale)}
+
+{field_textarea ratio="0:12" id="content_$locale" name="content[$locale]" error=$errors["content[$locale]"] class="visualEditor" style="height:250px;width: 100%;" value=$offer->getContent()->getData($locale)}
+
+{field_textarea class="text_input" ratio="2:10" name="short_description[$locale]" error=$errors["short_description[$locale]"] title=$dict.LABEL_short_description id="short_description_$locale" value=$offer->getShortDescription()->getData($locale) view_only=$viewOnly placeholder=false class="visualEditor" maxlength=200}
+{field_textarea class="text_input" ratio="2:10" name="reservation_info[$locale]" error=$errors["reservation_info[$locale]"] title=$dict.LABEL_reservation_info id="reservation_info_$locale" value=$offer->getReservationInfo()->getData($locale) view_only=$viewOnly placeholder=false class="visualEditor"}
+
+{field_text class="text_input" ratio="2:10" name="keywords[$locale]" error=$errors["keywords[$locale]"] title=$dict.LABEL_keywords id="seo_keywords_$locale" value=$offer->getKeywords()->getData($locale) view_only=$viewOnly placeholder=false}
+{field_text class="text_input" ratio="2:10" name="description[$locale]" error=$errors["description[$locale]"] title=$dict.LABEL_description id="seo_description_$locale" value=$offer->getDescription()->getData($locale) view_only=$viewOnly placeholder=false}
+
+<div>
+    <h4 style="margin-top:1.5em;font-weight:400;font-size:1.2em;color:#368ee0;">{$dict.LABEL_banners|escape}</h4>
+
+    <div class="snippet-fields-block"> 
+        {foreach $offer->getBanners($locale) as $banner}
+        <div class="parameter_group">
+            <div class="row-fluid">
+                <div class="span12 form_actions">
+                    <ul>
+                        <li><button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="10"><i class="icon-plus"></i></button></li>
+                        <li><button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row-fluid select_change_toggle">
+                <div class="span12">
+                    <dl class="input-field text-field row-fluid edit">
+                        <dt class="span4"><label for="{$locale}[banners][image{$banner@iteration}]">{$dict.LABEL_image|escape}</label></dt>
+                        <dd class="span8">
+                            <div class="input-block-level input-append" style="position: relative">
+                                <input id="{$locale}[banners][image{$banner@iteration}]" name="{$locale}[banners][image{$banner@iteration}]" value="{$banner.image|escape}" maxlength="255" style="padding-right: 95px" type="text">
+                                <button type="button" class="btn edit_file_trigger" style="position: absolute; right: 0; z-index: 999; width: 90px;">
+                                    <i class="icon-folder-open-alt"></i>
+                                    {$dict.ACTION_browse|escape}
+                                </button>
+                            </div>
+
+                            <div class="notes">{$dict.MESSAGE_banner_image|escape}</div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <dl class="input-field select-field row-fluid edit">
+                <dt class="span4"><label for="{$locale}[banners][background_position{$banner@iteration}]">{$dict.LABEL_background_position|escape}</label></dt>
+                <dd class="span8">
+                    <select id="{$locale}[banners][background_position{$banner@iteration}]" name="{$locale}[banners][background_position{$banner@iteration}]">
+                        <option value="">&nbsp;</option>
+                        {html_options options=$dict.SET_background_positions selected=$banner.background_position}
+                    </select>
+                </dd>
+            </dl>
+        </div>
+        {foreachelse}
+        <div class="parameter_group">
+            <div class="row-fluid">
+                <div class="span12 form_actions">
+                    <ul>
+                        <li><button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="10"><i class="icon-plus"></i></button></li>
+                        <li><button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row-fluid select_change_toggle">
+                <div class="span12">
+                    <dl class="input-field text-field row-fluid edit">
+                        <dt class="span4"><label for="{$locale}[banners][image1]">{$dict.LABEL_image|escape}</label></dt>
+                        <dd class="span8">
+                            <div class="input-block-level input-append" style="position: relative">
+                                <input id="{$locale}[banners][image1]" name="{$locale}[banners][image1]" value="" maxlength="255" style="padding-right: 95px" type="text">
+                                <button type="button" class="btn edit_file_trigger" style="position: absolute; right: 0; z-index: 999; width: 90px;">
+                                    <i class="icon-folder-open-alt"></i>
+                                    {$dict.ACTION_browse|escape}
+                                </button>
+                            </div>
+
+                            <div class="notes">{$dict.MESSAGE_banner_image|escape}</div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <dl class="input-field select-field row-fluid edit">
+                <dt class="span4"><label for="{$locale}[banners][background_position1]">{$dict.LABEL_background_position|escape}</label></dt>
+                <dd class="span8">
+                    <select id="{$locale}[banners][background_position1]" name="banner_background_positions[$locale][]">
+                        <option value="">&nbsp;</option>
+                        {html_options options=$dict.SET_background_positions}
+                    </select>
+                </dd>
+            </dl>
+        </div>
+        {/foreach}
+    </div>
+</div>
+
+<div>
+    <h4 style="margin-top:1.5em;font-weight:400;font-size:1.2em;color:#368ee0;">{$dict.LABEL_menus|escape}</h4>
+
+    <div class="snippet-fields-block"> 
+        {foreach $offer->getMenus($locale) as $menu}
+        <div class="parameter_group">
+            <div class="row-fluid">
+                <div class="span12 form_actions">
+                    <ul>
+                        <li><button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="10"><i class="icon-plus"></i></button></li>
+                        <li><button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+                    </ul>
+                </div>
+            </div>
+
+            <dl class="input-field select-field row-fluid edit">
+                <dt class="span4"><label for="{$locale}[menus][name{$banner@iteration}]">{$dict.LABEL_name|escape}</label></dt>
+                <dd class="span8">
+                    <input type="text" id="{$locale}[menus][name{$banner@iteration}]" name="{$locale}[menus][name{$banner@iteration}]" value="{$menu.name}" maxlength="255">
+                </dd>
+            </dl>
+
+            <div class="row-fluid select_change_toggle">
+                <div class="span12">
+                    <dl class="input-field text-field row-fluid edit">
+                        <dt class="span4"><label for="{$locale}[menus][file{$menu@iteration}]">{$dict.LABEL_file|escape}</label></dt>
+                        <dd class="span8">
+                            <div class="input-block-level input-append" style="position: relative">
+                                <input id="{$locale}[menus][file{$menu@iteration}]" name="{$locale}[menus][file{$menu@iteration}]" value="{$menu.file|escape}" maxlength="255" style="padding-right: 95px" type="text">
+                                <button type="button" class="btn edit_file_trigger" style="position: absolute; right: 0; z-index: 999; width: 90px;">
+                                    <i class="icon-folder-open-alt"></i>
+                                    {$dict.ACTION_browse|escape}
+                                </button>
+                            </div>
+
+                            <div class="notes">{$dict.MESSAGE_menu_file|escape}</div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        {foreachelse}
+        <div class="parameter_group">
+            <div class="row-fluid">
+                <div class="span12 form_actions">
+                    <ul>
+                        <li><button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="10"><i class="icon-plus"></i></button></li>
+                        <li><button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button></li>
+                    </ul>
+                </div>
+            </div>
+
+            <dl class="input-field select-field row-fluid edit">
+                <dt class="span4"><label for="{$locale}[menus][name{$banner@iteration}]">{$dict.LABEL_name|escape}</label></dt>
+                <dd class="span8">
+                    <input type="text" id="{$locale}[menus][name{$banner@iteration}]" name="{$locale}[menus][name{$banner@iteration}]" maxlength="255">
+                </dd>
+            </dl>
+
+            <div class="row-fluid select_change_toggle">
+                <div class="span12">
+                    <dl class="input-field text-field row-fluid edit">
+                        <dt class="span4"><label for="{$locale}[menus][file1]">{$dict.LABEL_file|escape}</label></dt>
+                        <dd class="span8">
+                            <div class="input-block-level input-append" style="position: relative">
+                                <input id="{$locale}[menus][file1]" name="{$locale}[menus][file1]" value="" maxlength="255" style="padding-right: 95px" type="text">
+                                <button type="button" class="btn edit_file_trigger" style="position: absolute; right: 0; z-index: 999; width: 90px;">
+                                    <i class="icon-folder-open-alt"></i>
+                                    {$dict.ACTION_browse|escape}
+                                </button>
+                            </div>
+
+                            <div class="notes">{$dict.MESSAGE_menu_file|escape}</div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        {/foreach}
+    </div>
+</div>
+
+<div class="modal container hide fade edit_file_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h4>{$dict.SET_modules.media_admin|escape}</h4>
+    </div>
+    <div class="modal-body">
+      <div class="tabs-box" id="select_tabs">
+        <div class="tabs-container">
+            <ul class="tabs tabs-inline tabs-top">
+                {if $hasShareFolderRight}
+                <li class="active">
+                    <a href="#{$locale|replace:'/':'___'}-share" data-toggle="tab">{$dict.LABEL_share_files}</a>
+                </li>
+                {/if}
+                <li {if !$hasShareFolderRight}class="active"{/if}>
+                    <a href="#{$locale|replace:'/':'___'}-offer" data-toggle="tab">Offer Files</a>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content tab-content-inline tab-content-bottom">
+            {if $hasShareFolderRight}
+            <div class="tab-pane padding active" id="{$locale|replace:'/':'___'}-share">
+                <iframe src="about:blank" width="100%" height="500" class="mediashare"></iframe>
+            </div>
+            {/if}
+            <div class="tab-pane padding {if !$hasShareFolderRight}active{/if}" id="{$locale|replace:'/':'___'}-offer">
+                <iframe src="about:blank" width="100%" height="500" class="offer"></iframe>
+            </div>
+        </div>
+     </div>
+    </div>
+</div>

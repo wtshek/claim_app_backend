@@ -1,0 +1,25 @@
+{if $snippet_data.homepage}
+<style type="text/css">
+/* overwrite default css background */
+#main .content_wrapper {ldelim}
+	background-image: url('{$snippet_data.images[0]}');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 50% 0;
+    background-color: #000;
+{rdelim}
+</style>
+{elseif (count($snippet_data.images) > 0 && !$snippet_data.homepage) || ($snippet_data.homepage && count($snippet_data.images) > 1)}
+<div id="image-slideshow">
+{foreach from=$snippet_data.images item=img name=foo}
+    <img src="{$img|escape:'html'}" />
+{/foreach}
+</div>
+<script type="text/javascript">
+$(function() {ldelim}
+new imgSelector("#image-slideshow", {ldelim}'displayPanel': false, 'duration': {$snippet_data.interval}, 'transitionTime': {$snippet_data.duration}{rdelim});
+//var slideshow_images = new Array({foreach from=$snippet_data.images item=img name=foo}{if $smarty.foreach.foo.last}"{$img}"{else}"{$img}",{/if}{/foreach});
+//$().urcImageTween('#image-slideshow-01', '#image-slideshow-02', slideshow_images, {$snippet_data.interval}, {$snippet_data.duration});	
+{rdelim});
+</script>
+{/if}

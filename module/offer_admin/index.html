@@ -1,0 +1,442 @@
+<div class="row">
+  <div class="col-12">
+    <div class="box box-bordered box-color">
+      <div class="box-title">
+        <h3><i class="icon-reorder"></i>{$dict.LABEL_offer_management|escape}</h3>
+
+        {if $user->hasRights($m->module, Right::CREATE)}
+        <ul class="actions">
+          <li>
+            <a class="btn btn-primary" href="?op=edit#/site-distribution" name="admin-role-new-btn">
+              <i class="icon-plus-sign"></i>
+              {$dict.LABEL_new_offer|escape}
+            </a>
+          </li>
+
+          <li>
+            <button type="button" class="btn btn-mini content-slideUp">
+              <i class="icon-angle-down"></i>
+            </button>
+          </li>
+        </ul>
+        {/if}
+      </div>
+
+      <div class="box-content nopadding">
+        <nav>
+          <div class="nav nav-tabs tabs-inline tabs-top" id="site-tree-tab" role="tablist">
+            {*
+            <a class="nav-item nav-link active" id="page-offers-tab" data-toggle="tab" href="#page-offers" role="tab" aria-controls="page-offers" aria-selected="true">
+              {$dict.LABEL_page_offers|escape}
+            </a>
+            *}
+
+            <a class="nav-item nav-link active" id="manage-offers-tab" data-toggle="tab" href="#manage-offers" role="tab" aria-controls="manage-offers" aria-selected="true">
+              {$dict.LABEL_manage_offers|escape}
+            </a>
+          </div>
+        </nav>
+
+        <div class="tab-content tab-content-inline tab-content-bottom" id="site-tree-tabContent">
+          {*
+          <div class="tab-pane fade nopadding show active" id="page-offers">
+            {$page_offers.content}
+          </div>
+          *}
+
+          <div class="tab-pane fade nopadding show active" id="manage-offers">
+            <div id="offers-search">
+              <div class="row">
+                <div class="col-12 col-lg-9">
+                  <form action="{$sets.paths['mod_from_doc']|escape}#/manage-offers" method="GET">
+                    <div class="find_bar">
+                      <div class="keywords">
+                        {field_text class="text_input" name="keywords" title="{$dict.LABEL_keywords|escape}" value=$_get.keywords error=null view_only=false placeholder=true}
+                      </div>
+
+                      <div class="action">
+                        <button type="submit" name="find_btn" class="btn btn-primary">
+                          <i class="icon-search"></i>
+                          {$dict.ACTION_find|escape}</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <div class="col-12 col-lg-3">
+                  <select name="astat" id="offer_active_stat" class="form-control">
+                    {html_options options=$dict.SET_offer_active_stat selected=$_get.astat}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div style="position: relative;margin-top:-50px;min-width:520px;" id="offer_list_tab_wrapper">
+              <form name="offer_list_fast" action="?op=order_index_fast_update" method="POST">
+                <div class="form_actions">
+                  <ul style="margin: 0 5px 5px 0;">
+                    <li>
+                      <button type="submit" name="save_draft" class="btn btn-primary">
+                        <i class="icon-pencil"></i>
+                        {$dict.ACTION_save_draft|escape}</button>
+                    </li>
+
+                    {if $user->hasRights('offer_admin', Right::APPROVE)}
+                      <li>
+                        <button type="submit" name="save_publish" class="btn btn-primary">
+                          <i class="icon-save"></i>
+                          {$dict.ACTION_publish|escape}</button>
+                      </li>
+                    {else}
+                      <li>
+                        <button type="submit" name="save_approval" class="btn btn-primary">
+                          <i class="icon-envelope"></i>
+                          {$dict.ACTION_send_approve|escape}</button>
+                      </li>
+                    {/if}
+                  </ul>
+                </div>
+
+                {$offers_list.content}
+
+                <div class="form_actions">
+                  <ul style="margin: 0 5px 5px 0;">
+                    <li>
+                      <button type="submit" name="save_draft" class="btn btn-primary">
+                        <i class="icon-pencil"></i>
+                        {$dict.ACTION_save_draft|escape}</button>
+                      <input type="hidden" name="list_status" value=""/>
+                    </li>
+
+                    {if $user->hasRights('offer_admin', Right::APPROVE)}
+                      <li>
+                        <button type="submit" name="save_publish" class="btn btn-primary">
+                          <i class="icon-save"></i>
+                          {$dict.ACTION_publish|escape}</button>
+                      </li>
+                    {else}
+                      <li>
+                        <button type="submit" name="save_approval" class="btn btn-primary">
+                          <i class="icon-envelope"></i>
+                          {$dict.ACTION_send_approve|escape}</button>
+                      </li>
+                    {/if}
+                  </ul>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * File:
+ * Author: Patrick Yeung
+ * Email: <patrick[at]avalade[dot]com>
+ * Date: 13?9?2?
+ * Time: ??12:08
+ *
+ */
+
+(function($){
+    var offer_elements = $('#page_offers td .offer_no');
+    var webpage_offers_elements = $('#page_offers td .offers_count');
+    var offer_list_rows = $('#offers_list tbody tr[data-row-id]');
+    var offers_data = {
+    };
+    var webpage_offers = {
+    };
+    var offer_webpages = {
+    };
+
+    var pop_over_init_opts = {
+        'animation': true,
+        'html': true,
+        'placement': 'bottom',
+        'selector': false,
+        'trigger': 'manual',
+        'title': '',
+        'content': '',
+        'delay': 0,
+        'container': false
+    };
+
+    offer_elements.popover(pop_over_init_opts);
+    webpage_offers_elements.popover($.extend({ldelim}{rdelim}, pop_over_init_opts, {ldelim}'placement': 'top'{rdelim}));
+    offer_list_rows.popover($.extend({ldelim}{rdelim}, pop_over_init_opts, {ldelim}'placement': 'left'{rdelim}));
+
+    var getOfferPreview = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var me = this;
+        $('#page_offers td .offer_no').not($(this)).removeClass('highlight').popover('hide');
+
+        var id = $(this).text();
+        $(this).addClass('highlight');
+
+        if(offers_data['offer_' + id] == undefined) {
+            $(me).attr('data-content', '<div class="offers-loading"><div class="loading"></div></div>');
+            $(me).popover('show');
+
+            // get url
+            $.ajax({
+                'url': './',
+                'type': 'get',
+                'data': {
+                    'op': 'retrieve_offer_preview',
+                    'id': id
+                },
+                'complete': function(ajax, status) {
+
+                },
+                'success': function(json, status, ajax) {
+                    offers_data['offer_' + json.id] = json;
+                    showOffer.apply(me, [json.id]);
+                }
+            });
+        } else {
+            showOffer.apply(me, [id]);
+        }
+    }
+
+    var showOffer = function(id) {
+        var data = offers_data['offer_' + id];
+
+        $(this).attr({
+            'data-content': data.html,
+            'data-original-title': data.title
+        });
+
+        $(this).popover('show');
+
+        new contentSelector($(this).next().find('.offers').first(), {
+            'resize': false
+        });
+    }
+
+    var getWebpageOffers = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var me = this;
+        $('#page_offers td .offers_count').not($(this)).removeClass('highlight').popover('hide');
+        $(this).addClass('highlight');
+
+        var id = $(this).parentsUntil('#page_offers', 'tr[data-row-id]').attr('data-row-id');
+
+        if(webpage_offers['webpage_' + id] == undefined) {
+            $(me).attr('data-content', '<div class="offers-loading"><div class="loading"></div></div>');
+            $(me).popover('show');
+
+            // get url
+            $.ajax({
+                'url': './',
+                'type': 'get',
+                'data': {
+                    'op': 'get_webpage_offers',
+                    'id': id
+                },
+                'complete': function(ajax, status) {
+
+                },
+                'success': function(json, status, ajax) {
+                    webpage_offers['webpage_' + json.id] = json;
+                    showWebpageOffers.apply(me, [json.id]);
+                }
+            });
+        } else {
+            showWebpageOffers.apply(me, [id]);
+        }
+    }
+
+    var showWebpageOffers = function(id) {
+        var data = webpage_offers['webpage_' + id];
+
+        var html = '<ul class="webpage_offers">';
+
+        for(var i = 0; i < data.offers.length; i++) {
+            html = html + '<li class="offer-' + data.offers[i].status + '">' + data.offers[i].title
+                    + ':&nbsp;#' + data.offers[i].id + '</li>';
+        }
+
+        html = html + '</ul>';
+
+        $(this).attr({
+            'data-content': html,
+            'data-original-title': data.title
+        });
+
+        $(this).popover('show');
+    }
+
+    $('#page_offers').delegate('td .offer_no', 'click', getOfferPreview);
+    $('#page_offers').delegate('td .offers_count', 'click', getWebpageOffers);
+
+    $('#offers_list tbody tr[data-row-id] a').bind('click', function(e) {
+        e.stopPropagation();
+    });
+
+    //get_offer_page_trees
+    $('#offers_list tbody tr[data-row-id]').bind('click', function(e) {
+        var toShow = !$(this).data('shown');
+
+        if(toShow) {
+            $('#offer_list_tab_wrapper').css({
+                'padding-right': 280
+            });
+            var me = this;
+            $('#offers_list tbody tr[data-row-id]').not($(this)).removeClass('highlight').popover('hide');
+
+            var id = $(this).attr('data-row-id');
+            $(this).addClass('highlight');
+
+            if(offer_webpages['offer_' + id] == undefined) {
+                $(me).attr('data-content', '<div class="offers-loading"><div class="loading"></div></div>');
+                $(me).popover('show');
+
+                // get url
+                $.ajax({
+                    'url': './',
+                    'type': 'get',
+                    'data': {
+                        'op': 'get_offer_page_trees',
+                        'id': id
+                    },
+                    'complete': function(ajax, status) {
+
+                    },
+                    'success': function(json, status, ajax) {
+                        offer_webpages['offer_' + json.id] = json;
+                        showOfferPageTree.apply(me, [json.id]);
+                    }
+                });
+            } else {
+                showOfferPageTree.apply(me, [id]);
+            }
+        } else {
+            $('#offer_list_tab_wrapper').css({
+                'padding-right': 0
+            });
+            $(this).popover('hide');
+        }
+
+        $('#offers_list tbody tr[data-row-id]').data('shown', false);
+        $(this).data('shown', toShow);
+
+    });
+
+    function showOfferPageTree(id) {
+        var data = offer_webpages['offer_' + id];
+
+        var html = '<div class="offer_webpages_tree">'
+            + (data.preview_path == "" ? "" : '<div class="offer_anonymous_preview"><h4>{$dict.LABEL_anonymous_preview|escape:"javascript"}</h4>'
+                                            + '<ul><li><a href="' + data.preview_path + '&m=0" target="_blank" class="btn btn-primary"><i class="icon-desktop">&nbsp;</i>{$dict.SET_webpage_page_types.desktop|escape:"javascript"}</a></li>'
+                                            //+ '<li><a href="' + data.preview_path + '&m=1" target="_blank" class="btn btn-primary"><i class="icon-mobile-phone">&nbsp;</i>{$dict.SET_webpage_page_types.mobile|escape:"javascript"}</a></li>'
+                                            + '</ul><p>{$dict.LABEL_expiry_time|escape:"javascript"}:&nbsp;' + data.code_expire_time + '</p><hr /></div>')
+            + data.tree_struct + '</div>';
+        $(this).attr({
+            'data-content': html
+        });
+
+        $(this).popover('show');
+
+        //var t = $(this).next('.popover').find('.offer_webpages_tree');
+        var t = $($(this).data('bs.popover').tip).find('.offer_webpages_tree');
+        t.css({
+            'width': t[0].scrollWidth
+        }).fancytree({
+            activate: function(event, data) {
+                window.location.href = data.node.data.href;
+            }
+        });
+    }
+
+
+    $('body').delegate('.popover', 'click', function(e){
+        e.stopPropagation();
+    });
+    $('body').bind('click', function(){
+        offer_elements.removeClass('highlight').popover('hide');
+        webpage_offers_elements.removeClass('highlight').popover('hide');
+    });
+
+    $(window).bind('resize', function() {
+        offer_elements.removeClass('highlight').popover('hide');
+        webpage_offers_elements.removeClass('highlight').popover('hide');
+        offer_list_rows.removeClass('highlight').popover('hide');
+    });
+
+
+    $('.buttonset a').filter(function() {
+        return $(this).text().match('Delete');
+        }).on("click", function (e) {
+        var r=confirm("{$dict.MESSAGE_delete_confirm|escape:'javascript'}");
+    if (!r) {
+        e.preventDefault();
+        }
+    });
+
+    $('#offer_active_stat').bind('change', function(e) {
+        e.preventDefault();
+        var vars = {ldelim}{rdelim};
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for(var i = 0; i < hashes.length; i++)
+        {
+            var hash = hashes[i].split('=');
+            if(hash.length == 2) {
+                vars[hash[0]] = hash[1];
+            }
+        }
+
+        vars[$(this).prop('name')] = $(this).val();
+        window.location.href = '?' + $.param(vars) + (window.location.hash);
+    });
+    
+    $('input[name^="order_index"]').bind('change', function(e){
+        $(this).next('input').val(1);
+    });
+    
+    var form = $("form[name='offer_list_fast']");
+
+    form.delegate('button[name="save_draft"]', 'click', function(e){
+        e.preventDefault();
+        /*form.find('input[name^="order_modified"]').each(function(index){
+            if($(this).val()==1)
+                $(this).next('input').val("draft");
+        });*/
+        $('input[name^="list_status"]').val("draft");
+        form.submit();
+    });
+
+    form.delegate('button[name="save_publish"]', 'click', function(e){
+        e.preventDefault();
+
+        /*form.find('input[name^="order_modified"]').each(function(index){
+            if($(this).val()==1)
+                $(this).next('input').val("approved");
+        });*/
+        var r=confirm("{$dict.MESSAGE_publish_confirm|escape:'javascript'}");
+        if (r) {
+            $('input[name^="list_status"]').val("approved");
+            form.submit();
+        }
+        
+    });
+
+    form.delegate('button[name="save_approval"]', 'click', function(e){
+        e.preventDefault();
+
+        /*form.find('input[name^="order_modified"]').each(function(index){
+            if($(this).val()==1)
+                $(this).next('input').val("pending");
+        });*/
+        $('input[name^="list_status"]').val("pending");
+        form.submit();
+    });
+})(jQuery);
+</script>

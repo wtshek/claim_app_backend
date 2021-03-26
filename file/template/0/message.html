@@ -1,0 +1,9 @@
+<p>{$message|nl2br}</p>
+
+{if $redirect}
+<script>
+setTimeout( function() {
+    window.location.href = "{$redirect|escape:'javascript'}";
+}, 5000 );
+</script>
+{/if}

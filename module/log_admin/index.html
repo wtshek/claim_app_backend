@@ -1,0 +1,124 @@
+<div class="row">
+  <div class="col-12">
+    <form id="finder_form" method="GET" accept-charset="UTF-8" action="">
+      <div class="box">
+        <div class="box-title">
+          <h3><i class="icon-search"></i>{$dict.LABEL_log_finder|escape}</h3>
+
+          <ul class="actions">
+            <li>
+              <a href="#" class="btn btn-mini content-slideUp"><i class="icon-angle-down"></i></a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="box-content nopadding">
+          <div class="box-content">
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                {field_text class="text_input" name="keyword" title=$dict.LABEL_keyword id="keyword" maxlength="255" value=$_get.keyword error=null view_only=false placeholder=true}
+              </div>
+
+              <div class="col-12 col-lg-6">
+                {field_select ratio="3:9" name="locale" title=$dict.LABEL_locale id="locale" options=$sets.locales selected=$_get.locale error=null has_empty=true}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                {field_calendar ratio="3:9" name="start_date" id="start_date" title=$dict.LABEL_start_date  value=$_get.start_date showsTime=false}
+              </div>
+
+              <div class="col-12 col-lg-6">
+                {field_calendar ratio="3:9" name="end_date" id="end_date" title=$dict.LABEL_end_date  value=$_get.end_date showsTime=false}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-lg-6">
+                {field_select ratio="3:9" name="module" title=$dict.LABEL_module id="module" options=$dict.SET_modules selected=$_get.module error=null has_empty=true}
+              </div>
+
+              <div class="col-12 col-lg-6">
+              </div>
+            </div>
+          </div>
+
+          <div class="box-actions">
+            <div class="row">
+              <div class="col-12">
+                <div class="form_actions">
+                  <ul>
+                    <li>
+                      <button type="submit" name="submit" class="btn">
+                        <i class="icon-search"></i>
+                        {$dict.ACTION_find|escape}</button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="spacer">&nbsp;</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="box box-bordered box-color">
+      <div class="box-title">
+        <h3><i class="icon-reorder"></i>{$dict.LABEL_logs|escape}</h3>
+      </div>
+
+      <div class="box-content nopadding">
+        <nav>
+          <div class="nav nav-tabs tabs-inline tabs-top" id="log-tab" role="tablist">
+            <a class="nav-item nav-link active" id="{$list.summary.id|escape}-tab" data-toggle="tab" href="#{$list.summary.id|escape}" role="tab" aria-controls="{$list.summary.id|escape}" aria-selected="true">
+              {$dict.LABEL_all|escape} ({$list.summary.record_count})
+            </a>
+
+            {foreach item=type_list from=$type_lists}
+            <a class="nav-item nav-link" id="{$type_list.summary.id|escape}-tab" data-toggle="tab" href="#{$type_list.summary.id|escape}" role="tab" aria-controls="{$type_list.summary.id|escape}" aria-selected="false">
+              {$type_list.name|escape} ({$type_list.summary.record_count})
+            </a>
+            {/foreach}
+          </div>
+        </nav>
+
+        <div class="tab-content nopadding tab-content-inline tab-content-bottom" id="log-tabContent">
+          <div class="tab-pane active" id="{$list.summary.id|escape}">{$list.content}</div>
+
+          {foreach item=type_list from=$type_lists}
+          <div class="tab-pane" id="{$type_list.summary.id|escape}">{$type_list.content}</div>
+          {/foreach}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('a').each(function(index){
+        if($(this).attr('href')!=undefined)
+        {
+            if($(this).attr('href').indexOf('delete')!='-1')
+            {
+                var _href = $(this).attr('href');
+                $(this).bind('click', function(e){
+                    e.preventDefault();
+                    var delete_confirm = confirm("{$dict.DESCRIPTION_confirm_to_delete}");
+                    if(delete_confirm == true)
+                        window.open(_href, '_self');
+                    else
+                        return false;
+                });
+            }
+        }
+    });
+});
+</script>

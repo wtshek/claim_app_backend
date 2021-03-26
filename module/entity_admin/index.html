@@ -1,0 +1,217 @@
+{if $data.message}
+<div class="row-fluid margin-top">
+  <div class="col-12">
+    <div class="alert alert-success">{$data.message|escape}</div>
+  </div>
+</div>
+{/if}
+
+<!-- Search form -->
+{if $load_search_form}
+<form id="search_form" method="GET" accept-charset="UTF-8" action="">
+  <div class="box box-bordered box-color">
+    <div class="box-title"><h3>{$dict.ACTION_search|escape}</h3></div>
+
+    <div class="box-content">
+      <div class="row">
+        {$response.content}
+      </div>
+    </div>
+
+    <div class="actions_container">
+      {foreach $smarty.get as $key => $value}
+      {if strpos($key, 'search_') !== 0 && strpos($key, 'product_list_') !== 0}
+      <input type="hidden" name="{$key}" value="{$value|escape}">
+      {/if}
+      {/foreach}
+
+      <ul class="actions">
+        <li><button class="btn btn-primary"><i class="icon-search"></i>{$dict.ACTION_search|escape}</button></li>
+      </ul>
+    </div>
+  </div>
+</form>
+{else}
+<div class="box box-bordered box-color">
+  <div class="box-title"><h3>{$response.titles|@end|escape}</h3></div>
+{/if}
+
+<!-- List -->
+{$data.list.content}
+
+{if !$load_search_form}
+</div>
+{/if}
+
+<script>
+(function() {
+    // Delete confirmation
+    $( "a[href*=delete]" ).click( function() {
+        return window.confirm( "{$dict.MESSAGE_delete_confirm|escape:'javascript'}" );
+    } );
+} )();
+</script>
+
+<!-- Modal -->
+{if $entity_admin_def[$response.module].children[$smarty.get.entity].edit == 'modal'}
+<form id="edit_form" method="POST" accept-charset="UTF-8" action=""
+  class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+  <div class="modal-dialog {if in_array($smarty.get.entity, array('gallery_container'))}modal-xl{/if}" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{$dict.SET_operations.edit|sprintf:''|escape}</h5>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body"></div>
+
+      <div class="modal-footer">
+        {if $entity_def.status_table}
+        <input type="hidden" name="status" value="">
+        <button type="submit" name="status" value="draft" class="btn btn-primary"><i class="icon-pencil"></i> {$dict.ACTION_save_draft|escape}</button>
+        {if $user->hasRights($response.module, Right::APPROVE)}
+        <button type="submit" name="status" value="approved" class="btn btn-primary"><i class="icon-save"></i> {$dict.ACTION_approve|escape}</button>
+        {else}
+        <button type="submit" name="status" value="pending" class="btn btn-primary"><i class="icon-envelope"></i> {$dict.ACTION_send_approve|escape}</button>
+        {/if}
+        {else}
+        <button type="submit" class="btn btn-primary"><i class="icon-save"></i> {$dict.ACTION_save|escape}</button>
+        {/if}
+        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove-circle"></i> {$dict.ACTION_close|escape}</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+(function() {
+    var edit_form = $( "#edit_form" ).on( "shown.bs.modal", function() {
+        // Show modal dialog and initiate chosens
+        edit_body.find( ".chosen-select-tab" ).chosen();
+
+        // Allow inputs in TinyMCE to get focus
+        // https://stackoverflow.com/questions/36279941/using-tinymce-in-a-modal-dialog
+        $( document ).off( "focusin.modal" );
+    } );
+    var edit_header = edit_form.find( ".modal-header h5" );
+    var edit_body = edit_form.find( ".modal-body" );
+
+    // Form submission
+    new form_submit_panel( edit_form );
+    edit_form.find( "button[name=status]" ).click( function() {
+        edit_form.find( "input[name=status]" ).val( this.value );
+
+        // Select locales
+        {if $entity_def.status_table == 'locale_table'}
+        $( "#edit_locale_modal" ).modal();
+        {else}
+        edit_form.submit();
+        {/if}
+
+        return false;
+    } );
+
+    // Modal edit form
+    $( "a[href*=edit]:not(.btn)" ).click( function() {
+        $.ajax( {
+            url: this.href,
+            success: function( response )
+            {
+                var response = $( response );
+                var response_edit_form = response.find( "#edit_form" );
+                var response_box_content = response_edit_form.find( ".box-content" );
+
+                // Set HTML
+                edit_form.attr( "action", response_edit_form.attr("action") );
+                edit_header.text( response_edit_form.find(".box-title").text() );
+                edit_body.attr( "class", response_box_content.attr("class").replace("box-content", "modal-body") );
+                edit_body.html( response_box_content.html() );
+
+                // Workaround for issues in navigation links and nest modals
+                edit_body.find( ".nav-link" ).each( function(i, element) {
+                    var link = $( element );
+                    link.attr( "data-target", link.attr("href") );
+                    link.attr( "href", "" );
+                } );
+                edit_body.find( ".modal" ).attr( "data-backdrop", false ).on( "show.bs.modal", function() {
+                    edit_form.css( "visibility", "hidden" );
+                    $( this ).css( "visibility", "visible" );
+                } ).on( "hide.bs.modal", function() {
+                    edit_form.css( "visibility", "" );
+                    $( this ).css( "visibility", "" );
+                } );
+                edit_body.find( "button[data-dismiss=modal]" ).removeAttr( "data-dismiss" ).click( function() {
+                    $( this ).closest( ".modal" ).modal( "hide" );
+                } );
+
+                // Set JS
+                eval( response_edit_form.nextAll("script").text() );
+
+                edit_form.modal();
+            }
+        } );
+        return false;
+    } );
+} )();
+</script>
+{/if}
+
+{if $entity_def.order_by.field == 'order_index'}
+<form id="change_order_form" method="POST" accept-charset="UTF-8" action=""
+  class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{$dict.SET_operations.change_order|sprintf:'':''|escape}</h5>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body"></div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary"><i class="icon-save"></i> {$dict.ACTION_save|escape}</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="icon-remove-circle"></i> {$dict.ACTION_close|escape}</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+(function() {
+    var change_order_form = $( "#change_order_form" );
+    var change_order_header = change_order_form.find( ".modal-header h5" );
+    var change_order_body = change_order_form.find( ".modal-body" );
+
+    // Modal change order form
+    $( "a[href*=change_order]" ).click( function() {
+        $.ajax( {
+            url: this.href,
+            success: function( response )
+            {
+                var response = $( response );
+                var response_change_order_form = response.find( "#change_order_form" );
+                var response_box_content = response_change_order_form.find( ".box-content" );
+
+                // Set HTML
+                change_order_form.attr( "action", response_change_order_form.attr("action") );
+                change_order_header.text( response_change_order_form.find(".box-title").text() );
+                change_order_body.attr( "class", response_box_content.attr("class").replace("box-content", "modal-body") );
+                change_order_body.html( response_box_content.html() );
+
+                // Set JS
+                eval( response_change_order_form.nextAll("script").text() );
+
+                change_order_form.modal();
+            }
+        } );
+        return false;
+    } );
+} )();
+</script>
+{/if}

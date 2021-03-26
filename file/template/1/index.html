@@ -1,0 +1,252 @@
+{$root_url = "{$sets.paths.app_from_doc}/{$request.locale}{$sitemap->getRoot()->getItem()->getRelativeUrl($platform)}"}
+
+<!-- Privacy bar -->
+{if !$smarty.cookies.privacy_accepted}
+<p id="privacy" class="small text-center">
+  {$dict.MESSAGE_cookies|escape}<a href="{$dict.URL_cookies|escape}">{$dict.LABEL_cookies|escape}</a>{$dict.MESSAGE_cookies_ending|escape}
+  <a class="btn btn-primary btn-privacy ml-md-5" href="{$dict.URL_cookies_ok|escape}">{$dict.LABEL_cookies_ok|escape}</a>
+  <a class="btn btn-primary btn-privacy ml-md-2" href="{$dict.URL_cookies|escape}">{$dict.LABEL_privacy_policy|escape}</a>
+</p>
+
+<script>
+$(document).ready( function() {
+    $("#privacy > a.btn[href*='#']").click(function() {
+        Cookies.set("privacy_accepted", "1", {
+            expires: 30
+        });
+        $(this).parent().slideUp();
+        return false;
+    });
+} );
+</script>
+{/if}
+
+<!-- Navigation -->
+<div>
+  <nav id="mainNavbar" class="navbar fixed-top navbar-expand-xl flex-xl-column p-0">
+    <div class="navbar-bg">
+      <div class="container mt-1">
+        <div class="row w-100 mx-auto">
+          <div class="col-xl-12 top-header px-0 px-xl-3">
+            <!-- Top Navigation -->
+            <div class="text-right">
+              <ul class="list-inline mb-0">
+                {$first_locale = 1}
+                {foreach $sets.public_locales as $locale => $locale_name}
+                {if $request.locale != $locale}
+                {if !$first_locale}
+                <li class="list-inline-item">|</li>
+                {/if}
+                <li class="list-inline-item">
+                  {if $pg->hasLocale($locale)}
+                  <a href="{$sets.paths.app_from_doc|escape}/{$locale|escape}{$data.current_url|escape}{if http_build_query($smarty.get)}?{$smarty.get|http_build_query|escape}{/if}">
+                    {$locale_name|escape}
+                  </a>
+                  {else}
+                  {$locale_name|escape}
+                  {/if}
+                </li>
+                {$first_locale = 0}
+                {/if}
+                {/foreach}
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-xl-12 mx-auto brand">
+            <a class="navbar-brand" href="{$root_url|escape}"></a>
+          </div>
+
+          <!-- Header Reservation Button in Mobile - For Hotel -->
+          <!--
+          <div class="d-xl-none mobile-book-btn">
+            <a href="#" class="btn btn-primary ctc" target="_blank">{$dict.LABEL_book_now|escape}</a>
+          </div>
+          -->
+        </div>
+      </div>
+
+      <button class="navbar-toggler pt-3" type="button" data-toggle="collapse" data-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="{$dict.LABEL_toggle_navigation|escape}">
+        <span class="sr-only">{$dict.LABEL_toggle_navigation|escape}"</span>
+        <div class="animated-toggler-icon"><span></span><span></span><span></span><span></span></div>
+      </button>
+
+      <div class="collapse navbar-collapse flex-xl-column mx-auto  justify-content-xl-end" id="mainNavigation">
+        <div class="container">
+          <!-- Header Reservation Form - For Hotel -->
+          <!--
+          <div class="col-xl-10 flex-0 d-xl-flex flex-xl-column">
+            <div class="d-none d-xl-flex justify-content-end flex-row">
+              <form class="form-inline header-reservation-form pt-3">
+                <div id="headerReservationForm">
+                  <div class="form-group nav-reserve-field d-inline-block">
+                    <input type="text" class="form-control check-in" id="nav-check-in" name="nav-check-in" placeholder="{$dict.LABEL_check_in|escape}"><i class="fas fa-calendar-alt"></i>
+                  </div>
+
+                  <div class="form-group nav-reserve-field d-inline-block">
+                    <input type="text" class="form-control check-out" id="nav-check-out" name="nav-check-out" placeholder="{$dict.LABEL_check_out|escape}"><i class="fas fa-calendar-alt"></i>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary ctc ml-1" id="nav-reserve-btn">{$dict.LABEL_book_now|escape}</button>
+              </form>
+            </div>
+          </div>
+          -->
+
+          <!-- Main navigation -->
+          <div class="row w-100 mx-auto">
+            <div class="col-xl-12 px-0">
+              {$main_nav|replace:'<ul class="navbar-nav">':'<ul class="navbar-nav justify-content-xl-end">'}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<!-- Carousel -->
+{if $pg->getType() == 'static' && count($pg->getBanners($request.locale)) > 0}
+<header>
+  <div id="carouselIndicators" class="carousel slide" data-ride="carousel">
+    {if count($pg->getBanners($request.locale)) > 1}
+    <ol class="carousel-indicators">
+      {foreach $pg->getBanners($request.locale) as $item}
+      <li data-target="#carouselIndicators" data-slide-to="{$item@index}"{if $item@first} class="active"{/if}></li>
+      {/foreach}
+    </ol>
+    {/if}
+
+    <div class="carousel-inner">
+      {foreach $pg->getBanners($request.locale) as $item}
+      <div class="carousel-item{if $item@first} active{/if}" id="carousel-{$item.banner_id}">
+        <picture>
+          <!-- Medium devices (tablets, 768px and up) -->
+          {if $item.image_md}
+          <source srcset="{if $conf.aws_enabled}https://{$conf.cloudfront_domain|escape}/{elseif $item.image_md|strpos:'http' === false}file/{/if}{$item.image_md|escape}" media="(min-width: 768px)">
+          {/if}
+
+          <!-- Extra large devices (large desktops, 1200px and up) -->
+          {if $item.image_xl}
+          <source srcset="{if $conf.aws_enabled}https://{$conf.cloudfront_domain|escape}/{elseif $item.image_xl|strpos:'http' === false}file/{/if}{$item.image_xl|escape}" media="(min-width: 1200px)">
+          {/if}
+
+          <img src="{if $conf.aws_enabled}https://{$conf.cloudfront_domain|escape}/{elseif $item.image_xs|strpos:'http' === false}file/{/if}{$item.image_xs|escape}" alt="" loading="lazy">
+        </picture>
+
+        {if $item.url}
+        <a href="{if $conf.aws_enabled}https://{$conf.cloudfront_domain|escape}/{elseif $item.url|strpos:'http' === false}file/{/if}{$item.url|escape}" class="d-block h-100"></a>
+        {/if}
+      </div>
+      {/foreach}
+    </div>
+
+    {if count($pg->getBanners($request.locale)) > 1}
+    <a class="carousel-control-prev" href="#carouselIndicators" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">{$dict.LABEL_previous|escape}</span>
+    </a>
+
+    <a class="carousel-control-next" href="#carouselIndicators" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">{$dict.LABEL_next|escape}</span>
+    </a>
+    {/if}
+  </div>
+</header>
+
+<style>
+{foreach $pg->getBanners($request.locale) as $item}
+#carousel-{$item.banner_id} > picture > img {
+    {if $item.background_position_xs}
+    object-position: {$item.background_position_xs|escape};
+    {/if}
+}
+{/foreach}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    {foreach $pg->getBanners($request.locale) as $item}
+    {if $item.image_md && $item.background_position_md}
+    #carousel-{$item.banner_id} > picture > img {
+        object-position: {$item.background_position_md|escape};
+    }
+    {/if}
+    {/foreach}
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    {foreach $pg->getBanners($request.locale) as $item}
+    {if $item.image_xl && $item.background_position_xl}
+    #carousel-{$item.banner_id} > picture > img {
+        object-position: {$item.background_position_xl|escape};
+    }
+    {/if}
+    {/foreach}
+}
+</style>
+{/if}
+
+<!-- Content -->
+<div id="content">
+  {if in_array($bodyClass, array('with-banner', 'without-banner'))}
+  <section id="title" class="pb-0">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col">
+          {capture "pageTitle"}{$pg->getHeadlineTitle($request.locale)|default:$pg->getTitle($request.locale)}{/capture}
+          <h1{if strlen($smarty.capture.pageTitle) > 12} class="long"{/if}>{$smarty.capture.pageTitle|escape|nl2br}</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+  {/if}
+
+  {$section_contents.content}
+</div>
+
+<!-- Footer -->
+<footer class="py-1">
+  <div class="container text-center">
+    <div class="row">
+      <div class="col-12 w-100">
+        {$footer_nav}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 w-100">
+        {$conf_locales["footer_static_content$conf_platform"]}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Announcement -->
+{if $conf.announcement_enabled
+  && (!$conf.announcement_start_date || $smarty.now >= strtotime($conf.announcement_start_date))
+  && (!$conf.announcement_end_date || $smarty.now <= strtotime($conf.announcement_end_date))
+  && (!$conf.announcement_session_check || !$smarty.cookies.announcement_session_check)}
+<div id="announcement" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.LABEL_close|escape}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {$conf.announcement_content[$request.locale]}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready( function() {
+    $( "#announcement" ).on( "hidden.bs.modal", function () {
+        Cookies.set( "announcement_session_check", "1" );
+    } ).modal( "show" );
+} );
+</script>
+{/if}

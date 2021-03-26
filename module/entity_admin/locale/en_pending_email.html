@@ -1,0 +1,23 @@
+Pending approval for {$dict.APP_title|escape}
+<p>Hi,</p>
+
+<p>
+  The {$dict.SET_entities[$smarty.get.entity]|strtolower|escape} (<strong>{$data.name|escape}</strong>) is recently
+  {if $smarty.get.id}
+  edited
+  {elseif $data.op == 'edit'}
+  created
+  {/if}
+  by {$user->getFirstName()|escape} &lt;<a href="mailto:{$user->getEmail()|escape}">{$user->getEmail()|escape}</a>&gt;.
+</p>
+
+<p>
+  To approve or edit details, please visit the following URL:
+  <a href="{$sets.paths.server_url|escape}{$sets.paths.mod_from_doc|escape}/?entity={$smarty.get.entity|escape:'url'}&amp;op=edit&amp;id={$data.id}">
+    {$sets.paths.server_url|escape}{$sets.paths.mod_from_doc|escape}/?entity={$smarty.get.entity|escape:'url'}&amp;op=edit&amp;id={$data.id}
+  </a>
+<p>
+
+<p>Regards,</p>
+
+<p>{$conf.mailer_name|escape}</p>

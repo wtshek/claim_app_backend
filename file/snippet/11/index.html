@@ -1,0 +1,29 @@
+<div aria-multiselectable="true" class="panel-group about-accordion" id="accordion" role="tablist">
+  {foreach $snippet_data.list as $start_year => $list}
+  <div class="panel panel-default">
+    <div class="panel-heading" id="heading-{$start_year}" role="tab">
+      <h4 class="panel-title">
+        <a aria-controls="press-release-{$start_year}" aria-expanded="{if $list@first}true{else}false{/if}" class="{if !$list@first}collapsed{/if}" data-parent="#accordion" data-target="#press-release-{$start_year}" data-toggle="collapse" href="#press-release-{$start_year}" onclick="return false" role="button">{$start_year} <span class="arrow"></span></a>
+      </h4>
+    </div>
+
+    <div aria-labelledby="heading-{$start_year}" class="panel-collapse collapse {if $list@first}in{/if}" id="press-release-{$start_year}" role="tabpanel">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-2">{$snippet_data.LABEL_date|escape}</div>
+          <div class="col-md-10"></div>
+        </div>
+
+        {foreach $list as $record}
+        <div class="row">
+          <div class="col-md-2">{$record.release_date|date_format:'%Y/%m/%d'}</div>
+          <div class="col-md-10">
+            <a href="{$request.locale|escape}{$data.current_url|escape}{$record.id}/">{$record.title|escape|nl2br}</a>
+          </div>
+        </div>
+        {/foreach}
+      </div>
+    </div>
+  </div>
+  {/foreach}
+</div>

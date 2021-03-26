@@ -1,0 +1,429 @@
+{field_text ratio="0:12" name="action_url[$locale]" placeholder=$dict.DESCRIPTION_action_url error=$errors["action_url[$locale]"] value=$offer->getActionUrl()->getData($locale)}
+{field_textarea ratio="0:12" id="content_$locale" name="content[$locale]" error=$errors["content[$locale]"] class="visualEditor" style="height:250px;width: 100%;" value=$offer->getContent()->getData($locale) style="height: 490px"}
+{field_textarea class="text_input" ratio="2:10" name="short_description[$locale]" error=$errors["short_description[$locale]"] title=$dict.LABEL_short_description id="short_description_$locale" value=$offer->getShortDescription()->getData($locale) view_only=$viewOnly placeholder=false class="visualEditor" maxlength=200 notes="`$dict.LABEL_character_limit`: 200" style="height: 250px"}
+<!--{field_textarea class="text_input" ratio="2:10" name="reservation_info[$locale]" error=$errors["reservation_info[$locale]"] title=$dict.LABEL_reservation_info id="reservation_info_$locale" value=$offer->getReservationInfo()->getData($locale) view_only=$viewOnly placeholder=false class="visualEditor"}-->
+
+<datalist id="edit_background_position_list">
+  {foreach $dict.SET_background_positions as $background_position => $background_position_text}
+  <option>{$background_position|escape}</option>
+  {/foreach}
+</datalist>
+
+<div>
+  <h4 style="margin-top:1.5em;font-weight:400;font-size:1.2em;color:#368ee0;">{$dict.LABEL_menus|escape}</h4>
+
+  <div class="snippet-fields-block">
+    {foreach $offer->getMenus($locale) as $menu}
+    <div class="parameter_group">
+      <div class="row">
+        <div class="col-12 form_actions">
+          <ul>
+            <li>
+              <button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="10"><i class="icon-plus"></i></button>
+            </li>
+
+            <li>
+              <button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <dl class="input-field select-field row edit">
+        <dt class="col-4"><label for="{$locale}[menus][name{$menu@iteration}]">{$dict.LABEL_name|escape}</label></dt>
+        <dd class="col-8">
+          <input type="text" id="{$locale}[menus][name{$menu@iteration}]" name="{$locale}[menus][name{$menu@iteration}]" class="form-control" value="{$menu.name}" maxlength="255">
+        </dd>
+      </dl>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[menus][file{$menu@iteration}]">{$dict.LABEL_file|escape}</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[menus][file{$menu@iteration}]" name="{$locale}[menus][file{$menu@iteration}]" class="form-control" value="{$menu.file|escape}" maxlength="255" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i> {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes">{$dict.MESSAGE_menu_file|escape}</div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    {foreachelse}
+    <div class="parameter_group">
+      <div class="row">
+        <div class="col-12 form_actions">
+          <ul>
+            <li>
+              <button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="10"><i class="icon-plus"></i></button>
+            </li>
+
+            <li>
+              <button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <dl class="input-field select-field row edit">
+        <dt class="col-4"><label for="{$locale}[menus][name1]">{$dict.LABEL_name|escape}</label></dt>
+        <dd class="col-8">
+          <input type="text" id="{$locale}[menus][name1]" name="{$locale}[menus][name1]" class="form-control" maxlength="255">
+        </dd>
+      </dl>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[menus][file1]">{$dict.LABEL_file|escape}</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[menus][file1]" name="{$locale}[menus][file1]" class="form-control" value="" maxlength="255" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i> {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes">{$dict.MESSAGE_menu_file|escape}</div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    {/foreach}
+  </div>
+</div>
+
+<div>
+  <h4 style="margin-top:1.5em;font-weight:400;font-size:1.2em;color:#368ee0;">{$dict.LABEL_banners|escape}</h4>
+
+  <div class="snippet-fields-block">
+    {foreach $offer->getBanners($locale) as $banner}
+    <div class="parameter_group">
+      <div class="row">
+        <div class="col-12 form_actions">
+          <ul>
+            <li>
+              <button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="10"><i class="icon-plus"></i></button>
+            </li>
+
+            <li>
+              <button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[banners][image_xs{$banner@iteration}]">{$dict.LABEL_image|escape} ({$dict.LABEL_viewport_xs|escape})</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[banners][image_xs{$banner@iteration}]" name="{$locale}[banners][image_xs{$banner@iteration}]" class="form-control" value="{$banner.image_xs|escape}" maxlength="255" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i>
+                    {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes">{$dict.MESSAGE_banner_image_xs|escape}</div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <dl class="input-field select-field row edit">
+        <dt class="col-4"><label for="{$locale}[banners][background_position_xs{$banner@iteration}]">{$dict.LABEL_background_position|escape} ({$dict.LABEL_viewport_xs|escape})</label></dt>
+        <dd class="col-8">
+          {*
+          <select id="{$locale}[banners][background_position_xs{$banner@iteration}]" name="{$locale}[banners][background_position_xs{$banner@iteration}]" class="form-control">
+            <option value="">&nbsp;</option>
+            {html_options options=$dict.SET_background_positions selected=$banner.background_position_xs}
+          </select>
+          *}
+          <input type="text" id="{$locale}[banners][background_position_xs{$banner@iteration}]" name="{$locale}[banners][background_position_xs{$banner@iteration}]" class="form-control" list="edit_background_position_list" value="{$banner.background_position_xs|escape}">
+        </dd>
+      </dl>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[banners][image_md{$banner@iteration}]">{$dict.LABEL_image|escape} ({$dict.LABEL_viewport_md|escape})</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[banners][image_md{$banner@iteration}]" name="{$locale}[banners][image_md{$banner@iteration}]" class="form-control" value="{$banner.image_md|escape}" maxlength="255" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i>
+                    {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes">{$dict.MESSAGE_banner_image_md|escape}</div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <dl class="input-field select-field row edit">
+        <dt class="col-4"><label for="{$locale}[banners][background_position_md{$banner@iteration}]">{$dict.LABEL_background_position|escape} ({$dict.LABEL_viewport_md|escape})</label></dt>
+        <dd class="col-8">
+          {*
+          <select id="{$locale}[banners][background_position_md{$banner@iteration}]" name="{$locale}[banners][background_position_md{$banner@iteration}]" class="form-control">
+            <option value="">&nbsp;</option>
+            {html_options options=$dict.SET_background_positions selected=$banner.background_position_md}
+          </select>
+          *}
+          <input type="text" id="{$locale}[banners][background_position_md{$banner@iteration}]" name="{$locale}[banners][background_position_md{$banner@iteration}]" class="form-control" list="edit_background_position_list" value="{$banner.background_position_md|escape}">
+        </dd>
+      </dl>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[banners][image_xl{$banner@iteration}]">{$dict.LABEL_image|escape} ({$dict.LABEL_viewport_xl|escape})</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[banners][image_xl{$banner@iteration}]" name="{$locale}[banners][image_xl{$banner@iteration}]" class="form-control" value="{$banner.image_xl|escape}" maxlength="255" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i>
+                    {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes">{$dict.MESSAGE_banner_image_xl|escape}</div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <dl class="input-field select-field row edit">
+        <dt class="col-4"><label for="{$locale}[banners][background_position_xl{$banner@iteration}]">{$dict.LABEL_background_position|escape} ({$dict.LABEL_viewport_xl|escape})</label></dt>
+        <dd class="col-8">
+          {*
+          <select id="{$locale}[banners][background_position_xl{$banner@iteration}]" name="{$locale}[banners][background_position_xl{$banner@iteration}]" class="form-control">
+            <option value="">&nbsp;</option>
+            {html_options options=$dict.SET_background_positions selected=$banner.background_position_xl}
+          </select>
+          *}
+          <input type="text" id="{$locale}[banners][background_position_xl{$banner@iteration}]" name="{$locale}[banners][background_position_xl{$banner@iteration}]" class="form-control" list="edit_background_position_list" value="{$banner.background_position_xl|escape}">
+        </dd>
+      </dl>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[banners][url{$banner@iteration}]">{$dict.LABEL_url|escape}</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[banners][url{$banner@iteration}]" name="{$locale}[banners][url{$banner@iteration}]" class="form-control" value="{$banner.url|escape}" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i>
+                    {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    {foreachelse}
+    <div class="parameter_group">
+      <div class="row">
+        <div class="col-12 form_actions">
+          <ul>
+            <li>
+              <button type="button" name="parameter_group_add[]" class="btn btn-small" data-max="10"><i class="icon-plus"></i></button>
+            </li>
+            <li>
+              <button type="button" name="parameter_group_remove[]" class="btn btn-small"><i class="icon-minus"></i></button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[banners][image_xs1]">{$dict.LABEL_image|escape} ({$dict.LABEL_viewport_xs|escape})</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[banners][image_xs1]" name="{$locale}[banners][image_xs1]" class="form-control" value="" maxlength="255" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i>
+                    {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes">{$dict.MESSAGE_banner_image_xs|escape}</div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <dl class="input-field select-field row edit">
+        <dt class="col-4"><label for="{$locale}[banners][background_position_xs1]">{$dict.LABEL_background_position|escape} ({$dict.LABEL_viewport_xs|escape})</label></dt>
+        <dd class="col-8">
+          {*
+          <select id="{$locale}[banners][background_position_xs1]" name="banner_background_positions[$locale][]" class="form-control">
+            <option value="">&nbsp;</option>
+            {html_options options=$dict.SET_background_positions}
+          </select>
+          *}
+          <input type="text" id="{$locale}[banners][background_position_xs1]" name="{$locale}[banners][background_position_xs1]" class="form-control" list="edit_background_position_list" value="">
+        </dd>
+      </dl>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[banners][image_md1]">{$dict.LABEL_image|escape} ({$dict.LABEL_viewport_md|escape})</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[banners][image_md1]" name="{$locale}[banners][image_md1]" class="form-control" value="" maxlength="255" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i>
+                    {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes">{$dict.MESSAGE_banner_image_md|escape}</div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <dl class="input-field select-field row edit">
+        <dt class="col-4"><label for="{$locale}[banners][background_position_md1]">{$dict.LABEL_background_position|escape} ({$dict.LABEL_viewport_md|escape})</label></dt>
+        <dd class="col-8">
+          {*
+          <select id="{$locale}[banners][background_position_md1]" name="banner_background_positions[$locale][]" class="form-control">
+            <option value="">&nbsp;</option>
+            {html_options options=$dict.SET_background_positions}
+          </select>
+          *}
+          <input type="text" id="{$locale}[banners][background_position_md1]" name="{$locale}[banners][background_position_md1]" class="form-control" list="edit_background_position_list" value="">
+        </dd>
+      </dl>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[banners][image_xl1]">{$dict.LABEL_image|escape} ({$dict.LABEL_viewport_xl|escape})</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[banners][image_xl1]" name="{$locale}[banners][image_xl1]" class="form-control" value="" maxlength="255" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i>
+                    {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+
+              <div class="notes">{$dict.MESSAGE_banner_image_xl|escape}</div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <dl class="input-field select-field row edit">
+        <dt class="col-4"><label for="{$locale}[banners][background_position_xl1]">{$dict.LABEL_background_position|escape} ({$dict.LABEL_viewport_xl|escape})</label></dt>
+        <dd class="col-8">
+          {*
+          <select id="{$locale}[banners][background_position_xl1]" name="banner_background_positions[$locale][]" class="form-control">
+            <option value="">&nbsp;</option>
+            {html_options options=$dict.SET_background_positions}
+          </select>
+          *}
+          <input type="text" id="{$locale}[banners][background_position_xl1]" name="{$locale}[banners][background_position_xl1]" class="form-control" list="edit_background_position_list" value="">
+        </dd>
+      </dl>
+
+      <div class="row select_change_toggle">
+        <div class="col-12">
+          <dl class="input-field text-field row edit">
+            <dt class="col-4"><label for="{$locale}[banners][url1]">{$dict.LABEL_url|escape}</label></dt>
+            <dd class="col-8">
+              <div class="input-group">
+                <input id="{$locale}[banners][url1]" name="{$locale}[banners][url1]" class="form-control" value="" type="text">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary edit_file_trigger">
+                    <i class="icon-folder-open-alt"></i>
+                    {$dict.ACTION_browse|escape}
+                  </button>
+                </div>
+              </div>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    {/foreach}
+  </div>
+</div>
+
+<div class="modal hide fade edit_file_modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{$dict.SET_modules.media_admin|escape}</h5>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="{$dict.ACTION_close|escape}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <nav>
+          <div class="nav nav-tabs tabs-inline tabs-top" id="edit-file-{$locale|escape}-tab" role="tablist">
+            {if $hasShareFolderRight}
+            <a class="nav-item nav-link active" id="edit-file-{$locale|escape}-shared-tab" data-toggle="tab" href="#edit-file-{$locale|escape}-shared" role="tab" aria-controls="edit-file-{$locale|escape}-shared" aria-selected="true">
+              {$dict.LABEL_share_files|escape}
+            </a>
+            {/if}
+
+            <a class="nav-item nav-link {if !$hasShareFolderRight}active{/if}" id="edit-file-{$locale|escape}-offer-tab" data-toggle="tab" href="#edit-file-{$locale|escape}-offer" role="tab" aria-controls="edit-file-{$locale|escape}-offer" aria-selected="{if !$hasShareFolderRight}true{else}false{/if}">
+              Offer Files
+            </a>
+          </div>
+        </nav>
+
+        <div class="tab-content" id="edit-file-{$locale|escape}-tabContent">
+          {if $hasShareFolderRight}
+          <div class="tab-pane fade padding show active" id="edit-file-{$locale|escape}-shared" role="tabpanel" aria-labelledby="edit-file-{$locale|escape}-shared-tab">
+            <iframe src="about:blank" width="100%" height="500" class="mediashare"></iframe>
+          </div>
+          {/if}
+
+          <div class="tab-pane fade padding {if !$hasShareFolderRight}show active{/if}" id="edit-file-{$locale|escape}-offer" role="tabpanel" aria-labelledby="edit-file-{$locale|escape}-offer-tab">
+            <iframe src="about:blank" width="100%" height="500" class="offer"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{field_text class="text_input" ratio="2:10" name="keywords[$locale]" error=$errors["keywords[$locale]"] title=$dict.LABEL_keywords id="seo_keywords_$locale" value=$offer->getKeywords()->getData($locale) view_only=$viewOnly placeholder=false} {field_text class="text_input" ratio="2:10" name="description[$locale]" error=$errors["description[$locale]"] title=$dict.LABEL_description id="seo_description_$locale" value=$offer->getDescription()->getData($locale) view_only=$viewOnly placeholder=false}

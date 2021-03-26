@@ -1,0 +1,125 @@
+<div class="container press-release">
+  <div class="row line-heading">
+    <h1 class="text-center text">{$snippet_data.record.title|escape|nl2br}</h1>
+  </div>
+
+  {if $snippet_data.record.release_date_shown_in_detail_page}
+  <p class="gold-title text-center">
+    {$snippet_data.record.release_date|date_format:'%Y/%m/%d'}
+  </p>
+  {/if}
+
+  <div class="row">
+    <div class="col-sm-8">
+      <div>
+        {$snippet_data.record.content}
+      </div>
+
+      <p class="back">
+        <a href="{$request.locale}{$data.current_url|escape}"><i aria-hidden="true" class="fa fa-angle-left"></i> {$snippet_data.LABEL_view_more_press_releases|escape}</a>
+      </p>
+    </div>
+
+    <div class="col-xs-12 col-sm-4">
+      {if $snippet_data.record.pdf}
+      <a href="{if strpos($snippet_data.record.pdf, 'media_center/') === 0}{if $conf.aws_enabled}http://{$conf.cloudfront_domain|escape}/{else}file/{/if}{/if}{$snippet_data.record.pdf|escape}" target="_blank">{$snippet_data.LABEL_download_pdf|escape} <i aria-hidden="true" class="fa fa-download"></i></a>
+      {/if}
+
+      {if count($snippet_data.dinings) > 0 || count($snippet_data.rooms) > 0}
+      <div class="col-xs-12 gold-border">
+        <h2>{$snippet_data.LABEL_reservations_and_enquires_title|escape}</h2>
+        {if count($snippet_data.dinings) > 0}
+        <div>{$snippet_data.MESSAGE_dining_reservations_and_enquires_details}</div>
+        {/if}
+        {if count($snippet_data.rooms) > 0}
+        <div>{$snippet_data.MESSAGE_room_reservations_and_enquires_details}</div>
+        {/if}
+      </div>
+      {/if}
+
+      {if count($snippet_data.rooms) == 1}
+      <div class="col-xs-12 gold-border">
+        <div class="col-xs-12 text-center">
+          <img alt="" class="img-responsive" src="{if $conf.aws_enabled}http://{$conf.cloudfront_domain|escape}/{else}file/{/if}{$snippet_data.rooms.0.image|escape}">
+        </div>
+
+        <div class="col-xs-12">
+          <h2>{$snippet_data.rooms.0.title|escape}</h2>
+
+          <div>{$snippet_data.rooms.0.short_description}</div>
+        </div>
+      </div>
+      {/if}
+
+      {if count($snippet_data.dinings) == 1}
+      <div class="col-xs-12 gold-border">
+        <div class="col-xs-12 text-center restaurant-logo">
+          <img alt="" src="{if $conf.aws_enabled}http://{$conf.cloudfront_domain|escape}/{else}file/{/if}{$snippet_data.dinings.0.logo|escape}">
+        </div>
+
+        <div class="col-xs-12">
+<!--          <h2>{$snippet_data.dinings.0.title|escape}</h2>-->
+
+          <table class="restaurant-info">
+            <tbody>
+              <tr>
+                <td width="30%">{$snippet_data.dinings.0.opening_hours_title|escape}</td>
+                <td>{$snippet_data.dinings.0.opening_hours_details}</td>
+              </tr>
+
+             <!-- <tr>
+                <td width="30%">{$snippet_data.dinings.0.location_title|escape}</td>
+                <td>{$snippet_data.dinings.0.location_details}</td>
+              </tr>
+
+              <tr>
+                <td width="30%">{$snippet_data.dinings.0.attire_title|escape}</td>
+                <td>{$snippet_data.dinings.0.attire_details}</td>
+              </tr>
+
+              {if count($snippet_data.dinings.0.menus) > 0}
+              <tr>
+                <td>{$snippet_data.dinings.0.menu_title|escape}</td>
+                <td>
+                  <ul>
+                    {foreach $snippet_data.dinings.0.menus as $menu}
+                    <li>
+                      <a href="{if $conf.aws_enabled}http://{$conf.cloudfront_domain|escape}/{else}file/{/if}{$menu.file|escape}" target="_blank">{$menu.name|escape}</a>
+                    </li>
+                    {/foreach}
+                  </ul>
+                </td>
+              </tr>
+              {/if}-->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {/if}
+
+      {if $snippet_data.record.album_text_1 || $snippet_data.record.album_text_2 || $snippet_data.record.album_text_3}
+      <div class="col-xs-12 gold-border">
+        <h2>{$snippet_data.LABEL_photo_albums_title|escape}</h2>
+
+        {if $snippet_data.record.album_text_1}
+        <p><a href="{$snippet_data.record.album_url_1|escape}" target="_blank">{$snippet_data.record.album_text_1|escape} &raquo;</a></p>
+        {/if}
+
+        {if $snippet_data.record.album_text_2}
+        <p><a href="{$snippet_data.record.album_url_2|escape}" target="_blank">{$snippet_data.record.album_text_2|escape} &raquo;</a></p>
+        {/if}
+
+        {if $snippet_data.record.album_text_3}
+        <p><a href="{$snippet_data.record.album_url_3|escape}" target="_blank">{$snippet_data.record.album_text_3|escape} &raquo;</a></p>
+        {/if}
+        
+      </div>
+      {/if}      
+
+      <div class="col-xs-12 gold-border">
+        <h2>{$snippet_data.LABEL_press_contact_title|escape}</h2>
+        <div>{$snippet_data.MESSAGE_press_contact_details}</div>
+      </div>
+    </div>
+  </div>
+</div>

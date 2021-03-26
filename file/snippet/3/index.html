@@ -1,0 +1,28 @@
+<ul id="content-slider" style="width: 100%; height: auto;">
+    <li>
+        {if count($child_pages_items)}
+        <table width="85%" class="pressrelease" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+                {foreach from=$child_pages_items item=item name=child_page}
+                    {if !$smarty.foreach.child_page.first}
+                        <tr>
+                            <td colspan="2"><img width="660" height="1" class="divider" alt="" src="file/media/share/content-horizontal-divider.png" /></td>
+                        </tr>
+                    {/if}
+                    <tr><td class="date">
+                            {date('Y-m-d', $item->getItem()->getLocalePublishDate($request.locale, 'timestamp') + (8 * 60 * 60))}
+                        </td>
+                        <td>
+                            <h2><a href="{$sets.paths['app_from_doc']|escape:'html'}/{$request.locale|escape:'html'}{$item->getItem()->getRelativeUrl($module->platform, true)|escape:'html'}">
+                                    {$item->getItem()->getTitle($module->kernel->request['locale'])|escape:'html'}
+                            </a></h2>
+                        </td>
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
+        {else}
+            <p>{$dict.LABEL_no_records|escape:'html'}</p>
+        {/if}
+    </li>
+</ul>

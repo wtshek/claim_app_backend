@@ -1,0 +1,233 @@
+<form id="subscription-form" method="POST" action="{$smarty.server.REDIRECT_URL|escape}">
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-title-mr">
+      {$snippet_data.LABEL_title|escape}
+      <sup class="required"><i class="fas fa-asterisk"></i></sup>
+    </label>
+
+    <div class="col-12 col-md-8">
+      {foreach $dict.SET_titles as $title => $title_name}
+      <div class="form-check form-check-inline">
+        <input id="subscription-title-{$title|escape}" class="form-check-input" type="radio" name="title" value="{$title|escape}" required>
+        <label class="form-check-label" for="subscription-title-{$title|escape}">{$title_name|escape}</label>
+      </div>
+      {/foreach}
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+
+  {capture "first_name"}
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-first-name">
+      {$snippet_data.LABEL_first_name|escape}
+      <sup class="required"><i class="fas fa-asterisk"></i></sup>
+    </label>
+
+    <div class="col-12 col-md-8">
+      <input id="subscription-first-name" class="form-control" type="text" name="first_name"
+        maxlength="255" required autocomplete="given-name">
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+  {/capture}
+
+  {capture "last_name"}
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-last-name">
+      {$snippet_data.LABEL_last_name|escape}
+      <sup class="required"><i class="fas fa-asterisk"></i></sup>
+    </label>
+
+    <div class="col-12 col-md-8">
+      <input id="subscription-last-name" class="form-control" type="text" name="last_name"
+        maxlength="255" required autocomplete="family-name">
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+  {/capture}
+
+  {if in_array($request.locale, array('zh-hans', 'zh-hant'))}
+  {$smarty.capture.last_name}{$smarty.capture.first_name}
+  {else}
+  {$smarty.capture.first_name}{$smarty.capture.last_name}
+  {/if}
+
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-email">
+      {$snippet_data.LABEL_email|escape}
+      <sup class="required"><i class="fas fa-asterisk"></i></sup>
+    </label>
+
+    <div class="col-12 col-md-8">
+      <input id="subscription-email" class="form-control" type="email" name="email"
+        {if $smarty.get.email}value="{$smarty.get.email|escape}"{/if}
+        maxlength="255" required autocomplete="email">
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-phone">
+      {$snippet_data.LABEL_phone|escape}
+    </label>
+
+    <div class="col-12 col-md-8">
+      <input id="subscription-phone" class="form-control" type="tel" name="phone"
+        maxlength="255" required autocomplete="tel">
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-address">
+      {$snippet_data.LABEL_address|escape}
+    </label>
+
+    <div class="col-12 col-md-8">
+      <input id="subscription-address" class="form-control" type="text" name="address"
+        maxlength="255" required autocomplete="street-address">
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-city">
+      {$snippet_data.LABEL_city|escape}
+    </label>
+
+    <div class="col-12 col-md-8">
+      <input id="subscription-city" class="form-control" type="text" name="city"
+        maxlength="255" required autocomplete="street-city">
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-zip-code">
+      {$snippet_data.LABEL_zip_code|escape}
+    </label>
+
+    <div class="col-12 col-md-8">
+      <input id="subscription-zip-code" class="form-control" type="text" name="zip_code"
+        maxlength="255" required autocomplete="postal-code">
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-12 col-md-4 col-form-label" for="subscription-country">
+      {$snippet_data.LABEL_country|escape}
+      <sup class="required"><i class="fas fa-asterisk"></i></sup>
+    </label>
+
+    <div class="col-12 col-md-8">
+      <datalist id="subscription-countries">
+        {html_options values=$dict.SET_countries}
+      </datalist>
+      <input id="subscription-country" class="form-control" type="text" name="country"
+        maxlength="255" required autocomplete="country-name" list="subscription-countries">
+      <div class="invalid-feedback"></div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-12">
+      <div class="h-captcha" data-sitekey="{$conf.hcaptcha_sitekey|escape}" data-theme="light"
+        data-size="invisible" data-callback="hcaptcha_callback"></div>
+      <small class="form-text">{$dict.MESSAGE_hcaptcha_compliance}</small>
+    </div>
+  </div>
+
+  <div class="form-group row pt-3">
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">
+        {$snippet_data.LABEL_submit|escape}
+      </button>
+    </div>
+  </div>
+</form>
+
+<script>
+// hCaptcha callback
+function hcaptcha_callback()
+{
+    var form = $( "#subscription-form" );
+    var submit = form.find( "button[type=submit]" ).prop( "disabled", true );
+
+    $.post( form[0].action, form.serialize(), function(errors) {
+        // Errors not found
+        if ( Object.keys(errors).length == 0 )
+        {
+            window.location.href = "{$smarty.server.REDIRECT_URL|strtok:'?'}/{$snippet_data.redirect_alias|escape}/";
+        }
+
+        // Errors found
+        // hCaptcha should not return errors, so use alert for debugging
+        else
+        {
+            window.alert( Object.keys(errors).map(function(e) {
+                return errors[e];
+            }).join("\r\n") );
+        }
+
+        submit.prop( "disabled", false );
+    } );
+};
+
+// Code to run on document ready
+$( document ).ready( function() {
+    // Form validation
+    var form = $( "#subscription-form" ).attr( "novalidate", true ).on( "submit", function() {
+        controls.removeClass( "is-invalid" );
+        feedbacks.empty();
+        submit.prop( "disabled", true );
+
+        $.post( this.action, form.serialize(), function(errors) {
+            // Errors not found
+            if ( Object.keys(errors).length == 0 )
+            {
+                window.location.href = "{$smarty.server.REDIRECT_URL|strtok:'?'}/{$snippet_data.redirect_alias|escape}/";
+            }
+
+            // Errors found
+            else
+            {
+                // Show errors
+                for ( name in errors )
+                {
+                    if ( errors.hasOwnProperty(name) )
+                    {
+                        var field = controls.filter( "*[name='" + name + "']" );
+                        if ( field.length > 0 )
+                        {
+                            if ( field.is(":radio") )
+                            {
+                                field.addClass( "is-invalid" ).parent().addClass( "is-invalid" ).siblings( ".invalid-feedback" ).text( errors[name] );
+                            }
+                            else
+                            {
+                                field.addClass( "is-invalid" );
+                                field.next().text( errors[name] );
+                            }
+                        }
+                    }
+                }
+
+                // Execute hCaptcha
+                if ( Object.keys(errors).length == 1 && errors["h-captcha-response"] )
+                {
+                    hcaptcha.execute( hcaptcha_container.find("iframe").data("hcaptchaWidgetId") );
+                }
+            }
+
+            submit.prop( "disabled", false );
+        } );
+
+        return false;
+    } );
+    var controls = form.find( ".form-control, .form-check, .form-check-input" );
+    var feedbacks = form.find( ".invalid-feedback" );
+    var hcaptcha_container = form.find( ".h-captcha" );
+    var submit = form.find( "button[type=submit]" );
+} );
+</script>
